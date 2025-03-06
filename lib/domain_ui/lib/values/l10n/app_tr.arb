@@ -1,0 +1,17 @@
+{
+    "splashTitle": "ParcelInfo",
+    "splashButton": "Temayı Değiş",
+    "infoDialogParcelInfoTitle": "Parsel Bilgileri",
+    "infoLabelCity": "İl",
+    "infoLabelDistrict": "İlçe",
+    "infoLabelNeighborhood": "Mahalle",
+    "infoLabelLocation": "Mevkii",
+    "infoLabelStatus": "Durum",
+    "infoLabelGroundStatus": "Zemin Durum",
+    "infoLabelSummary": "Özet",
+    "infoLabelArea": "Alan",
+    "infoLabelKind": "Nitelik",
+    "infoLabelParcelNumber": "Parsel Numarası",
+    "infoLabelBlockNumber": "Ada Numarası",
+    "infoLabelMapSheetNumber": "Pafta"
+}

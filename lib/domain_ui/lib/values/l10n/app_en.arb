@@ -1,0 +1,17 @@
+{
+    "splashTitle": "ParcelInfo",
+    "splashButton": "Change theme",
+    "infoDialogParcelInfoTitle": "Parcel Informations",
+    "infoLabelCity": "City",
+    "infoLabelDistrict": "District",
+    "infoLabelNeighborhood": "Neighborhood",
+    "infoLabelLocation": "Location",
+    "infoLabelStatus": "Status",
+    "infoLabelGroundStatus": "Ground Status",
+    "infoLabelSummary": "Summary",
+    "infoLabelArea": "Area",
+    "infoLabelKind": "Kind",
+    "infoLabelParcelNumber": "Parcel Number",
+    "infoLabelBlockNumber": "Block Number",
+    "infoLabelMapSheetNumber": "Map Sheet Number"
+}

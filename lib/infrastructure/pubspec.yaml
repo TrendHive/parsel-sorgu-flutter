@@ -1,0 +1,26 @@
+name: infrastructure
+description: "ParcelInfo's infrastructure library."
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ^3.5.3
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  core:
+    path: ../core
+  device_info_plus: ^11.1.1
+  package_info_plus: ^8.1.1
+  dio: ^5.7.0
+  geolocator: ^13.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
