@@ -1,0 +1,2 @@
+NSLocationWhenInUseUsageDescription = "The app wants to use your location.";
+NSLocationAlwaysUsageDescription = "The app wants to use your location at all times.";

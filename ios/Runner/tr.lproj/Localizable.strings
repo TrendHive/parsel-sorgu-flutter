@@ -1,0 +1,2 @@
+NSLocationWhenInUseUsageDescription = "Uygulama konumunuzu kullanmak istiyor.";
+NSLocationAlwaysUsageDescription = "Uygulama konumunuzu her zaman kullanmak istiyor.";
