@@ -10,5 +10,6 @@ final class HomeLoading extends HomeState {}
 final class HomeStart extends HomeState {}
 
 final class HomeParcelInfoFound extends HomeState {}
+final class HomeParcelInfoShow extends HomeState {}
 
 final class HomeError extends HomeState {}

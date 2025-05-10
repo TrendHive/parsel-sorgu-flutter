@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:application/parcel_get/usecase/parcel_get_usecase.dart';
 import 'package:core/base/base_exception.dart';
 import 'package:domain/constants.dart';
 import 'package:domain/package/model/package_model.dart';
+import 'package:domain/parcel_info/model/parcel_info_list_model.dart';
 import 'package:domain/parcel_info/model/parcel_info_model.dart';
 import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +22,7 @@ class HomeCubit extends Cubit<HomeState> {
   List<BaseException> exceptionList = [];
 
   PackageModel packageModel = PackageModel();
-  ParcelInfoModel parcelInfoModel = ParcelInfoModel();
+  ParcelInfoListModel parcelInfoListModel = ParcelInfoListModel();
 
   ParcelGetUseCase parcelGetUseCase = ParcelGetUseCase();
 
@@ -35,7 +38,8 @@ class HomeCubit extends Cubit<HomeState> {
         position.latitude <= DomainConstants.turkeyEndLatitude &&
         position.longitude >= DomainConstants.turkeyStartLongitude &&
         position.longitude <= DomainConstants.turkeyEndLongitude) {
-      parcelInfoModel.location = LatLng(position.latitude, position.longitude);
+      parcelInfoListModel.location =
+          LatLng(position.latitude, position.longitude);
     }
     emit(HomeStart());
     return;
@@ -43,9 +47,18 @@ class HomeCubit extends Cubit<HomeState> {
 
   Future<void> getParcelInfo({required LatLng point}) async {
     emit(HomeLoading());
-    parcelInfoModel.point = point;
-    Either<BaseException, ParcelInfoModel> result =
-        await parcelGetUseCase.execute(parcelInfoModel);
+    parcelInfoListModel.point = point;
+    for (ParcelInfoModel parcelInfo in parcelInfoListModel.parcelInfoList) {
+      if (isPointInPolygon(point, parcelInfo.polygonCoordinates)) {
+        ParcelInfoModel parcelInfoModel = parcelInfo;
+        parcelInfoListModel.parcelInfoList.remove(parcelInfo);
+        parcelInfoListModel.parcelInfoList.add(parcelInfoModel);
+        emit(HomeParcelInfoShow());
+        return;
+      }
+    }
+    Either<BaseException, ParcelInfoListModel> result =
+        await parcelGetUseCase.execute(parcelInfoListModel);
     result.fold((left) {
       exceptionList.add(result.left);
       emit(HomeError());
@@ -53,5 +66,47 @@ class HomeCubit extends Cubit<HomeState> {
       emit(HomeParcelInfoFound());
     });
     return;
+  }
+
+  bool isPointInPolygon(LatLng point, List<LatLng> polygon) {
+    int intersectCount = 0;
+    for (int j = 0; j < polygon.length - 1; j++) {
+      LatLng a = polygon[j];
+      LatLng b = polygon[j + 1];
+
+      if (rayIntersectsSegment(point, a, b)) {
+        intersectCount++;
+      }
+    }
+    return (intersectCount % 2 == 1); // Tekse içeride
+  }
+
+  bool rayIntersectsSegment(LatLng point, LatLng a, LatLng b) {
+    double px = point.longitude;
+    double py = point.latitude;
+    double ax = a.longitude;
+    double ay = a.latitude;
+    double bx = b.longitude;
+    double by = b.latitude;
+
+    if (ay > by) {
+      double tempX = ax, tempY = ay;
+      ax = bx;
+      ay = by;
+      bx = tempX;
+      by = tempY;
+    }
+
+    if (py == ay || py == by) py += 0.0000001; // Tam çizgi üstündeyse kaydır
+
+    if (py < ay || py > by) return false;
+    if (px >= max(ax, bx)) return false;
+
+    if (px < min(ax, bx)) return true;
+
+    double red = (ax != bx) ? ((by - ay) / (bx - ax)) : double.infinity;
+    double blue = (ax != px) ? ((py - ay) / (px - ax)) : double.infinity;
+
+    return blue >= red;
   }
 }

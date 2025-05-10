@@ -30,51 +30,112 @@ class _HomePageState extends State<HomePage> {
         infoList: [
           Info(
             label: ParcelInfoLocalKeys.of(context)!.infoLabelCity,
-            value: context.read<HomeCubit>().parcelInfoModel.cityName,
+            value: context
+                .read<HomeCubit>()
+                .parcelInfoListModel
+                .parcelInfoList
+                .last
+                .cityName,
           ),
           Info(
             label: ParcelInfoLocalKeys.of(context)!.infoLabelDistrict,
-            value: context.read<HomeCubit>().parcelInfoModel.districtName,
+            value: context
+                .read<HomeCubit>()
+                .parcelInfoListModel
+                .parcelInfoList
+                .last
+                .districtName,
           ),
           Info(
             label: ParcelInfoLocalKeys.of(context)!.infoLabelNeighborhood,
-            value: context.read<HomeCubit>().parcelInfoModel.neighborhoodName,
+            value: context
+                .read<HomeCubit>()
+                .parcelInfoListModel
+                .parcelInfoList
+                .last
+                .neighborhoodName,
           ),
           Info(
             label: ParcelInfoLocalKeys.of(context)!.infoLabelLocation,
-            value: context.read<HomeCubit>().parcelInfoModel.locationString,
+            value: context
+                .read<HomeCubit>()
+                .parcelInfoListModel
+                .parcelInfoList
+                .last
+                .locationString,
           ),
           Info(
             label: ParcelInfoLocalKeys.of(context)!.infoLabelStatus,
-            value: context.read<HomeCubit>().parcelInfoModel.status,
+            value: context
+                .read<HomeCubit>()
+                .parcelInfoListModel
+                .parcelInfoList
+                .last
+                .status,
           ),
           Info(
             label: ParcelInfoLocalKeys.of(context)!.infoLabelGroundStatus,
-            value: context.read<HomeCubit>().parcelInfoModel.groundStatus,
+            value: context
+                .read<HomeCubit>()
+                .parcelInfoListModel
+                .parcelInfoList
+                .last
+                .groundStatus,
           ),
           Info(
             label: ParcelInfoLocalKeys.of(context)!.infoLabelSummary,
-            value: context.read<HomeCubit>().parcelInfoModel.summary,
+            value: context
+                .read<HomeCubit>()
+                .parcelInfoListModel
+                .parcelInfoList
+                .last
+                .summary,
           ),
           Info(
             label: ParcelInfoLocalKeys.of(context)!.infoLabelArea,
-            value: context.read<HomeCubit>().parcelInfoModel.area.toString(),
+            value: context
+                .read<HomeCubit>()
+                .parcelInfoListModel
+                .parcelInfoList
+                .last
+                .area
+                .toString(),
           ),
           Info(
             label: ParcelInfoLocalKeys.of(context)!.infoLabelKind,
-            value: context.read<HomeCubit>().parcelInfoModel.kind,
+            value: context
+                .read<HomeCubit>()
+                .parcelInfoListModel
+                .parcelInfoList
+                .last
+                .kind,
           ),
           Info(
             label: ParcelInfoLocalKeys.of(context)!.infoLabelParcelNumber,
-            value: context.read<HomeCubit>().parcelInfoModel.parcelID,
+            value: context
+                .read<HomeCubit>()
+                .parcelInfoListModel
+                .parcelInfoList
+                .last
+                .parcelID,
           ),
           Info(
             label: ParcelInfoLocalKeys.of(context)!.infoLabelBlockNumber,
-            value: context.read<HomeCubit>().parcelInfoModel.blockID,
+            value: context
+                .read<HomeCubit>()
+                .parcelInfoListModel
+                .parcelInfoList
+                .last
+                .blockID,
           ),
           Info(
             label: ParcelInfoLocalKeys.of(context)!.infoLabelMapSheetNumber,
-            value: context.read<HomeCubit>().parcelInfoModel.mapSheetID,
+            value: context
+                .read<HomeCubit>()
+                .parcelInfoListModel
+                .parcelInfoList
+                .last
+                .mapSheetID,
           ),
         ]);
     infoDialog?.show();
@@ -95,7 +156,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return BlocConsumer<HomeCubit, HomeState>(
       listener: (context, state) {
-        if (state is HomeParcelInfoFound) {
+        if (state is HomeParcelInfoShow) {
           showInfoDialog();
         }
         if (state is HomeError) {
@@ -109,7 +170,7 @@ class _HomePageState extends State<HomePage> {
             urlTemplate: DomainConstants.urlTemplate,
             onTap: (TapPosition tapPosition, LatLng point) =>
                 context.read<HomeCubit>().getParcelInfo(point: point),
-            initialCenter: context.read<HomeCubit>().parcelInfoModel.location,
+            parcelInfoListModel: context.read<HomeCubit>().parcelInfoListModel,
           ),
         );
       },

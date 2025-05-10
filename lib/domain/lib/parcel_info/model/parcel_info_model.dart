@@ -1,12 +1,8 @@
 import 'package:core/base/base_model.dart';
 import 'package:core/constants.dart';
-import 'package:domain/constants.dart';
 import 'package:latlong2/latlong.dart';
 
 class ParcelInfoModel extends BaseModel {
-  LatLng point =
-      const LatLng(CoreConstants.zeroDouble, CoreConstants.zeroDouble);
-
   int cityID = CoreConstants.zero;
   String cityName = CoreConstants.empty;
   int districtID = CoreConstants.zero;
@@ -22,10 +18,6 @@ class ParcelInfoModel extends BaseModel {
   String blockID = CoreConstants.empty;
   String mapSheetID = CoreConstants.empty;
   String kind = CoreConstants.empty;
-
   String type = CoreConstants.empty;
-  List<List<List<double>>> coordinates = [];
-
-  LatLng location = const LatLng(
-      DomainConstants.istanbulLatitude, DomainConstants.istanbulLongitude);
+  List<LatLng> polygonCoordinates = [];
 }

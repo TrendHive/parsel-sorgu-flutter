@@ -11,6 +11,7 @@ class CoreConstants {
   static const String hyphen = "-";
   static const String slash = "/";
   static const String dot = ".";
+  static const String comma = ",";
   static const String equal = "=";
   static const String and = "&";
   static const String nextLine = "\n";

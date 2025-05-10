@@ -1,4 +1,6 @@
+import 'package:core_ui/values/base_dimens.dart';
 import 'package:domain_ui/values/parcel_info_color.dart';
+import 'package:domain_ui/widgets/container/parcel_info_container.dart';
 import 'package:domain_ui/widgets/text/parcel_info_text.dart';
 import 'package:flutter/material.dart';
 
@@ -10,15 +12,29 @@ class ErrorDialogBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.error,
-            color: ParcelInfoColor.dangerButtonLight,
+      color: ParcelInfoColor.transparent,
+      child: Center(
+        child: ParcelInfoContainer(
+          width: MediaQuery.of(context).size.width * 4 / 5,
+          height: MediaQuery.of(context).size.height * 2 / 3,
+          color: ParcelInfoColor.white,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(BaseDimens.radius.large),
+            color: ParcelInfoColor.white,
           ),
-          ParcelInfoText(message)
-        ],
+          margin: EdgeInsets.symmetric(horizontal: BaseDimens.margin.xxxLarge),
+          padding: EdgeInsets.all(BaseDimens.padding.large),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.error,
+                color: ParcelInfoColor.dangerButtonLight,
+              ),
+              ParcelInfoText(message)
+            ],
+          ),
+        ),
       ),
     );
   }
