@@ -2,6 +2,7 @@ import 'package:core_ui/dialog/base_dialog.dart';
 import 'package:domain/info/info.dart';
 import 'package:domain_ui/dialog/info/builder/info_dialog_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class InfoDialog extends BaseDialog {
   final String title;
@@ -20,5 +21,6 @@ class InfoDialog extends BaseDialog {
         title: title,
         subTitle: subTitle,
         infoList: infoList,
+        onClosePressed: () => context.pop(),
       );
 }

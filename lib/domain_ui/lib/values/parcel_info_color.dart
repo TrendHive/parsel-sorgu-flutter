@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:core_ui/values/base_color.dart';
 
 class ParcelInfoColor {
   final bool isDarkMode;
@@ -62,4 +63,8 @@ class ParcelInfoColor {
   static const Color fontColorDescDark = Color(0xffC8C8C8);
   late Color fontColorDesc =
       isDarkMode ? fontColorDescDark : fontColorDescLight;
+
+  static const Color transparent = Colors.transparent;
+  static const Color white = BaseColor.white;
+  static const Color black = BaseColor.black;
 }

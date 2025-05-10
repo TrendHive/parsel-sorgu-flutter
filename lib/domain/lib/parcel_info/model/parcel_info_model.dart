@@ -1,5 +1,6 @@
 import 'package:core/base/base_model.dart';
 import 'package:core/constants.dart';
+import 'package:domain/constants.dart';
 import 'package:latlong2/latlong.dart';
 
 class ParcelInfoModel extends BaseModel {
@@ -25,6 +26,6 @@ class ParcelInfoModel extends BaseModel {
   String type = CoreConstants.empty;
   List<List<List<double>>> coordinates = [];
 
-  LatLng location =
-      const LatLng(CoreConstants.zeroDouble, CoreConstants.zeroDouble);
+  LatLng location = const LatLng(
+      DomainConstants.istanbulLatitude, DomainConstants.istanbulLongitude);
 }
