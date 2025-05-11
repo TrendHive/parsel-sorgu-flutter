@@ -1,4 +1,4 @@
-package com.example.parcel_info
+package com.trendhive.parcel_info
 
 import io.flutter.embedding.android.FlutterActivity
 

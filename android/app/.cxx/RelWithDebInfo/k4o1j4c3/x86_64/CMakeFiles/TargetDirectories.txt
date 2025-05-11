@@ -1,0 +1,2 @@
+/Users/ogzatechmacmini/Documents/GitHub/parsel-sorgu-flutter/android/app/.cxx/RelWithDebInfo/k4o1j4c3/x86_64/CMakeFiles/edit_cache.dir
+/Users/ogzatechmacmini/Documents/GitHub/parsel-sorgu-flutter/android/app/.cxx/RelWithDebInfo/k4o1j4c3/x86_64/CMakeFiles/rebuild_cache.dir

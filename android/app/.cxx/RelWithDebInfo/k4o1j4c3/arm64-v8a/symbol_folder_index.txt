@@ -1,0 +1,1 @@
+/Users/ogzatechmacmini/Documents/GitHub/parsel-sorgu-flutter/build/app/intermediates/cxx/RelWithDebInfo/k4o1j4c3/obj/arm64-v8a
