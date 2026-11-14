@@ -11,9 +11,13 @@ import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
 /// registry's boundaries with the real ones is the app's main question.
 /// Then the imagery switch, and the actions: a new freehand drawing, the
 /// device's location, people, history and sign out.
+///
+/// In a [compact] window people, history and sign out fold into one menu,
+/// so the bar stays two rows high on a phone and the map stays visible.
 class MapTopBar extends StatelessWidget {
   const MapTopBar({
     super.key,
+    required this.compact,
     required this.layers,
     required this.baseMap,
     required this.onToggleLayer,
@@ -24,6 +28,8 @@ class MapTopBar extends StatelessWidget {
     required this.onActivity,
     required this.onSignOut,
   });
+
+  final bool compact;
 
   final Set<MapLayerEnum> layers;
 
@@ -95,21 +101,53 @@ class MapTopBar extends StatelessWidget {
               icon: const Icon(Icons.my_location),
               onPressed: onMyLocation,
             ),
-            IconButton.filledTonal(
-              tooltip: l10n.menuPeople,
-              icon: const Icon(Icons.groups_outlined),
-              onPressed: onPeople,
-            ),
-            IconButton.filledTonal(
-              tooltip: l10n.menuActivity,
-              icon: const Icon(Icons.history),
-              onPressed: onActivity,
-            ),
-            IconButton(
-              tooltip: l10n.signOut,
-              icon: const Icon(Icons.logout),
-              onPressed: onSignOut,
-            ),
+            if (compact)
+              PopupMenuButton<VoidCallback>(
+                tooltip: l10n.menuPeople,
+                icon: const Icon(Icons.more_vert),
+                onSelected: (VoidCallback action) => action(),
+                itemBuilder: (BuildContext context) =>
+                    <PopupMenuEntry<VoidCallback>>[
+                      PopupMenuItem<VoidCallback>(
+                        value: onPeople,
+                        child: ListTile(
+                          leading: const Icon(Icons.groups_outlined),
+                          title: ParcelInfoText(l10n.menuPeople),
+                        ),
+                      ),
+                      PopupMenuItem<VoidCallback>(
+                        value: onActivity,
+                        child: ListTile(
+                          leading: const Icon(Icons.history),
+                          title: ParcelInfoText(l10n.menuActivity),
+                        ),
+                      ),
+                      PopupMenuItem<VoidCallback>(
+                        value: onSignOut,
+                        child: ListTile(
+                          leading: const Icon(Icons.logout),
+                          title: ParcelInfoText(l10n.signOut),
+                        ),
+                      ),
+                    ],
+              )
+            else ...<Widget>[
+              IconButton.filledTonal(
+                tooltip: l10n.menuPeople,
+                icon: const Icon(Icons.groups_outlined),
+                onPressed: onPeople,
+              ),
+              IconButton.filledTonal(
+                tooltip: l10n.menuActivity,
+                icon: const Icon(Icons.history),
+                onPressed: onActivity,
+              ),
+              IconButton(
+                tooltip: l10n.signOut,
+                icon: const Icon(Icons.logout),
+                onPressed: onSignOut,
+              ),
+            ],
           ],
         ),
       ),
