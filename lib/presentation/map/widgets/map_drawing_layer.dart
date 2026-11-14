@@ -16,7 +16,8 @@ import 'package:parcel_atlas/presentation/map/widgets/map_edge_chip.dart';
 /// The shape is drawn thick in yellow, so it stands out from both stored
 /// layers. Each edge carries a [MapEdgeChip] with its live length that
 /// inserts a corner when tapped; each corner is a draggable, numbered
-/// [MapCornerHandle] — tap to select, drag to move.
+/// [MapCornerHandle] — tap to select, drag to move. Every handle is drawn
+/// small but hit at the full 48 px tap target, so a fingertip finds it.
 ///
 /// [lengthOf] writes a length in the reader's format. The callbacks hand
 /// positions to the Cubit, which snaps and records them.
@@ -94,12 +95,17 @@ class MapDrawingLayer extends StatelessWidget {
               DragMarker(
                 key: ValueKey<int>(i),
                 point: corners[i],
-                size: const Size.square(ParcelInfoDimens.cornerHandle),
+                size: const Size.square(ParcelInfoDimens.minTapTarget),
                 builder: (BuildContext context, LatLng _, bool dragging) =>
-                    MapCornerHandle(
-                      number: i + CoreConstants.one,
-                      selected: draft.selected == i,
-                      dragging: dragging,
+                    Center(
+                      child: SizedBox.square(
+                        dimension: ParcelInfoDimens.cornerHandle,
+                        child: MapCornerHandle(
+                          number: i + CoreConstants.one,
+                          selected: draft.selected == i,
+                          dragging: dragging,
+                        ),
+                      ),
                     ),
                 onTap: (_) => onSelect(i),
                 onDragStart: (_, _) => onDragStart(i),

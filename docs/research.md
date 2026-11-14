@@ -17,6 +17,8 @@ are the sources' own words.
 | Flutter — Architecture case study (Compass app) | https://docs.flutter.dev/app-architecture/case-study |
 | Flutter — Offline-first design pattern | https://docs.flutter.dev/app-architecture/design-patterns/offline-first |
 | Flutter — Testing overview | https://docs.flutter.dev/testing/overview |
+| Flutter — Adaptive and responsive design | https://docs.flutter.dev/ui/adaptive-responsive (and its general, large-screens, best-practices and SafeArea/MediaQuery pages) |
+| Material 3 — Window size classes, touch targets | https://m3.material.io/foundations/layout/applying-layout/window-size-classes · https://m3.material.io/foundations/designing/structure |
 | Effective Dart (style, documentation, usage, design) | https://dart.dev/effective-dart |
 | Very Good Ventures — layered / feature-first architecture | https://verygood.ventures/blog/very-good-flutter-architecture |
 | Code With Andrea — Flutter project structure | https://codewithandrea.com/articles/flutter-project-structure |
@@ -69,6 +71,26 @@ another, so the repositories stay unaware of each other.
 | PREFER relative import paths | **Deviation:** package imports everywhere (`always_use_package_imports`). A `../../..` hides which layer it crossed; the layer is the thing reviewed. |
 | AVOID catches without `on` clauses | **Deviation at boundaries only:** a repository or service is where any throw becomes a `BaseException`; narrowing its catch would let one escape into the app. Domain and application code never catch. |
 | AVOID classes with only static members | **Deviation for named values:** `CoreConstants`, `GeoRules`, `MapRules`, `ParcelRules` are namespaces of constants and pure functions, matching the owner's existing `CoreConstants`/`BaseDimens` style. |
+
+## Responsive and adaptive layout
+
+Flutter defines responsive as fitting the UI into the space, and adaptive as
+being usable in it. What the guidance asks, and how the app does it:
+
+| Guidance | How |
+|---|---|
+| Branch layout on the window size, never on the device type or orientation | `WindowSizeClassEnum` (Material 3: compact < 600, medium < 840, expanded < 1200, large < 1600, extra-large) is the only thing layout branches on. |
+| Read the window with `MediaQuery.sizeOf`, not `MediaQuery.of` | Done — it rebuilds only on a size change. `LayoutBuilder` where a widget sizes itself to its parent. |
+| Never lock orientation | No orientation lock on any platform. |
+| Neither text nor boxes take the full width on a large screen | Content pages sit in `ParcelInfoReadableWidth` (840 px); panels and dialogs are capped at 440 px; sign-in is capped too. |
+| Navigation and panels change with the space | The details panel rises from the bottom up to medium and sits at the side from expanded; in a compact window the top bar folds people, history and sign out into one menu. |
+| Wrap the body in `SafeArea` | Bars and panels over the map sit in `SafeArea`; the map itself runs edge to edge under them. |
+| Touch first; mouse and keyboard as accelerators | Every action is a labelled button; while drawing, Ctrl/Cmd+Z, Shift+Ctrl/Cmd+Z, Delete/Backspace and Escape are shortcuts for the same buttons. Enter signs in. |
+| Touch targets at least 48 dp (Material) | Buttons and fields are 48 px high; drawing corners are drawn at 30 px but hit at 48 px; edge chips are 36 px high. |
+| Keep state across resizes | All state is in Cubits, so resizing or rotating rebuilds the layout without losing a drawing in progress. |
+
+Not yet verified on real devices: the phone layouts on Android/iOS hardware
+and the desktop builds (roadmap).
 
 ## Testing (Flutter testing overview)
 

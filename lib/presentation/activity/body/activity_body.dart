@@ -7,6 +7,7 @@ import 'package:parcel_atlas/domain_ui/copy/activity_copy.dart';
 import 'package:parcel_atlas/domain_ui/copy/exception_copy.dart';
 import 'package:parcel_atlas/domain_ui/values/parcel_info_format.dart';
 import 'package:parcel_atlas/domain_ui/values/parcel_info_local_keys.dart';
+import 'package:parcel_atlas/domain_ui/widgets/layout/parcel_info_readable_width.dart';
 import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
 
 /// One line per change: "`member` `did what`", then the record and the time.
@@ -34,23 +35,25 @@ class ActivityBody extends StatelessWidget {
         ActivityReady(:final List<ActivityEntity> entries) =>
           entries.isEmpty
               ? Center(child: ParcelInfoText(l10n.activityEmpty))
-              : ListView.separated(
-                  itemCount: entries.length,
-                  separatorBuilder: (_, _) => const Divider(height: 1),
-                  itemBuilder: (BuildContext context, int index) {
-                    final ActivityEntity entry = entries[index];
-                    return ListTile(
-                      leading: Icon(_icon(entry.action)),
-                      title: ParcelInfoText(
-                        '${entry.stamp.memberName} ${ActivityCopy.action(l10n, entry.action)}',
-                      ),
-                      subtitle: ParcelInfoText(
-                        '${ActivityCopy.target(l10n, entry.target)}: ${entry.label}\n'
-                        '${format.date(entry.stamp.at)}',
-                      ),
-                      isThreeLine: true,
-                    );
-                  },
+              : ParcelInfoReadableWidth(
+                  child: ListView.separated(
+                    itemCount: entries.length,
+                    separatorBuilder: (_, _) => const Divider(height: 1),
+                    itemBuilder: (BuildContext context, int index) {
+                      final ActivityEntity entry = entries[index];
+                      return ListTile(
+                        leading: Icon(_icon(entry.action)),
+                        title: ParcelInfoText(
+                          '${entry.stamp.memberName} ${ActivityCopy.action(l10n, entry.action)}',
+                        ),
+                        subtitle: ParcelInfoText(
+                          '${ActivityCopy.target(l10n, entry.target)}: ${entry.label}\n'
+                          '${format.date(entry.stamp.at)}',
+                        ),
+                        isThreeLine: true,
+                      );
+                    },
+                  ),
                 ),
       },
     );
