@@ -10,7 +10,8 @@ _Last updated: 2026-11-15._
 
 ## Released
 
-Version 2.0.0 is live on https://parcel-info.web.app (the only environment).
+Version 2.0.1 is live on https://parcel-info.web.app (the only environment):
+2.0.0 plus the responsive layout, the app icon and the docs.
 
 - Sign-in with fixed accounts; the main (admin) account exists.
 - Map with two layers (registry parcels, read-only; family-drawn real
@@ -55,8 +56,8 @@ Version 2.0.0 is live on https://parcel-info.web.app (the only environment).
 ## How work is done here
 
 - Flow: feature branch from `dev` → PR to `dev` (CI "Gate" must pass) →
-  squash merge → release PR `dev → main` → deploy (`pr-flow`, `deploy`
-  skills). `main` and `dev` are protected and cannot be deleted.
+  squash merge → release branch cut from `main` with `dev` squashed in →
+  PR to `main` → deploy (`pr-flow`, `deploy` skills). `main` and `dev` are protected and cannot be deleted.
 - The owner has allowed the assistant to merge pull requests once CI is
   green.
 - Everything in the repository is English; Turkish only in
