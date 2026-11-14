@@ -27,7 +27,7 @@ class MapEdgeChip extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: BaseDimens.padding.small,
-              vertical: BaseDimens.padding.xxxxSmall,
+              vertical: BaseDimens.padding.small,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
