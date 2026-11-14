@@ -12,6 +12,7 @@ import 'package:parcel_atlas/domain_ui/dialog/confirm/confirm_dialog.dart';
 import 'package:parcel_atlas/domain_ui/values/parcel_info_format.dart';
 import 'package:parcel_atlas/domain_ui/values/parcel_info_local_keys.dart';
 import 'package:parcel_atlas/domain_ui/widgets/feedback/parcel_info_toast.dart';
+import 'package:parcel_atlas/domain_ui/widgets/layout/parcel_info_readable_width.dart';
 import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
 import 'package:parcel_atlas/presentation/people/dialog/group_dialog.dart';
 import 'package:parcel_atlas/presentation/people/dialog/person_dialog.dart';
@@ -47,7 +48,7 @@ class PeopleBody extends StatelessWidget {
         PersonsFailed(:final exception) => Center(
           child: ParcelInfoText(ExceptionCopy.of(l10n, exception)),
         ),
-        PersonsReady() => _tabs(context, state),
+        PersonsReady() => ParcelInfoReadableWidth(child: _tabs(context, state)),
       },
     );
   }

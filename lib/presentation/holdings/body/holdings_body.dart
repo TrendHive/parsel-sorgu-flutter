@@ -13,6 +13,7 @@ import 'package:parcel_atlas/domain_ui/copy/exception_copy.dart';
 import 'package:parcel_atlas/domain_ui/values/parcel_info_color.dart';
 import 'package:parcel_atlas/domain_ui/values/parcel_info_format.dart';
 import 'package:parcel_atlas/domain_ui/values/parcel_info_local_keys.dart';
+import 'package:parcel_atlas/domain_ui/widgets/layout/parcel_info_readable_width.dart';
 import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
 import 'package:parcel_atlas/presentation/router/parcel_info_router.dart';
 
@@ -34,7 +35,9 @@ class HoldingsBody extends StatelessWidget {
         HoldingsFailed(:final exception) => Center(
           child: ParcelInfoText(ExceptionCopy.of(l10n, exception)),
         ),
-        HoldingsReady() => _ready(context, state),
+        HoldingsReady() => ParcelInfoReadableWidth(
+          child: _ready(context, state),
+        ),
       },
     );
   }

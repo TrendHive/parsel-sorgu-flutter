@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
@@ -22,6 +23,7 @@ import 'package:parcel_atlas/domain_ui/values/parcel_info_color.dart';
 import 'package:parcel_atlas/domain_ui/values/parcel_info_dimens.dart';
 import 'package:parcel_atlas/domain_ui/values/parcel_info_format.dart';
 import 'package:parcel_atlas/domain_ui/values/parcel_info_local_keys.dart';
+import 'package:parcel_atlas/domain_ui/values/window_size_class_enum.dart';
 import 'package:parcel_atlas/domain_ui/widgets/feedback/parcel_info_toast.dart';
 import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
 import 'package:parcel_atlas/presentation/map/dialog/save_drawing_dialog.dart';
@@ -44,8 +46,13 @@ import 'package:parcel_atlas/presentation/router/parcel_info_router.dart';
 /// distance on screen whatever the zoom. It shows each message once
 /// (`noticeId`) and moves the camera when asked (`focusId`).
 ///
-/// Layout: the bar at the top (browsing or drawing), the selected record's
-/// panel at the bottom on a phone and at the right on a wide screen.
+/// Layout follows the window size class, never the device: the selected
+/// record's panel rises from the bottom in a compact or medium window and
+/// sits at the right from expanded up.
+///
+/// While drawing, the keyboard is an accelerator beside the buttons:
+/// Ctrl/Cmd+Z undoes, Ctrl/Cmd+Shift+Z or Ctrl+Y redoes, Delete or
+/// Backspace removes the selected corner, Escape discards the drawing.
 class MapBody extends StatefulWidget {
   const MapBody({super.key});
 
@@ -177,9 +184,11 @@ class _MapBodyState extends State<MapBody> {
       },
       builder: (BuildContext context, MapState state) {
         final MapReady? ready = state is MapReady ? state : null;
-        final bool wide =
-            MediaQuery.sizeOf(context).width >= ParcelInfoDimens.wideLayout;
-        return Stack(
+        final WindowSizeClassEnum size = WindowSizeClassEnum.of(
+          MediaQuery.sizeOf(context).width,
+        );
+        final bool wide = size.isAtLeast(WindowSizeClassEnum.expanded);
+        final Widget map = Stack(
           children: <Widget>[
             FlutterMap(
               mapController: _controller,
@@ -235,9 +244,31 @@ class _MapBodyState extends State<MapBody> {
               ),
           ],
         );
+        return ready?.drawing == null
+            ? map
+            : CallbackShortcuts(
+                bindings: _drawingShortcuts(),
+                child: Focus(autofocus: true, child: map),
+              );
       },
     );
   }
+
+  Map<ShortcutActivator, VoidCallback>
+  _drawingShortcuts() => <ShortcutActivator, VoidCallback>{
+    const SingleActivator(LogicalKeyboardKey.keyZ, control: true): _cubit.undo,
+    const SingleActivator(LogicalKeyboardKey.keyZ, meta: true): _cubit.undo,
+    const SingleActivator(LogicalKeyboardKey.keyZ, control: true, shift: true):
+        _cubit.redo,
+    const SingleActivator(LogicalKeyboardKey.keyZ, meta: true, shift: true):
+        _cubit.redo,
+    const SingleActivator(LogicalKeyboardKey.keyY, control: true): _cubit.redo,
+    const SingleActivator(LogicalKeyboardKey.delete):
+        _cubit.removeSelectedCorner,
+    const SingleActivator(LogicalKeyboardKey.backspace):
+        _cubit.removeSelectedCorner,
+    const SingleActivator(LogicalKeyboardKey.escape): _cubit.cancelDrawing,
+  };
 
   static const _defaultBase = MapTileLayer.defaultBase;
 
@@ -288,6 +319,8 @@ class _MapBodyState extends State<MapBody> {
   ];
 
   Widget _topBar(MapReady state) => MapTopBar(
+    compact: !WindowSizeClassEnum.of(MediaQuery.sizeOf(context).width)
+        .isAtLeast(WindowSizeClassEnum.medium),
     layers: state.layers,
     baseMap: state.baseMap,
     onToggleLayer: _cubit.toggleLayer,
