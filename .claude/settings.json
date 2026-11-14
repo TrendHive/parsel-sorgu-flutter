@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./**/*.g.dart)",
+      "Read(./lib/domain_ui/values/l10n/app_localizations*.dart)",
+      "Read(./lib/firebase_options.dart)",
+      "Read(./build/**)",
+      "Read(./.dart_tool/**)",
+      "Read(./ios/Pods/**)",
+      "Read(./pubspec.lock)"
+    ]
+  }
+}

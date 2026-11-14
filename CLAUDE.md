@@ -1,0 +1,107 @@
+# CLAUDE.md
+
+**Parcel Atlas** — a family's shared map of land parcels. Members sign in with
+fixed accounts, look parcels up in the official land registry (TKGM), draw the
+real boundaries where the registry is wrong, and record who owns which share.
+Everything is stored once and seen live on every device. Flutter (web first,
+Android/iOS later) · package `parcel_atlas` · Firebase project `parcel-info`.
+
+**Read before exploring:** this file, then [architecture.md](architecture.md)
+for the reasons behind each rule. [README.md](README.md) is for people running
+the app. Never read generated files (`*.g.dart`, `app_localizations*.dart`,
+`firebase_options.dart`).
+
+## The gate — work is not done while any step is red
+
+```bash
+flutter analyze
+dart run tool/check_structure.dart   # layer imports, folders, English-only code
+flutter test
+```
+
+## Architecture — one package, layers as folders
+
+```
+lib/
+  core/            base types, exceptions + causes, constants, validators
+  core_ui/         app-agnostic base widgets (Base*) and values
+  domain/          entities, value objects, read models, rules, ports (*Interface)
+  domain_ui/       the app's own widgets (ParcelInfo*), theme, colours, l10n
+  application/     use cases + one Cubit per page, the getIt container
+  infrastructure/  services (internal: Firestore · external: TKGM) + repositories
+  presentation/    pages, router, app shell
+  main.dart        composition root — the only file that sees every layer
+```
+
+Allowed imports (enforced by `tool/check_structure.dart`):
+
+| Layer | May import |
+|---|---|
+| `core` | nothing in the app |
+| `core_ui` | core |
+| `domain` | core — and no Flutter |
+| `domain_ui` | core, core_ui, domain |
+| `application` | core, domain — never infrastructure, never widgets |
+| `infrastructure` | core, domain |
+| `presentation` | core, core_ui, domain, domain_ui, application — never infrastructure |
+
+**Folders: `lib/<layer>/<feature>/<kind>/`**, kinds singular: domain
+`entity/ value_object/ read_model/ enum/ interface/ rule/ validator/`;
+application `usecase/ cubit/`; infrastructure `service/ repository/ mapper/
+dto/`. Features: `activity · auth · drawing · input · map · parcel · person`.
+
+## Rules
+
+1. **One public declaration per file, named after the file** (`share_value_object.dart` → `ShareValueObject`). Exceptions: a `sealed` family; a Cubit's `part` state; a `*Fields` record typedef beside its value object.
+2. **Errors are values.** domain/application never throw; they return `Either<BaseException, T>`. An exception carries a `BaseCause` with a `CauseCode`; the UI turns the cause into words (`ExceptionCopy`). Never a sentence in an exception.
+3. **Ports** are `*Interface` in `interface/`, declared in domain, implemented in infrastructure.
+4. **Domain types extend their base** in `core/base/`: `BaseEntity` (equal by id), `BaseValueObject<T>` (equal by value, `validators`), `BaseReadModel` (a snapshot, equal by props). Behaviour lives on the type that owns the data.
+5. **One Cubit per page**, `application/<feature>/cubit/<page>_cubit.dart` + `<page>_state.dart` as a `part`. Cubits orchestrate; they never compute. They cancel their subscriptions in `close()`.
+6. **State is `sealed`**, one variant per thing the page shows.
+7. **Two data sources, two kinds of service.** Internal: the family store (Firestore) — `FirestoreStoreService`. External: the official registry (TKGM) — `TkgmParcelService`. Repositories are the single source of truth and combine them; nothing above infrastructure knows which one answered.
+8. **The registry is rationed.** It allows a few lookups per connection per day. Never call it for a point the store already covers, never automatically, never in a loop; "Güncelle" (Refresh) refetches one parcel by number. A 403 is `QuotaExceededException`.
+9. **Registry parcels are read-only.** Only a registry answer changes them; members cannot edit or delete them (Firestore rules refuse it too). People, groups, shares and notes live on drawn parcels.
+10. **Every write is signed and logged.** A repository write stamps `created`/`updated` with the member and server time and adds one `activity` line in the same atomic batch.
+11. **Geometry is computed in one place** — `GeoRules` (WGS84 ellipsoid, local tangent plane). Shares are exact fractions (`ShareValueObject`), never doubles.
+12. **`getIt` only in `main.dart` and a page's `BlocProvider`.** Everything else takes dependencies through its constructor.
+13. **English everywhere except the language files.** Code, comments, docs, commits: English. Turkish lives only in `lib/domain_ui/values/l10n/app_tr.arb` (and `app_en.arb` for English). No string literal a user reads is written in a widget.
+14. **Comments sit above a declaration** — one `///` block naming members as `[x]`; no comments inside bodies.
+15. **No magic values.** Numbers and strings that mean something are named: `CoreConstants`, `*Rules`, `BaseDimens`/`ParcelInfoDimens`, `ParcelInfoColor`.
+16. **A bug fix ships a test that fails without it**, named after the symptom.
+17. **Docs move with the code.** A change to structure, data model, rules or commands updates CLAUDE.md, architecture.md and README.md in the same change.
+
+## Commands
+
+```bash
+flutter run -d chrome                         # hot reload works (one package)
+flutter gen-l10n                              # after editing an .arb
+dart run build_runner build -d                # after editing a @JsonSerializable DTO
+dart run tool/add_member.dart <username> "<Name>" [--admin]   # create a family account
+flutter build web --release && firebase deploy               # publish (the deploy skill)
+```
+
+## Firebase (free Spark plan only)
+
+Hosting (`parcel-info.web.app`), Firestore (`eur3`) and Email/Password auth.
+Accounts are fixed: there is no sign-up in the app; `tool/add_member.dart`
+creates them and regenerates the member list in `firestore.rules`. Never add a
+paid service.
+
+## Docs, skills and agents
+
+`docs/requirements.md` (what the owner asked, with each decision) ·
+`docs/research.md` (Flutter/Dart standards and where we deviate) ·
+`docs/data-model.md` · `docs/tkgm-api.md` · `docs/regressions.md` ·
+`docs/roadmap.md`. Skills in `.claude/skills/` (architecture-rules, new-page,
+i18n-copy, bug-fix, registry-quota, add-member, deploy, pr-flow); agents in
+`.claude/agents/` (flutter-developer, code-reviewer).
+
+## Git and CI — the `pr-flow` skill
+
+`main` (releases) and `dev` (integration) are protected: they change only
+through pull requests whose "Gate" check is green (`.github/workflows/ci.yml`:
+format, analyze with infos fatal, structure, tests, web build). Branch from
+`dev`; a merge to `main` deploys. The pre-commit hook runs the fast half
+(enable once: `git config core.hooksPath .githooks`). Commit messages in
+English, conventional (`feat(map): …`). Never commit secrets, service-account
+keys or family data.

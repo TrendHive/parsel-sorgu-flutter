@@ -1,0 +1,264 @@
+{
+  "@@locale": "tr",
+  "appTitle": "Parsel Atlası",
+  "ok": "Tamam",
+  "cancel": "Vazgeç",
+  "save": "Kaydet",
+  "delete": "Sil",
+  "edit": "Düzenle",
+  "close": "Kapat",
+  "retry": "Tekrar dene",
+  "confirmDeleteTitle": "Silinsin mi?",
+  "confirmDeleteBody": "{name} kalıcı olarak silinecek. Bu geri alınamaz.",
+  "@confirmDeleteBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "signInTitle": "Giriş yap",
+  "signInSubtitle": "Size verilen kullanıcı adı ve şifre ile giriş yapın.",
+  "usernameLabel": "Kullanıcı adı",
+  "passwordLabel": "Şifre",
+  "signInButton": "Giriş yap",
+  "layerOfficial": "Resmi parseller",
+  "layerDrawn": "Gerçek sınırlar",
+  "baseSatellite": "Uydu",
+  "baseStreet": "Harita",
+  "menuPeople": "Kişiler",
+  "menuActivity": "Geçmiş",
+  "signOut": "Çıkış yap",
+  "myLocation": "Konumum",
+  "newDrawing": "Yeni çizim",
+  "noParcelStoredTitle": "Burada kayıtlı parsel yok",
+  "noParcelStoredBody": "Resmi kayıttan sorgulamak günlük sorgu hakkından birini kullanır.",
+  "queryRegistryButton": "Resmi kayıttan sorgula",
+  "querying": "Sorgulanıyor…",
+  "officialParcelTitle": "Ada {block} · Parsel {parcel}",
+  "@officialParcelTitle": {
+    "placeholders": {
+      "block": {
+        "type": "String"
+      },
+      "parcel": {
+        "type": "String"
+      }
+    }
+  },
+  "officialBadge": "Resmi kayıt",
+  "drawnBadge": "Gerçek sınır",
+  "cityLabel": "İl",
+  "districtLabel": "İlçe",
+  "neighborhoodLabel": "Mahalle / Köy",
+  "localityLabel": "Mevkii",
+  "qualityLabel": "Nitelik",
+  "sheetLabel": "Pafta",
+  "landStatusLabel": "Zemin durumu",
+  "registryAreaLabel": "Tapu alanı",
+  "inactiveParcel": "Bu parsel resmi kayıtta pasif (tarihî) görünüyor.",
+  "refreshButton": "Resmi kayıttan güncelle",
+  "drawRealButton": "Gerçek sınırı çiz",
+  "officialReadOnlyNote": "Resmi bilgiler değiştirilemez; yalnızca resmi kayıttan güncellenir.",
+  "queriedBy": "İlk sorgulayan: {name} · {date}",
+  "@queriedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "refreshedBy": "Son güncelleme: {name} · {date}",
+  "@refreshedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "correctionsTitle": "Bu parselin gerçek sınırları",
+  "measuredAreaLabel": "Ölçülen alan",
+  "perimeterLabel": "Çevre",
+  "edgesLabel": "Kenar uzunlukları",
+  "linkedOfficialLabel": "Düzelttiği resmi parsel",
+  "areaDifference": "Tapuya göre fark: {difference} ({percent})",
+  "@areaDifference": {
+    "placeholders": {
+      "difference": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "ownersTitle": "Sahipler",
+  "noOwners": "Henüz sahip eklenmedi.",
+  "sharesTotal": "Toplam pay: {total}",
+  "@sharesTotal": {
+    "placeholders": {
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "sharesIncomplete": "Paylar toplamı 1 değil — bazı sahipler eksik olabilir.",
+  "editShape": "Şekli düzenle",
+  "editDetails": "Bilgileri düzenle",
+  "createdBy": "Oluşturan: {name} · {date}",
+  "@createdBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "updatedBy": "Son değişiklik: {name} · {date}",
+  "@updatedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "noteLabel": "Not",
+  "viaGroup": "{group} üzerinden",
+  "@viaGroup": {
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "drawingHint": "Köşe eklemek için haritaya dokunun. Köşeleri sürükleyerek taşıyın, kenardaki + ile araya köşe ekleyin.",
+  "crosshairHint": "Haritayı kaydırıp nişangâhı noktaya getirin, sonra köşe ekleyin.",
+  "drawingCorners": "{count, plural, =0{Köşe yok} =1{1 köşe} other{{count} köşe}}",
+  "@drawingCorners": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "undo": "Geri al",
+  "redo": "İleri al",
+  "deleteCorner": "Köşeyi sil",
+  "crosshairMode": "Nişangâh",
+  "addCornerHere": "Buraya köşe ekle",
+  "finishDrawing": "Bitir",
+  "cancelDrawing": "Çizimi bırak",
+  "saveDrawingTitle": "Çizimi kaydet",
+  "nameLabel": "Ad",
+  "drawingNameDefault": "{label} gerçek sınır",
+  "@drawingNameDefault": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "addOwner": "Sahip ekle",
+  "shareLabel": "Pay",
+  "shareHint": "örn. 1/4",
+  "invalidShare": "Geçerli bir pay yazın (örn. 1/4).",
+  "pickOwnerTitle": "Kişi veya grup seçin",
+  "peopleTitle": "Kişiler ve gruplar",
+  "peopleTab": "Kişiler",
+  "groupsTab": "Gruplar",
+  "addPersonButton": "Kişi ekle",
+  "addGroupButton": "Grup ekle",
+  "personDialogTitle": "Kişi",
+  "groupDialogTitle": "Grup",
+  "groupMembersLabel": "Üyeler",
+  "parcelCount": "{count, plural, =0{Parsel yok} =1{1 parsel} other{{count} parsel}}",
+  "@parcelCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "memberCount": "{count, plural, =0{Üye yok} =1{1 kişi} other{{count} kişi}}",
+  "@memberCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noPeople": "Henüz kişi yok. Parsel sahiplerini buradan ekleyin.",
+  "noGroups": "Henüz grup yok. Aynı yerleri paylaşan kişileri grup yapın.",
+  "holdingsParcels": "Parsel",
+  "holdingsTotalArea": "Toplam parsel alanı",
+  "holdingsOwnedArea": "Sahip olunan alan",
+  "showOnMap": "Haritada göster",
+  "holdingsEmpty": "Atanmış parsel yok.",
+  "groupMembersTitle": "Grup üyeleri",
+  "memberOfGroups": "Üye olduğu gruplar",
+  "perMemberShare": "Kişi başı {share}",
+  "@perMemberShare": {
+    "placeholders": {
+      "share": {
+        "type": "String"
+      }
+    }
+  },
+  "activityTitle": "Değişiklik geçmişi",
+  "activityEmpty": "Henüz değişiklik yok.",
+  "actionQueried": "resmi kayıttan sorguladı",
+  "actionRefreshed": "resmi kayıttan güncelledi",
+  "actionCreated": "oluşturdu",
+  "actionUpdated": "değiştirdi",
+  "actionDeleted": "sildi",
+  "targetOfficial": "Resmi parsel",
+  "targetDrawn": "Gerçek sınır",
+  "targetPerson": "Kişi",
+  "targetGroup": "Grup",
+  "noticeFromStore": "Bu parsel zaten kayıtlı — sorgu hakkı harcanmadı.",
+  "noticeQueried": "Parsel resmi kayıttan alındı ve kaydedildi.",
+  "noticeRefreshed": "Parsel resmi kayıttan güncellendi.",
+  "noticeDrawingSaved": "Çizim kaydedildi.",
+  "noticeDrawingDeleted": "Çizim silindi.",
+  "noticeSaved": "Kaydedildi.",
+  "errorUnknown": "Bir şeyler ters gitti. Lütfen tekrar deneyin.",
+  "errorNetwork": "İnternet bağlantısı yok ya da sunucu yanıt vermiyor.",
+  "errorBadResponse": "Resmi kayıt beklenmeyen bir yanıt verdi.",
+  "errorQuota": "Resmi kayıt bugünkü sorgu sınırına ulaştı. Kayıtlı parseller çalışmaya devam eder; yeni sorgu yarın yapılabilir.",
+  "errorNoParcel": "Bu noktada resmi kayıtta parsel bulunamadı.",
+  "errorInvalidCredentials": "Kullanıcı adı veya şifre hatalı.",
+  "errorNotMember": "Bu hesap aile listesinde değil.",
+  "errorAdminOnly": "Bu işlemi yalnızca ana hesap yapabilir.",
+  "errorNotSignedIn": "Önce giriş yapın.",
+  "errorTooFewCorners": "Bir alan için en az 3 köşe gerekir.",
+  "errorRecordMissing": "Bu kayıt başka bir cihazda silinmiş.",
+  "errorSharesExceed": "Her pay 0 ile 1 arasında olmalı ve paylar toplamı 1'i aşmamalı.",
+  "errorEmptyField": "Bu alan boş bırakılamaz.",
+  "squareMeters": "{value} m²",
+  "@squareMeters": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "meters": "{value} m",
+  "@meters": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  }
+}
