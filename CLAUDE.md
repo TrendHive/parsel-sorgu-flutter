@@ -6,7 +6,8 @@ real boundaries where the registry is wrong, and record who owns which share.
 Everything is stored once and seen live on every device. Flutter (web first,
 Android/iOS later) · package `parcel_atlas` · Firebase project `parcel-info`.
 
-**Read before exploring:** this file, then [architecture.md](architecture.md)
+**Read before exploring:** this file, then [docs/status.md](docs/status.md)
+(where the work stands and what is next), then [architecture.md](architecture.md)
 for the reasons behind each rule. [README.md](README.md) is for people running
 the app. Never read generated files (`*.g.dart`, `app_localizations*.dart`,
 `firebase_options.dart`).
