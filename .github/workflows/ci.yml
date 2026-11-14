@@ -1,0 +1,84 @@
+# The gate on every pull request and push to main and dev, and the web deploy
+# on main once the gate is green.
+#
+#   pull request → dev / main   gate
+#   push dev                     gate
+#   push main                    gate → deploy to Firebase Hosting (live)
+#
+# `main` and `dev` are protected: they change only through pull requests, and
+# a pull request merges only when the "Gate" check is green.
+#
+# The deploy needs the secret FIREBASE_SERVICE_ACCOUNT_PARCEL_INFO (a service
+# account JSON with Firebase Hosting Admin). Until it exists the deploy is
+# skipped with a notice and the gate stays meaningful.
+name: ci
+
+on:
+  pull_request:
+    branches: [main, dev]
+  push:
+    branches: [main, dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  gate:
+    name: Gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.50.0
+          cache: true
+      - name: Dependencies
+        run: flutter pub get
+      - name: Format
+        run: |
+          dart format --output=none --set-exit-if-changed \
+            $(git ls-files '*.dart' | grep -v -e '\.g\.dart$' -e 'app_localizations' -e 'firebase_options.dart')
+      - name: Analyze (zero issues, infos included)
+        run: flutter analyze --fatal-infos --fatal-warnings
+      - name: Structure
+        run: dart run tool/check_structure.dart
+      - name: Test
+        run: flutter test
+      - name: Build web
+        run: flutter build web --release --no-wasm-dry-run
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        with:
+          name: web
+          path: build/web
+          retention-days: 7
+
+  deploy:
+    name: Deploy to Firebase Hosting
+    needs: gate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      HAS_SECRET: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PARCEL_INFO != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        if: env.HAS_SECRET == 'true'
+        with:
+          name: web
+          path: build/web
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        if: env.HAS_SECRET == 'true'
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PARCEL_INFO }}
+          projectId: parcel-info
+          channelId: live
+      - if: env.HAS_SECRET != 'true'
+        run: echo "::notice::Deploy skipped — FIREBASE_SERVICE_ACCOUNT_PARCEL_INFO is not set"
