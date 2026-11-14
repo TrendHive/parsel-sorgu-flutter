@@ -28,6 +28,11 @@ device. The app speaks Turkish; the code is English.
   area, the share and the owned area, with totals.
 - **History.** Every change is signed with who and when, and listed.
 
+## Environment
+
+One environment only: production (Firebase project `parcel-info`). The `dev`
+branch is for integration and deploys nowhere; merging to `main` releases.
+
 ## Platforms
 
 Web (primary), Android, iOS, macOS and Windows. Linux is not supported:

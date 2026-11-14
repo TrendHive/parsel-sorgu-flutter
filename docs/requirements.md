@@ -70,3 +70,5 @@ Collected 2026-11-14 – 2026-11-15.
 | R32 | Turkish only in the language file; everything else English, comments included. | Rule 13 in CLAUDE.md; enforced by `tool/check_structure.dart`. |
 | R33 | README, CLAUDE.md, skills, agents and docs, written as the project grows. | CLAUDE.md, architecture.md, README.md, `docs/`, `.claude/skills`, `.claude/agents`. |
 | R34 | Document what the owner explains so it is permanent. | This file. |
+| R35 | `main` and `dev` protected and undeletable; a Recipely-style flow with pull requests and checks on every push. | Both branches: pull request required, "Gate" check required, no deletion, no force-push, admins included. CI on every push and pull request. |
+| R36 | Only one environment: production. | One Firebase project (`parcel-info`); no flavors or staging; `dev` deploys nowhere, `main` releases. |

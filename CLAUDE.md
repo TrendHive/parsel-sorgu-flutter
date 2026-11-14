@@ -80,6 +80,13 @@ dart run tool/add_member.dart <username> "<Name>" [--admin]   # create a family 
 flutter build web --release && firebase deploy               # publish (the deploy skill)
 ```
 
+## One environment: production
+
+There is exactly one environment — the Firebase project `parcel-info`,
+served at `parcel-info.web.app`. No flavors, no staging project, no dev
+backend. The `dev` branch is only the integration branch: it deploys nowhere;
+a merge to `main` is a release and publishes to production.
+
 ## Firebase (free Spark plan only)
 
 Hosting (`parcel-info.web.app`), Firestore (`eur3`) and Email/Password auth.
