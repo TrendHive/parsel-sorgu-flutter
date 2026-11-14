@@ -1,0 +1,9 @@
+#!/bin/sh
+# The fast half of the gate, before a commit exists. CI runs the full gate
+# (tests and the web build too) on every push and pull request.
+# Enable once per clone: git config core.hooksPath .githooks
+set -e
+dart format --output=none --set-exit-if-changed \
+  $(git ls-files '*.dart' | grep -v -e '\.g\.dart$' -e 'app_localizations' -e 'firebase_options.dart')
+flutter analyze --fatal-infos --fatal-warnings
+dart run tool/check_structure.dart
