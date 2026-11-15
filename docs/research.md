@@ -32,7 +32,7 @@ Strength as the page gives it: **S** strongly recommend · **R** recommend ·
 
 | Recommendation | | How this project applies it |
 |---|---|---|
-| Clearly defined data and UI layers | S | Seven layer folders; the import table is enforced by `tool/check_structure.dart`. |
+| Clearly defined data and UI layers | S | Five layer folders; the import table is enforced by `tool/check_structure.dart`. |
 | Repository pattern in the data layer | S | One repository per aggregate in `infrastructure/<feature>/repository/`, behind a domain port. |
 | Views and view models (MVVM) | S | A page is the view; its Cubit is the view model — one per page, state `sealed`. |
 | No logic in widgets | S | Widgets render and forward events; rules live on domain types (`GeoRules`, `ShareValueObject`, `MapSnapshotReadModel`), orchestration in Cubits and use cases. |
@@ -110,7 +110,8 @@ Owner's original design: seven local packages. Findings:
 - Packages nested inside the app's `lib/` broke hot reload (each file had two
   package identities).
 
-Decision: one package, the same seven layers as folders, the import rules
+Decision: one package with the layers as folders — five since the design
+system moved inside presentation — the import rules
 enforced by `tool/check_structure.dart`. Rationale in architecture.md.
 
 ## Data sources

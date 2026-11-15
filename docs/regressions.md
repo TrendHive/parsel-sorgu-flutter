@@ -49,3 +49,31 @@ its real limit. *Guard:* documented in `docs/tkgm-api.md`; a browser 403 is
 `RegistryRefusesWebCause` with an accurate message, and the web build no
 longer implies a quota problem.
 
+## Native apps
+
+**Sign-in on macOS failed with a generic error although the password was
+right.** Firebase Auth stores the session in the keychain, which a macOS app
+may use only with the `keychain-access-groups` entitlement and a
+provisioning profile; an ad-hoc signed build has neither. *Guard:* both
+entitlement files carry the entitlement and the project signs automatically
+with the owner's team; documented in `docs/status.md` (build with a signed
+profile, never ad-hoc).
+
+**The Android build failed before compiling.** Flutter 3.50 needs Gradle
+9.3.1 or newer and the project still had the versions it was created with.
+*Guard:* the Android versions match a fresh Flutter project's (Gradle 9.5,
+AGP 9.3.1, Kotlin 2.4.20); re-check them on every Flutter upgrade.
+
+## Tools
+
+**`add_member` crashed in a terminal that cannot hide typing.** Such a
+terminal reports itself as one but refuses to switch echo off. *Guard:* the
+tools catch the refusal, warn that the input is visible, and go on.
+
+## Dividing
+
+**An equal split to one owner's children would have taken the other owners'
+shares.** *Guard:* the dialog offers "to the children" only for a drawing
+with a single owner; several owners can still split by number, which keeps
+every owner on every piece.
+

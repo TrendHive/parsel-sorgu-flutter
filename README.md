@@ -19,7 +19,7 @@ and record who owns which share — live on every family member's device.
 [![Dart 3.14](https://img.shields.io/badge/Dart-3.14-0175C2?style=flat-square&logo=dart&logoColor=white)](https://dart.dev)
 [![Firebase Spark](https://img.shields.io/badge/Firebase-Spark%20(free)-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com)
 [![Analyzer](https://img.shields.io/badge/analyzer-0%20issues-3FB950?style=flat-square)](#-checking-your-work)
-[![Tests](https://img.shields.io/badge/tests-59-3FB950?style=flat-square)](#-checking-your-work)
+[![Tests](https://img.shields.io/badge/tests-60-3FB950?style=flat-square)](#-checking-your-work)
 
 [Features](#-features) · [How it is built](#-how-it-is-built) · [Getting started](#-getting-started) · [Checking your work](#-checking-your-work) · [Security](#-security) · [Docs](#-documentation)
 
@@ -187,7 +187,7 @@ lib/
     core_ui/         app-agnostic base widgets
     domain_ui/       the app's widgets, theme, colours, l10n (Turkish template)
   main.dart        composition root
-tool/              check_structure.dart, add_member.dart
+tool/              check_structure.dart, add_member.dart, import_parcels.dart
 docs/              requirements, research, data model, registry API, status, roadmap
 ```
 

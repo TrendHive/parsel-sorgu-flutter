@@ -578,4 +578,8 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errorSplitMisses =>
       'Parsel bölünemedi. Kesme çizgisini ya da parça sayısını kontrol edin.';
+
+  @override
+  String get noticeUseApp =>
+      'Yeni parsel sorgusu web sitesinden yapılamıyor. Sorguyu telefondaki ya da bilgisayardaki Parsel Atlası uygulamasından yapın; sorgulanan parsel burada da hemen görünür.';
 }

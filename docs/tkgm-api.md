@@ -61,7 +61,9 @@ on the request and cannot remove it, so:
 
 **lookups work from the desktop and mobile apps and from Postman, not from the
 web app.** The web app shows everything already stored and does all drawing and
-ownership work; a 403 in the browser is reported as `RegistryRefusesWebCause`
+ownership work. On the web the app does not send a lookup at all: it shows
+a notice pointing to the desktop or mobile app (`MapNoticeEnum.useApp`).
+Should a browser request be made anyway, its 403 is reported as `RegistryRefusesWebCause`
 ("query from the desktop or mobile app"), in a native app as
 `RegistryQuotaCause`. The app does not add any header to disguise its origin,
 and no relay is used (see `docs/roadmap.md`). Verified 2026-11-15: on one
@@ -87,6 +89,9 @@ app is arranged so it is spent only on purpose:
    ground the store does not cover queries at once (the owner's choice: one
    tap, not two); Refresh is explicit.
 3. Refresh asks by number, never by point.
-4. Do not test against the live service casually — every call spends the
+4. A list of numbers on paper is stored with `tool/import_parcels.dart`:
+   it skips parcels already stored, keeps every answer in a cache folder,
+   spaces its calls and stops at the first refusal.
+5. Do not test against the live service casually — every call spends the
    connection's allowance. Use the fixture in tests, and the Postman
    collection for a deliberate manual check.
