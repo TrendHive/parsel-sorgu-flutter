@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.trendhive" "\0"
-            VALUE "FileDescription", "parcel_info" "\0"
+            VALUE "FileDescription", "Parsel Atlası" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "parcel_info" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 com.trendhive. All rights reserved." "\0"
             VALUE "OriginalFilename", "parcel_info.exe" "\0"
-            VALUE "ProductName", "parcel_info" "\0"
+            VALUE "ProductName", "Parsel Atlası" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
