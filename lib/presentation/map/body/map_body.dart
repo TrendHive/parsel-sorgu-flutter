@@ -29,17 +29,21 @@ import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_local_key
 import 'package:parcel_atlas/presentation/domain_ui/values/window_size_class_enum.dart';
 import 'package:parcel_atlas/presentation/domain_ui/widgets/feedback/parcel_info_toast.dart';
 import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
+import 'package:parcel_atlas/presentation/map/dialog/drawing_choice_dialog.dart';
 import 'package:parcel_atlas/presentation/map/dialog/owner_tree_dialog.dart';
 import 'package:parcel_atlas/presentation/map/dialog/parcel_search_dialog.dart';
 import 'package:parcel_atlas/presentation/map/dialog/save_drawing_dialog.dart';
 import 'package:parcel_atlas/presentation/map/dialog/split_equal_dialog.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_attribution.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_colour_legend.dart';
+import 'package:parcel_atlas/presentation/map/widgets/map_compare_bar.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_drawing_layer.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_drawing_toolbar.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_drawn_panel.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_official_panel.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_parcel_layers.dart';
+import 'package:parcel_atlas/presentation/map/widgets/map_redivide_bar.dart';
+import 'package:parcel_atlas/presentation/map/widgets/map_redivide_layer.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_split_bar.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_split_layer.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_tile_layer.dart';
@@ -157,14 +161,20 @@ class _MapBodyState extends State<MapBody> {
     if (details != null) await _cubit.saveDrawing(details);
   }
 
-  Future<void> _editDetails(MapReady state, DrawnParcelEntity drawing) async {
+  Future<void> _editDetails(
+    MapReady state,
+    DrawnParcelEntity drawing, {
+    String? officialParcelId,
+    String? addedPersonId,
+  }) async {
     final DrawingDetailsValueObject? details = await SaveDrawingDialog.open(
       context,
       snapshot: state.snapshot,
       name: drawing.name,
       owners: drawing.owners,
       note: drawing.note,
-      officialParcelId: drawing.officialParcelId,
+      officialParcelId: drawing.officialParcelId ?? officialParcelId,
+      addedPersonId: addedPersonId,
     );
     if (details != null) await _cubit.saveDetails(drawing, details);
   }
@@ -186,9 +196,15 @@ class _MapBodyState extends State<MapBody> {
 
   Future<void> _assign(MapReady state, OfficialParcelEntity parcel) async {
     final List<DrawnParcelEntity> corrections = state.snapshot
-        .drawingsCorrecting(parcel.id);
-    if (corrections.isNotEmpty) {
-      await _editDetails(state, corrections.first);
+        .drawingsCorrecting(parcel);
+    final DrawnParcelEntity? onto = switch (corrections.length) {
+      0 => null,
+      1 => corrections.single,
+      _ => await DrawingChoiceDialog.open(context, drawings: corrections),
+    };
+    if (!mounted || (corrections.isNotEmpty && onto == null)) return;
+    if (onto != null) {
+      await _assignDrawn(state, onto, officialParcelId: parcel.id);
       return;
     }
     final String name = ParcelInfoLocalKeys.of(context)
@@ -200,6 +216,31 @@ class _MapBodyState extends State<MapBody> {
     if (person != null) {
       await _cubit.assignOwner(parcel, person, name: name);
     }
+  }
+
+  Future<void> _assignDrawn(
+    MapReady state,
+    DrawnParcelEntity drawing, {
+    String? officialParcelId,
+  }) async {
+    final PersonEntity? person = await OwnerTreeDialog.open(
+      context,
+      persons: state.snapshot.persons,
+      excluded: <String>{
+        for (final OwnershipValueObject line in drawing.owners) line.personId,
+      },
+    );
+    if (person == null || !mounted) return;
+    if (drawing.owners.isEmpty) {
+      await _cubit.assignOwnerTo(drawing, person, officialParcelId);
+      return;
+    }
+    await _editDetails(
+      state,
+      drawing,
+      officialParcelId: officialParcelId,
+      addedPersonId: person.id,
+    );
   }
 
   Future<void> _splitEqual(MapReady state, DrawnParcelEntity drawing) async {
@@ -289,6 +330,8 @@ class _MapBodyState extends State<MapBody> {
                   ),
                 if (ready?.drawing != null) _drawingLayer(ready!.drawing!),
                 if (ready?.split != null) MapSplitLayer(split: ready!.split!),
+                if (ready?.redivide != null)
+                  MapRedivideLayer(redivide: ready!.redivide!),
                 MapAttribution(baseMap: ready?.baseMap ?? _defaultBase),
               ],
             ),
@@ -306,33 +349,56 @@ class _MapBodyState extends State<MapBody> {
                     constraints: const BoxConstraints(
                       maxWidth: ParcelInfoDimens.toolbarMaxWidth,
                     ),
-                    child: ready.split != null
+                    child: ready.redivide != null
+                        ? MapRedivideBar(
+                            redivide: ready.redivide!,
+                            onCancel: _cubit.cancelRedivide,
+                            onConfirm: _cubit.confirmRedivide,
+                          )
+                        : ready.split != null
                         ? MapSplitBar(
                             split: ready.split!,
                             onCancel: _cubit.cancelSplit,
                             onConfirm: _cubit.confirmSplit,
                           )
                         : ready.drawing == null
-                        ? _topBar(ready)
+                        ? Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              _topBar(ready),
+                              if (ready.compareIds.isNotEmpty)
+                                MapCompareBar(
+                                  count: ready.compareIds.length,
+                                  onOpen: () => context.push(
+                                    ParcelInfoRouter.compareOf(
+                                      ready.compareIds,
+                                    ),
+                                  ),
+                                  onClear: _cubit.clearCompare,
+                                ),
+                            ],
+                          )
                         : _toolbar(ready, ready.drawing!),
                   ),
                 ),
               ),
             if (ready != null &&
-                ready.colourLevel != null &&
+                ready.snapshot.drawings.isNotEmpty &&
                 ready.drawing == null &&
-                ready.split == null)
+                ready.split == null &&
+                ready.redivide == null)
               SafeArea(
                 child: Align(
                   alignment: Alignment.bottomLeft,
                   child: MapColourLegend(
-                    branches: ready.snapshot.branchesAt(ready.colourLevel!),
+                    branches: ready.snapshot.branchesAt(ready.colourLevel),
                   ),
                 ),
               ),
             if (ready != null &&
                 ready.drawing == null &&
                 ready.split == null &&
+                ready.redivide == null &&
                 ready.selection != null)
               SafeArea(
                 child: Align(
@@ -452,10 +518,12 @@ class _MapBodyState extends State<MapBody> {
         MapHitNone() => const SizedBox.shrink(),
         MapHitOfficial(:final parcel) => MapOfficialPanel(
           parcel: parcel,
-          corrections: state.snapshot.drawingsCorrecting(parcel.id),
+          corrections: state.snapshot.drawingsCorrecting(parcel),
           querying: state.querying,
           onDrawReal: () => _cubit.startDrawing(copyFrom: parcel),
           onAssign: () => _assign(state, parcel),
+          inCompare: state.compareIds.contains(parcel.id),
+          onCompare: () => _cubit.toggleCompare(parcel.id),
           onRefresh: () => _cubit.refresh(parcel),
           onOpenDrawing: (DrawnParcelEntity drawing) =>
               _cubit.focusOn(drawing.id),
@@ -467,7 +535,11 @@ class _MapBodyState extends State<MapBody> {
           canDelete: state.member?.canDelete ?? false,
           onEditShape: () => _cubit.startDrawing(edit: drawing),
           onEditDetails: () => _editDetails(state, drawing),
+          onAssign: () => _assignDrawn(state, drawing),
+          inCompare: state.compareIds.contains(drawing.id),
+          onCompare: () => _cubit.toggleCompare(drawing.id),
           onSplit: () => _cubit.startSplit(drawing),
+          onRedivide: () => _cubit.startRedivide(drawing),
           onSplitEqual: () => _splitEqual(state, drawing),
           onDelete: () => _delete(drawing),
           onOpenOfficial: (parcel) => _cubit.focusOn(parcel.id),

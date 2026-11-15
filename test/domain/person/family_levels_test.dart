@@ -60,4 +60,18 @@ void main() {
       'grandfather',
     ]);
   });
+
+  test('the owner picker opens on the heads of the family, loners last', () {
+    final List<PersonEntity> persons = <PersonEntity>[
+      testPerson('alone'),
+      ...testFamily,
+      testPerson('second head'),
+      testPerson('his son', parentId: 'second head'),
+    ];
+    expect(FamilyRules.heads(persons).map((PersonEntity p) => p.id), <String>[
+      'grandfather',
+      'second head',
+      'alone',
+    ]);
+  });
 }

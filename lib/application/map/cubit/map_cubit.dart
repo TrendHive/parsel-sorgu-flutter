@@ -4,6 +4,7 @@ import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:parcel_atlas/application/drawing/usecase/delete_drawing_usecase.dart';
+import 'package:parcel_atlas/application/drawing/usecase/redivide_drawings_usecase.dart';
 import 'package:parcel_atlas/application/drawing/usecase/save_drawing_usecase.dart';
 import 'package:parcel_atlas/application/drawing/usecase/split_drawing_usecase.dart';
 import 'package:parcel_atlas/application/map/usecase/locate_device_usecase.dart';
@@ -17,6 +18,7 @@ import 'package:parcel_atlas/domain/auth/entity/member_entity.dart';
 import 'package:parcel_atlas/domain/auth/interface/auth_repository_interface.dart';
 import 'package:parcel_atlas/domain/drawing/entity/drawn_parcel_entity.dart';
 import 'package:parcel_atlas/domain/drawing/read_model/map_drawing_read_model.dart';
+import 'package:parcel_atlas/domain/drawing/read_model/map_redivide_read_model.dart';
 import 'package:parcel_atlas/domain/drawing/read_model/map_split_read_model.dart';
 import 'package:parcel_atlas/domain/drawing/value_object/drawing_details_value_object.dart';
 import 'package:parcel_atlas/domain/drawing/value_object/drawing_draft_value_object.dart';
@@ -54,13 +56,20 @@ part 'map_state.dart';
 /// app, and what is already stored keeps working.
 ///
 /// Ownership: [assignOwner] records a person on a registry parcel in one
-/// step — the registry record stays untouched, so it stores a drawing with
-/// the registry's outline and that person as its owner. [setColourLevel]
-/// colours the drawings by a level of the family tree.
+/// step — the registry record stays untouched, so a parcel nobody drew gets
+/// a new drawing with the registry's outline and that person as its owner.
+/// [assignOwnerTo] records the person on an existing real boundary, linking
+/// it to its registry parcel when it was not. Neither moves the map. [setColourLevel]
+/// colours the drawings by a level of the family tree. [toggleCompare] puts
+/// a parcel on the comparison list or takes it off; [clearCompare] empties
+/// it.
 ///
 /// Dividing: [startSplit] opens a cut on a drawing; the next two taps set
 /// the line and [confirmSplit] stores the two halves. [splitEqual] cuts a
 /// drawing into strips of equal area, one per heir when heirs are given.
+/// [startRedivide] begins moving the line between a drawing and its
+/// neighbour: the next tap on a drawing picks the neighbour and the new
+/// shapes are previewed by their deeds; [confirmRedivide] stores them.
 ///
 /// Drawing: [startDrawing] opens a session, empty or seeded from a registry
 /// parcel's outline (the usual way: copy, then move the corners that are
@@ -72,7 +81,10 @@ part 'map_state.dart';
 /// result.
 ///
 /// A saved or queried record arrives back through the live snapshot, so
-/// [_pendingSelection] holds its id until the snapshot carries it.
+/// [_pendingSelection] holds its id until the snapshot carries it, and
+/// [_framePending] whether the camera moves to it then: an owner assigned
+/// to a parcel already on screen selects the result where it is, so the
+/// map stays still.
 final class MapCubit extends Cubit<MapState> {
   MapCubit(
     this._watchMap,
@@ -81,6 +93,7 @@ final class MapCubit extends Cubit<MapState> {
     this._queryByNumber,
     this._saveDrawing,
     this._splitDrawing,
+    this._redivideDrawings,
     this._deleteDrawing,
     this._locate,
     this._auth, {
@@ -99,6 +112,8 @@ final class MapCubit extends Cubit<MapState> {
 
   final SplitDrawingUseCase _splitDrawing;
 
+  final RedivideDrawingsUseCase _redivideDrawings;
+
   final DeleteDrawingUseCase _deleteDrawing;
 
   final LocateDeviceUseCase _locate;
@@ -113,6 +128,8 @@ final class MapCubit extends Cubit<MapState> {
   DrawingDraftValueObject? _dragOrigin;
 
   String? _pendingSelection;
+
+  bool _framePending = true;
 
   bool _framed = false;
 
@@ -185,9 +202,13 @@ final class MapCubit extends Cubit<MapState> {
     if (hit == null) return ready;
     _pendingSelection = null;
     _framed = true;
+    final bool frame = _framePending;
+    _framePending = true;
     return ready.copyWith(
       selection: () => hit,
-      focus: drawing?.outline.corners ?? official!.record.outline.corners,
+      focus: frame
+          ? drawing?.outline.corners ?? official!.record.outline.corners
+          : null,
     );
   }
 
@@ -198,6 +219,25 @@ final class MapCubit extends Cubit<MapState> {
     if (drawing != null) {
       if (drawing.crosshair) return;
       _placeCorner(current, drawing, point, metersPerPixel);
+      return;
+    }
+    final MapRedivideReadModel? redivide = current.redivide;
+    if (redivide != null) {
+      final MapHitReadModel hit = current.snapshot.hitAt(point, <MapLayerEnum>{
+        MapLayerEnum.drawn,
+      });
+      if (hit is MapHitDrawn && hit.drawing.id != redivide.first.id) {
+        emit(
+          current.copyWith(
+            redivide: () => MapRedivideReadModel.between(
+              first: redivide.first,
+              second: hit.drawing,
+              firstOfficial: current.snapshot.officialOf(redivide.first),
+              secondOfficial: current.snapshot.officialOf(hit.drawing),
+            ),
+          ),
+        );
+      }
       return;
     }
     final MapSplitReadModel? split = current.split;
@@ -303,7 +343,51 @@ final class MapCubit extends Cubit<MapState> {
         )),
         snapshot: current.snapshot,
       ),
+      frame: false,
     );
+  }
+
+  Future<void> assignOwnerTo(
+    DrawnParcelEntity drawing,
+    PersonEntity person, [
+    String? officialParcelId,
+  ]) async {
+    final MapState current = state;
+    if (current is! MapReady) return;
+    _afterDrawingWrite(
+      await _saveDrawing(
+        outline: drawing.outline,
+        details: DrawingDetailsValueObject((
+          name: drawing.name,
+          officialParcelId: drawing.officialParcelId ?? officialParcelId,
+          owners: <OwnershipValueObject>[
+            OwnershipValueObject(
+              personId: person.id,
+              share: ShareValueObject.whole,
+            ),
+          ],
+          note: drawing.note,
+        )),
+        existing: drawing,
+        snapshot: current.snapshot,
+      ),
+      frame: false,
+    );
+  }
+
+  void toggleCompare(String id) {
+    final MapState current = state;
+    if (current is! MapReady) return;
+    final List<String> ids = <String>[...current.compareIds];
+    if (!ids.remove(id)) ids.add(id);
+    emit(current.copyWith(compareIds: ids));
+  }
+
+  void clearCompare() {
+    final MapState current = state;
+    if (current is MapReady) {
+      emit(current.copyWith(compareIds: const <String>[]));
+    }
   }
 
   void setColourLevel(int? level) {
@@ -321,6 +405,31 @@ final class MapCubit extends Cubit<MapState> {
         focus: drawing.outline.corners,
       ),
     );
+  }
+
+  void startRedivide(DrawnParcelEntity drawing) {
+    final MapState current = state;
+    if (current is! MapReady) return;
+    emit(
+      current.copyWith(
+        selection: () => null,
+        redivide: () => MapRedivideReadModel.start(drawing),
+        layers: <MapLayerEnum>{...current.layers, MapLayerEnum.drawn},
+      ),
+    );
+  }
+
+  void cancelRedivide() {
+    final MapState current = state;
+    if (current is MapReady) emit(current.copyWith(redivide: () => null));
+  }
+
+  Future<void> confirmRedivide() async {
+    final MapState current = state;
+    if (current is! MapReady) return;
+    final MapRedivideReadModel? redivide = current.redivide;
+    if (redivide == null || !redivide.canConfirm) return;
+    _afterDrawingWrite(await _redivideDrawings(redivide), frame: false);
   }
 
   void cancelSplit() {
@@ -350,7 +459,10 @@ final class MapCubit extends Cubit<MapState> {
     ),
   );
 
-  void _afterDrawingWrite(Either<BaseException, String> result) {
+  void _afterDrawingWrite(
+    Either<BaseException, String> result, {
+    bool frame = true,
+  }) {
     if (isClosed) return;
     final MapState after = state;
     if (after is! MapReady) return;
@@ -359,11 +471,13 @@ final class MapCubit extends Cubit<MapState> {
         emit(after.copyWith(exception: value));
       case Right(:final String value):
         _pendingSelection = value;
+        _framePending = frame;
         emit(
           _resolvePending(
             after.copyWith(
               drawing: () => null,
               split: () => null,
+              redivide: () => null,
               layers: <MapLayerEnum>{...after.layers, MapLayerEnum.drawn},
               notice: MapNoticeEnum.drawingSaved,
             ),

@@ -274,7 +274,7 @@
   "parcelNumberLabel": "Parsel",
   "searchButton": "Sorgula",
   "colourBy": "Aileye göre renklendir",
-  "colourOff": "Renklendirme kapalı",
+  "colourOff": "Sahibe göre",
   "colourLevel": "{level}. kuşak: {names}",
   "@colourLevel": {
     "placeholders": {
@@ -289,10 +289,10 @@
   "colourShared": "Ortak",
   "colourUnassigned": "Sahibi yok",
   "assignOwner": "Sahip ata",
+  "assignOwnerWhichDrawing": "Hangi gerçek sınıra?",
   "assignOwnerTitle": "Kime ait?",
   "assignOwnerHint": "Kişiye dokununca seçilir. Oku ile çocuklarına inebilirsiniz; payı çocuklarına geçmiş birini seçerseniz çocukları eşit paydaş görünür.",
-  "showChildren": "Çocuklarına in",
-  "treeBack": "Bir üst kuşak",
+  "showChildren": "Çocuklarını aç / kapat",
   "splitButton": "İkiye böl",
   "splitEqualButton": "Eşit böl",
   "splitHint": "Kesme çizgisi için iki noktaya dokunun; çizgi bu iki noktadan geçer. Noktalar köşelere ve kenarlara kendiliğinden oturur.",
@@ -326,5 +326,51 @@
   "splitEqualNote": "Parsel, uzun ekseni boyunca eşit alanlı parçalara bölünür. Sonra her parçanın köşelerini düzeltebilirsiniz.",
   "errorDrawingOverlaps": "Bu çizim başka bir çizimin üstüne biniyor. Köşeleri komşu sınıra yaklaştırın; kendiliğinden o sınıra oturur.",
   "errorSplitMisses": "Parsel bölünemedi. Kesme çizgisini ya da parça sayısını kontrol edin.",
-  "noticeUseApp": "Yeni parsel sorgusu web sitesinden yapılamıyor. Sorguyu telefondaki ya da bilgisayardaki Parsel Atlası uygulamasından yapın; sorgulanan parsel burada da hemen görünür."
+  "noticeUseApp": "Yeni parsel sorgusu web sitesinden yapılamıyor. Sorguyu telefondaki ya da bilgisayardaki Parsel Atlası uygulamasından yapın; sorgulanan parsel burada da hemen görünür.",
+  "compareAdd": "Karşılaştırmaya ekle",
+  "compareRemove": "Karşılaştırmadan çıkar",
+  "compareOpen": "Karşılaştır ({count})",
+  "compareClear": "Listeyi temizle",
+  "compareTitle": "Parsel karşılaştırma",
+  "compareByOwner": "Sahibe göre",
+  "compareParcels": "Parseller",
+  "compareReal": "Gerçek",
+  "compareRegistry": "Tapu",
+  "compareDifference": "Fark",
+  "compareTotal": "Toplam",
+  "compareEmpty": "Karşılaştırılacak parsel yok. Haritada bir parsel seçip \"Karşılaştırmaya ekle\" deyin.",
+  "compareNotDrawn": "Gerçek sınırı çizilmemiş",
+  "compareNoRegistry": "Tapu kaydı yok",
+  "@compareOpen": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "redivideButton": "Komşuyla tapuya göre böl",
+  "redivideTitle": "Tapuya göre yeniden bölme",
+  "redividePick": "Yan taraftaki komşu gerçek sınıra dokunun.",
+  "redivideNoDeed": "İkisinin de tapu kaydı (resmi parseli) olmalı.",
+  "redivideSameDeed": "İkisi aynı tapuya ait; tapu bunların nasıl bölüneceğini söylemiyor.",
+  "redivideNotNeighbours": "Bu iki sınır ortak bir kenarı paylaşmıyor.",
+  "redivideReady": "Aradaki çizgi tapu alanlarına göre kaydırıldı. Yeni şekiller haritada.",
+  "redividePiece": "{name}: {after} (tapu {deed}, şu an {now})",
+  "@redividePiece": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      },
+      "deed": {
+        "type": "String"
+      },
+      "now": {
+        "type": "String"
+      }
+    }
+  },
+  "redivideConfirm": "Yeni sınırları kaydet"
 }

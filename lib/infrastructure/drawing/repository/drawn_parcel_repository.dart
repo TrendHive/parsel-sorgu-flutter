@@ -119,6 +119,42 @@ class DrawnParcelRepository implements DrawnParcelRepositoryInterface {
   }
 
   @override
+  Future<Either<BaseException, String>> reshape(
+    List<({DrawnParcelEntity drawing, GeoPolygonValueObject outline})>
+    changes, {
+    required MemberEntity actor,
+  }) {
+    final WriteBatch batch = _store.batch();
+    for (final ({DrawnParcelEntity drawing, GeoPolygonValueObject outline})
+        change
+        in changes) {
+      final DrawnParcelEntity drawing = change.drawing;
+      batch.update(
+        _store.doc(StoreCollection.drawnParcels, drawing.id),
+        _mapper.write(
+          change.outline,
+          DrawingDetailsValueObject((
+            name: drawing.name,
+            officialParcelId: drawing.officialParcelId,
+            owners: drawing.owners,
+            note: drawing.note,
+          )),
+          actor,
+        ),
+      );
+      _store.log(
+        batch,
+        action: ActivityActionEnum.updated,
+        target: ActivityTargetEnum.drawnParcel,
+        targetId: drawing.id,
+        label: drawing.name,
+        actor: actor,
+      );
+    }
+    return _store.commit(batch, changes.first.drawing.id);
+  }
+
+  @override
   Future<Either<BaseException, String>> delete(
     DrawnParcelEntity drawing, {
     required MemberEntity actor,

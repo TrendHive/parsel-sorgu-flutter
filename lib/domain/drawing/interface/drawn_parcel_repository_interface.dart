@@ -11,7 +11,9 @@ import 'package:parcel_atlas/domain/map/value_object/geo_polygon_value_object.da
 /// existing one's shape and details; [delete] removes it. [split] replaces
 /// one drawing by several pieces at once: the drawing itself becomes the
 /// first piece and the others are created beside it, so nothing has to be
-/// deleted and no moment exists when the land is stored twice or not at all. Each write stores
+/// deleted and no moment exists when the land is stored twice or not at all.
+/// [reshape] gives several existing drawings new outlines at once — the
+/// line between neighbours moved — keeping their details. Each write stores
 /// the measurements computed from the outline beside it and logs one
 /// activity line in the same atomic batch.
 abstract interface class DrawnParcelRepositoryInterface {
@@ -34,6 +36,12 @@ abstract interface class DrawnParcelRepositoryInterface {
     DrawnParcelEntity drawing,
     List<({GeoPolygonValueObject outline, DrawingDetailsValueObject details})>
     pieces, {
+    required MemberEntity actor,
+  });
+
+  Future<Either<BaseException, String>> reshape(
+    List<({DrawnParcelEntity drawing, GeoPolygonValueObject outline})>
+    changes, {
     required MemberEntity actor,
   });
 

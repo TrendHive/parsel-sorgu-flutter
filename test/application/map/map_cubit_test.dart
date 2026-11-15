@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:parcel_atlas/application/drawing/usecase/delete_drawing_usecase.dart';
+import 'package:parcel_atlas/application/drawing/usecase/redivide_drawings_usecase.dart';
 import 'package:parcel_atlas/application/drawing/usecase/save_drawing_usecase.dart';
 import 'package:parcel_atlas/application/drawing/usecase/split_drawing_usecase.dart';
 import 'package:parcel_atlas/application/map/cubit/map_cubit.dart';
@@ -22,7 +23,9 @@ import 'package:parcel_atlas/domain/auth/entity/member_entity.dart';
 import 'package:parcel_atlas/domain/auth/enum/member_role_enum.dart';
 import 'package:parcel_atlas/domain/auth/interface/auth_repository_interface.dart';
 import 'package:parcel_atlas/domain/drawing/entity/drawn_parcel_entity.dart';
+import 'package:parcel_atlas/domain/drawing/enum/redivide_step_enum.dart';
 import 'package:parcel_atlas/domain/drawing/interface/drawn_parcel_repository_interface.dart';
+import 'package:parcel_atlas/domain/drawing/value_object/drawing_details_value_object.dart';
 import 'package:parcel_atlas/domain/map/enum/map_notice_enum.dart';
 import 'package:parcel_atlas/domain/map/interface/device_location_interface.dart';
 import 'package:parcel_atlas/domain/map/read_model/map_hit_read_model.dart';
@@ -110,6 +113,7 @@ void main() {
       QueryParcelByNumberUseCase(auth, registry, officials),
       SaveDrawingUseCase(auth, drawings),
       SplitDrawingUseCase(auth, drawings),
+      RedivideDrawingsUseCase(auth, drawings),
       DeleteDrawingUseCase(auth, drawings),
       LocateDeviceUseCase(_Location()),
       auth,
@@ -191,6 +195,7 @@ void main() {
         QueryParcelByNumberUseCase(auth, registry, officials),
         SaveDrawingUseCase(auth, drawings),
         SplitDrawingUseCase(auth, drawings),
+        RedivideDrawingsUseCase(auth, drawings),
         DeleteDrawingUseCase(auth, drawings),
         LocateDeviceUseCase(_Location()),
         auth,
@@ -214,4 +219,67 @@ void main() {
       await web.close();
     },
   );
+
+  test('assign owner records the person on the existing real boundary, links '
+      'it, and leaves the map where it is', () async {
+    final DrawnParcelEntity drawn = (cubit.state as MapReady).snapshot
+        .drawingById('drawn')!;
+    final OfficialParcelEntity parcel = testOfficial('1');
+    final int focusBefore = (cubit.state as MapReady).focusId;
+    registerFallbackValue(drawn);
+    registerFallbackValue(drawn.outline);
+    registerFallbackValue(
+      const DrawingDetailsValueObject((
+        name: 'x',
+        officialParcelId: null,
+        owners: <OwnershipValueObject>[],
+        note: '',
+      )),
+    );
+    when(() => drawings.update(any(), any(), any(), actor: any(named: 'actor')))
+        .thenAnswer((_) async => const Right('drawn'));
+
+    await cubit.assignOwnerTo(drawn, testPerson('father'), parcel.id);
+
+    final DrawingDetailsValueObject details =
+        verify(
+              () => drawings.update(
+                drawn,
+                drawn.outline,
+                captureAny(),
+                actor: member,
+              ),
+            ).captured.single
+            as DrawingDetailsValueObject;
+    expect(details.name, 'drawn');
+    expect(details.officialParcelId, parcel.id);
+    expect(details.owners.single.personId, 'father');
+    verifyNever(
+      () => drawings.create(any(), any(), actor: any(named: 'actor')),
+    );
+    final MapReady after = cubit.state as MapReady;
+    expect(after.focusId, focusBefore);
+    expect(after.selection, isA<MapHitDrawn>());
+  });
+
+  test('re-dividing with a neighbour without a deed explains why and stores '
+      'nothing', () async {
+    final DrawnParcelEntity drawn = (cubit.state as MapReady).snapshot
+        .drawingById('drawn')!;
+    cubit.startRedivide(drawn);
+    expect(
+      (cubit.state as MapReady).redivide!.step,
+      RedivideStepEnum.pickNeighbour,
+    );
+
+    cubit.tap(insideDrawing, metersPerPixel: 1);
+    await cubit.confirmRedivide();
+
+    expect(
+      (cubit.state as MapReady).redivide!.step,
+      RedivideStepEnum.pickNeighbour,
+    );
+    verifyNever(() => drawings.reshape(any(), actor: any(named: 'actor')));
+    verifyNever(() => registry.fetchAt(any()));
+  });
 }

@@ -12,17 +12,20 @@ import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_dimens.da
 import 'package:parcel_atlas/presentation/map/widgets/map_parcel_label.dart';
 
 /// The two stored layers: registry parcels (cyan) under the family's drawn
-/// boundaries (orange), each shown only when its layer is on.
+/// boundaries, each shown only when its layer is on.
 ///
 /// The [selection] is outlined in white and thicker. Labels — "114/1" or a
 /// drawing's name — appear from [ParcelInfoDimens.parcelLabelMinZoom], where
 /// there is room to read them; further out they would only cover the
 /// imagery. A historical (inactive) registry parcel is dashed.
 ///
-/// With a [colourLevel] the drawn layer is coloured by branch of the family
-/// at that level of the tree instead: one colour per branch, a neutral one
-/// for a drawing several branches share, the usual orange for one nobody
-/// owns yet — and filled more strongly, so the branches read at a glance.
+/// The drawn layer is coloured by owner: one colour per person recorded as
+/// an owner, one for a drawing several people share, and a neutral grey for
+/// one nobody owns yet — filled strongly, so ownership reads at a glance.
+/// With a [colourLevel] it is coloured by branch of the family at that
+/// level of the tree instead. A registry parcel whose real boundaries have
+/// owners takes their colour too, so ownership shows with only the registry
+/// layer on; one nobody holds keeps the registry's cyan.
 class MapParcelLayers extends StatelessWidget {
   const MapParcelLayers({
     super.key,
@@ -48,11 +51,28 @@ class MapParcelLayers extends StatelessWidget {
       selection is MapHitDrawn &&
       (selection! as MapHitDrawn).drawing.id == drawing.id;
 
-  Color _colourOf(DrawnParcelEntity drawing, List<PersonEntity> branches) {
-    final int? level = colourLevel;
-    if (level == null) return ParcelInfoColor.drawnStroke;
-    final Set<String> holders = snapshot.holdersAt(drawing, level);
-    if (holders.isEmpty) return ParcelInfoColor.drawnStroke;
+  Color _colourOf(DrawnParcelEntity drawing, List<PersonEntity> branches) =>
+      _colourFor(
+        snapshot.holdersAt(drawing, colourLevel),
+        branches,
+        ParcelInfoColor.unowned,
+      );
+
+  Color _officialColour(
+    OfficialParcelEntity parcel,
+    List<PersonEntity> branches,
+  ) => _colourFor(
+    snapshot.officialHoldersAt(parcel, colourLevel),
+    branches,
+    ParcelInfoColor.officialStroke,
+  );
+
+  Color _colourFor(
+    Set<String> holders,
+    List<PersonEntity> branches,
+    Color nobody,
+  ) {
+    if (holders.isEmpty) return nobody;
     if (holders.length > 1) return ParcelInfoColor.sharedBranches;
     return ParcelInfoColor.branch(
       branches.indexWhere((PersonEntity p) => p.id == holders.single),
@@ -61,9 +81,7 @@ class MapParcelLayers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<PersonEntity> branches = colourLevel == null
-        ? const <PersonEntity>[]
-        : snapshot.branchesAt(colourLevel!);
+    final List<PersonEntity> branches = snapshot.branchesAt(colourLevel);
     final bool labels =
         MapCamera.of(context).zoom >= ParcelInfoDimens.parcelLabelMinZoom;
     final bool showOfficial = layers.contains(MapLayerEnum.official);
@@ -74,12 +92,16 @@ class MapParcelLayers extends StatelessWidget {
           PolygonLayer(
             polygons: <Polygon>[
               for (final OfficialParcelEntity parcel in snapshot.officials)
-                _polygon(
-                  parcel.record.outline.corners,
-                  ParcelInfoColor.officialStroke,
-                  selected: _isSelectedOfficial(parcel),
-                  dashed: !parcel.record.isActive,
-                ),
+                if (_officialColour(parcel, branches) case final Color colour)
+                  _polygon(
+                    parcel.record.outline.corners,
+                    colour,
+                    selected: _isSelectedOfficial(parcel),
+                    dashed: !parcel.record.isActive,
+                    alpha: colour == ParcelInfoColor.officialStroke
+                        ? ParcelInfoDimens.fillAlpha
+                        : ParcelInfoDimens.branchFillAlpha,
+                  ),
             ],
           ),
         if (showDrawn)
@@ -91,9 +113,7 @@ class MapParcelLayers extends StatelessWidget {
                   _colourOf(drawing, branches),
                   selected: _isSelectedDrawing(drawing),
                   dashed: false,
-                  alpha: colourLevel == null
-                      ? ParcelInfoDimens.fillAlpha
-                      : ParcelInfoDimens.branchFillAlpha,
+                  alpha: ParcelInfoDimens.branchFillAlpha,
                 ),
             ],
           ),
@@ -105,7 +125,7 @@ class MapParcelLayers extends StatelessWidget {
                   _label(
                     parcel.record.outline.centre,
                     parcel.label,
-                    ParcelInfoColor.officialStroke,
+                    _officialColour(parcel, branches),
                   ),
               if (showDrawn)
                 for (final DrawnParcelEntity drawing in snapshot.drawings)
