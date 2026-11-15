@@ -19,7 +19,7 @@ and record who owns which share — live on every family member's device.
 [![Dart 3.14](https://img.shields.io/badge/Dart-3.14-0175C2?style=flat-square&logo=dart&logoColor=white)](https://dart.dev)
 [![Firebase Spark](https://img.shields.io/badge/Firebase-Spark%20(free)-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com)
 [![Analyzer](https://img.shields.io/badge/analyzer-0%20issues-3FB950?style=flat-square)](#-checking-your-work)
-[![Tests](https://img.shields.io/badge/tests-21-3FB950?style=flat-square)](#-checking-your-work)
+[![Tests](https://img.shields.io/badge/tests-43-3FB950?style=flat-square)](#-checking-your-work)
 
 [Features](#-features) · [How it is built](#-how-it-is-built) · [Getting started](#-getting-started) · [Checking your work](#-checking-your-work) · [Security](#-security) · [Docs](#-documentation)
 
@@ -40,7 +40,7 @@ The registry's parcels (cyan) and the family's real boundaries (orange) over aer
 <td width="33%" valign="top">
 
 #### 🏛️ Official data, rationed
-Parcels come from the land registry's own service. A tap inside a stored parcel never calls it; a lookup is a deliberate button, so the daily limit lasts.
+Parcels come from the land registry's own service. A tap inside a stored parcel never calls it; each parcel costs one lookup ever. Lookups run from the desktop and mobile apps — the registry refuses third-party websites.
 
 </td>
 <td width="33%" valign="top">
@@ -59,14 +59,14 @@ Areas, perimeters and every side's length are computed on the WGS84 ellipsoid, s
 </td>
 <td valign="top">
 
-#### 👨‍👩‍👧‍👦 People, groups, shares
-Owners hold deed-style shares (1/4). A group — siblings who inherit alike — holds a share that is split among its members.
+#### 👨‍👩‍👧‍👦 A family tree of owners
+Owners hold deed-style shares (1/4). A share recorded on an ancestor passes down the tree, split equally among the children of each generation.
 
 </td>
 <td valign="top">
 
 #### 📊 Holdings
-For every person and group: each parcel, where it is, its area, the share held and the area it stands for, with totals.
+For every person: each parcel, where it is, its area, the share that reaches them — and from which ancestor — with totals.
 
 </td>
 </tr>

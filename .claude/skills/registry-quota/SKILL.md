@@ -11,8 +11,11 @@ allowance is spent until tomorrow. Full reference: `docs/tkgm-api.md`.
 - A point inside a stored parcel is answered from `MapSnapshotReadModel` —
   never the registry. `test/application/parcel/query_parcel_at_usecase_test.dart`
   guards it.
-- The registry is called only from an explicit member action (the query
-  button, Refresh). Never on map move, startup, a timer or a loop.
+- The registry is called only when a member taps ground the store does not
+  cover, or presses Refresh. Never on map move, startup, a timer or a loop.
+- In a browser the registry refuses third-party websites (403): lookups
+  work only from the desktop and mobile apps. Never spoof its origin or add
+  a relay without the owner's explicit decision.
 - Refresh fetches by `neighbourhoodId/block/parcel`, never by point.
 - No custom headers on the GET (no CORS preflight → one request per lookup).
 - Test with `test/support/fixtures/tkgm_parcel_duzkoy_114_1.json` and fakes.

@@ -70,7 +70,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get baseStreet => 'Harita';
 
   @override
-  String get menuPeople => 'Kişiler';
+  String get menuPeople => 'Aile';
 
   @override
   String get menuActivity => 'Geçmiş';
@@ -83,16 +83,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get newDrawing => 'Yeni çizim';
-
-  @override
-  String get noParcelStoredTitle => 'Burada kayıtlı parsel yok';
-
-  @override
-  String get noParcelStoredBody =>
-      'Resmi kayıttan sorgulamak günlük sorgu hakkından birini kullanır.';
-
-  @override
-  String get queryRegistryButton => 'Resmi kayıttan sorgula';
 
   @override
   String get querying => 'Sorgulanıyor…';
@@ -211,11 +201,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get noteLabel => 'Not';
 
   @override
-  String viaGroup(String group) {
-    return '$group üzerinden';
-  }
-
-  @override
   String get drawingHint =>
       'Köşe eklemek için haritaya dokunun. Köşeleri sürükleyerek taşıyın, kenardaki + ile araya köşe ekleyin.';
 
@@ -280,31 +265,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get invalidShare => 'Geçerli bir pay yazın (örn. 1/4).';
 
   @override
-  String get pickOwnerTitle => 'Kişi veya grup seçin';
+  String get pickOwnerTitle => 'Kişi seçin';
 
   @override
-  String get peopleTitle => 'Kişiler ve gruplar';
-
-  @override
-  String get peopleTab => 'Kişiler';
-
-  @override
-  String get groupsTab => 'Gruplar';
+  String get peopleTitle => 'Aile ağacı';
 
   @override
   String get addPersonButton => 'Kişi ekle';
 
   @override
-  String get addGroupButton => 'Grup ekle';
-
-  @override
   String get personDialogTitle => 'Kişi';
-
-  @override
-  String get groupDialogTitle => 'Grup';
-
-  @override
-  String get groupMembersLabel => 'Üyeler';
 
   @override
   String parcelCount(int count) {
@@ -319,23 +289,8 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
-  String memberCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count kişi',
-      one: '1 kişi',
-      zero: 'Üye yok',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get noPeople => 'Henüz kişi yok. Parsel sahiplerini buradan ekleyin.';
-
-  @override
-  String get noGroups =>
-      'Henüz grup yok. Aynı yerleri paylaşan kişileri grup yapın.';
+  String get noPeople =>
+      'Henüz kişi yok. En büyük atadan başlayarak aileyi ekleyin.';
 
   @override
   String get holdingsParcels => 'Parsel';
@@ -351,17 +306,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get holdingsEmpty => 'Atanmış parsel yok.';
-
-  @override
-  String get groupMembersTitle => 'Grup üyeleri';
-
-  @override
-  String get memberOfGroups => 'Üye olduğu gruplar';
-
-  @override
-  String perMemberShare(String share) {
-    return 'Kişi başı $share';
-  }
 
   @override
   String get activityTitle => 'Değişiklik geçmişi';
@@ -392,9 +336,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get targetPerson => 'Kişi';
-
-  @override
-  String get targetGroup => 'Grup';
 
   @override
   String get noticeFromStore =>
@@ -466,4 +407,65 @@ class AppLocalizationsTr extends AppLocalizations {
   String meters(String value) {
     return '$value m';
   }
+
+  @override
+  String get pickOwnerEmpty =>
+      'Eklenecek kişi yok. Önce Aile sayfasından kişileri ekleyin.';
+
+  @override
+  String childCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count çocuk',
+      one: '1 çocuk',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get parentLabel => 'Babası / annesi';
+
+  @override
+  String get parentNone => 'Yok (ağacın başı)';
+
+  @override
+  String get passesToChildrenLabel => 'Payı çocuklarına geçti';
+
+  @override
+  String get passesToChildrenHint =>
+      'Açıkken bu kişinin payları çocukları arasında eşit bölünür.';
+
+  @override
+  String passedToChildren(String names, String share) {
+    return '$names · kişi başı $share';
+  }
+
+  @override
+  String get passedOnBadge => 'çocuklarına geçti';
+
+  @override
+  String get addChildButton => 'Çocuk ekle';
+
+  @override
+  String get childrenTitle => 'Çocukları';
+
+  @override
+  String get childrenInheritTitle => 'Mirasçıları (çocukları)';
+
+  @override
+  String get holdingsPassedArea => 'Bıraktığı alan';
+
+  @override
+  String viaAncestor(String name) {
+    return '$name üzerinden';
+  }
+
+  @override
+  String get errorFamilyLoop =>
+      'Bir kişi kendi soyundan birinin çocuğu olamaz.';
+
+  @override
+  String get errorRegistryRefusesWeb =>
+      'Resmi kayıt, web sitesinden yapılan sorguları kabul etmiyor. Yeni parsel sorgusunu masaüstü veya mobil uygulamadan yapın; kayıtlı parseller burada da görünür.';
 }

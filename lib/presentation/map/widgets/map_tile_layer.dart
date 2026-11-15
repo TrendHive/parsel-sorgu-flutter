@@ -7,8 +7,8 @@ import 'package:parcel_atlas/domain/map/rule/map_rules.dart';
 ///
 /// Both sources are free with attribution: Esri World Imagery for aerial
 /// photos — the one to draw real boundaries on — and OpenStreetMap for
-/// streets and names. Beyond [MapRules.maxNativeZoom] tiles are enlarged, so
-/// a corner can still be placed precisely.
+/// streets and names. Beyond each source's native zoom the last real tile is
+/// enlarged, so a corner can still be placed precisely.
 class MapTileLayer extends StatelessWidget {
   const MapTileLayer({super.key, required this.baseMap});
 
@@ -31,7 +31,10 @@ class MapTileLayer extends StatelessWidget {
         BaseMapEnum.street => streetUrl,
       },
       userAgentPackageName: userAgentPackage,
-      maxNativeZoom: MapRules.maxNativeZoom,
+      maxNativeZoom: switch (baseMap) {
+        BaseMapEnum.satellite => MapRules.satelliteNativeZoom,
+        BaseMapEnum.street => MapRules.streetNativeZoom,
+      },
       maxZoom: MapRules.maxZoom,
     );
   }

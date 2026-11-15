@@ -12,7 +12,7 @@ void main() {
     expect((share.numerator, share.denominator), (1, 4));
   });
 
-  test("a group's 1/1 split among four siblings is 1/4 each", () {
+  test("a father's 1/1 split among four siblings is 1/4 each", () {
     final ShareValueObject each = ShareValueObject.whole.dividedBy(4);
     expect((each.numerator, each.denominator), (1, 4));
   });

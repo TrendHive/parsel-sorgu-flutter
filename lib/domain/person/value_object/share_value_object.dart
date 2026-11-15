@@ -10,8 +10,8 @@ import 'package:parcel_atlas/domain/person/validator/proper_fraction_validator.d
 /// shares of 1/3 make 1, not 0.9999 — and always print as the deed does.
 /// Every result is reduced: 2/8 is stored and shown as 1/4.
 ///
-/// [whole] is the entire parcel and [none] nothing. [plus] adds two shares,
-/// [dividedBy] splits one equally (a group's share among its members),
+/// [whole] is the entire parcel and [none] nothing. [plus] adds two shares, [times] takes a part of a share,
+/// [dividedBy] splits one equally (a parent's share among the children),
 /// [compareTo] orders them, and [fraction] is the share as a number for
 /// display or a bar chart only.
 ///
@@ -74,6 +74,11 @@ final class ShareValueObject
 
   ShareValueObject plus(ShareValueObject other) => ShareValueObject(
     numerator * other.denominator + other.numerator * denominator,
+    denominator * other.denominator,
+  );
+
+  ShareValueObject times(ShareValueObject other) => ShareValueObject(
+    numerator * other.numerator,
     denominator * other.denominator,
   );
 

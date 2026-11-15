@@ -8,23 +8,16 @@ import 'package:parcel_atlas/domain/map/read_model/map_snapshot_read_model.dart'
 import 'package:parcel_atlas/domain/parcel/entity/official_parcel_entity.dart';
 import 'package:parcel_atlas/domain/parcel/interface/official_parcel_repository_interface.dart';
 import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
-import 'package:parcel_atlas/domain/person/entity/person_group_entity.dart';
-import 'package:parcel_atlas/domain/person/interface/person_group_repository_interface.dart';
 import 'package:parcel_atlas/domain/person/interface/person_repository_interface.dart';
 
-/// The family's whole store as one live snapshot: registry parcels, drawings,
-/// people and groups, re-emitted whenever any of them changes on any device.
+/// The family's whole store as one live snapshot: registry parcels, drawings
+/// and people, re-emitted whenever any of them changes on any device.
 ///
-/// Nothing is emitted until all four have answered once, so the map never
+/// Nothing is emitted until all three have answered once, so the map never
 /// shows drawings whose people are still unknown. A failure on any stream is
 /// passed on as it happens.
 final class WatchMapUseCase {
-  const WatchMapUseCase(
-    this._officials,
-    this._drawings,
-    this._persons,
-    this._groups,
-  );
+  const WatchMapUseCase(this._officials, this._drawings, this._persons);
 
   final OfficialParcelRepositoryInterface _officials;
 
@@ -32,32 +25,23 @@ final class WatchMapUseCase {
 
   final PersonRepositoryInterface _persons;
 
-  final PersonGroupRepositoryInterface _groups;
-
   Stream<Either<BaseException, MapSnapshotReadModel>> call() {
     List<OfficialParcelEntity>? officials;
     List<DrawnParcelEntity>? drawings;
     List<PersonEntity>? persons;
-    List<PersonGroupEntity>? groups;
     final List<StreamSubscription<Object?>> subscriptions =
         <StreamSubscription<Object?>>[];
     late final StreamController<Either<BaseException, MapSnapshotReadModel>>
     out;
 
     void publish() {
-      if (officials == null ||
-          drawings == null ||
-          persons == null ||
-          groups == null) {
-        return;
-      }
+      if (officials == null || drawings == null || persons == null) return;
       out.add(
         Right(
           MapSnapshotReadModel(
             officials: officials!,
             drawings: drawings!,
             persons: persons!,
-            groups: groups!,
           ),
         ),
       );
@@ -93,10 +77,6 @@ final class WatchMapUseCase {
         listen<PersonEntity>(
           _persons.watchAll(),
           (List<PersonEntity> value) => persons = value,
-        );
-        listen<PersonGroupEntity>(
-          _groups.watchAll(),
-          (List<PersonGroupEntity> value) => groups = value,
         );
       },
       onCancel: () async {

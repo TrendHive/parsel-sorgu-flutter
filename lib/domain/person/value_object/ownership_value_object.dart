@@ -1,44 +1,26 @@
 import 'package:parcel_atlas/core/base/base_value_object.dart';
 import 'package:parcel_atlas/core/base/base_value_validator.dart';
-import 'package:parcel_atlas/domain/person/enum/holder_kind_enum.dart';
 import 'package:parcel_atlas/domain/person/value_object/share_value_object.dart';
 
-/// One line of a parcel's ownership: who holds it ([kind] and [holderId])
-/// and how much ([share]).
+/// One line of a parcel's ownership: who it is recorded on ([personId]) and
+/// how much ([share]).
 ///
-/// A group is stored as the group, not as its members at the time, so when
-/// the group changes every parcel it holds follows — four siblings who
-/// inherit everything together are kept in one place.
+/// The line names the person the land is recorded on — often an ancestor.
+/// Who holds it today follows from the family tree, so recording a parcel on
+/// a grandfather is enough for every heir to see their part.
 final class OwnershipValueObject
-    extends
-        BaseValueObject<
-          ({HolderKindEnum kind, String holderId, ShareValueObject share})
-        > {
+    extends BaseValueObject<({String personId, ShareValueObject share})> {
   const OwnershipValueObject({
-    required HolderKindEnum kind,
-    required String holderId,
+    required String personId,
     required ShareValueObject share,
-  }) : super((kind: kind, holderId: holderId, share: share));
+  }) : super((personId: personId, share: share));
 
   @override
-  List<
-    BaseValueValidator<
-      ({HolderKindEnum kind, String holderId, ShareValueObject share})
-    >
-  >
+  List<BaseValueValidator<({String personId, ShareValueObject share})>>
   get validators =>
-      const <
-        BaseValueValidator<
-          ({HolderKindEnum kind, String holderId, ShareValueObject share})
-        >
-      >[];
+      const <BaseValueValidator<({String personId, ShareValueObject share})>>[];
 
-  HolderKindEnum get kind => value.kind;
-
-  String get holderId => value.holderId;
+  String get personId => value.personId;
 
   ShareValueObject get share => value.share;
-
-  bool holds(HolderKindEnum holderKind, String id) =>
-      kind == holderKind && holderId == id;
 }

@@ -50,36 +50,37 @@ Members may create and refresh; nobody may delete. The app never edits one.
 | `name` | string | 1–200 characters |
 | `outline` | list of `{lat, lng}` | 3–2000 corners, exact |
 | `officialParcelId` | string \| null | the registry parcel it corrects |
-| `owners` | list of `{kind, holderId, numerator, denominator}` | `kind` is `person` or `group`; shares are reduced fractions, total ≤ 1 |
-| `ownerKeys` | list of string | `person:<id>` / `group:<id>`, for clean-up queries |
+| `owners` | list of `{personId, numerator, denominator}` | shares are reduced fractions, total ≤ 1 |
+| `ownerIds` | list of string | the same person ids, flat, for clean-up queries |
 | `note` | string | |
 | `measures` | `{areaSquareMeters, perimeterMeters, edgeLengthsMeters}` | computed from `outline` when saved |
 | `created`, `updated` | stamp | |
 
 Members create and update; only admin deletes.
 
-### `persons/{auto}` — parcel owners
+### `persons/{auto}` — parcel owners and their family tree
 
-`name`, `note`, `created`, `updated`. Not sign-in accounts. Deleting one
-(admin) also removes their owner lines from every drawing and their place in
-every group, in the same batch.
+| Field | Type | |
+|---|---|---|
+| `name` | string | |
+| `parentId` | string \| null | the person's parent in the tree |
+| `passesToChildren` | bool | the person's shares are split equally among their children |
+| `note` | string | |
+| `created`, `updated` | stamp | |
 
-### `groups/{auto}` — owners who hold together
-
-`name`, `memberIds` (person ids), `note`, `created`, `updated`. A group's
-share is split equally among `memberIds`. Deleting one (admin) removes its
-owner lines from every drawing in the same batch.
+Not sign-in accounts. Deleting one (admin) also removes their owner lines
+from every drawing and unlinks their children, in the same batch.
 
 ### `activity/{auto}` — the change log
 
 `action` (`queried` · `refreshed` · `created` · `updated` · `deleted`),
-`target` (`officialParcel` · `drawnParcel` · `person` · `group`), `targetId`,
+`target` (`officialParcel` · `drawnParcel` · `person`), `targetId`,
 `label` (the record's name at the time), `by` (stamp). Append-only: no update,
 no delete.
 
 ## Free-tier budget
 
 Spark allows 50 000 reads, 20 000 writes and 20 000 deletes a day. The map
-listens to four collections, so opening it reads every parcel, drawing,
-person and group once (then only changes); the offline cache makes later
+listens to three collections, so opening it reads every parcel, drawing
+and person once (then only changes); the offline cache makes later
 opens cheaper. A family's few hundred records are far inside the budget.

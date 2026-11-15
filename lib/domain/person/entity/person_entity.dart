@@ -6,15 +6,24 @@ import 'package:parcel_atlas/core/validator/not_blank_validator.dart';
 import 'package:parcel_atlas/domain/activity/value_object/audit_stamp_value_object.dart';
 import 'package:parcel_atlas/domain/input/enum/input_field_enum.dart';
 
-/// Someone parcels belong to — an owner, an heir, a tenant.
+/// Someone parcels belong to, and their place in the family tree.
 ///
-/// Not a member: a person never signs in. Members create people and assign
-/// parcels to them. [create] answers a new, unsaved person (empty [id], no
-/// stamps yet) or the reason it is not valid; [rename] the same for an edit.
+/// Not a member: a person never signs in. [parentId] is the person's father
+/// or mother in the tree, or null at its root. [passesToChildren] says the
+/// person's shares have passed on: whatever they hold is split equally
+/// among their children (and onward, if a child's share has passed on too).
+/// A parcel recorded on a grandfather therefore reaches every heir without
+/// being re-entered — and can later be compared with how the land was
+/// really divided.
+///
+/// [create] answers a new, unsaved person (empty [id], no stamps yet) or the
+/// reason it is not valid; [edit] the same for a change.
 final class PersonEntity extends BaseEntity {
   const PersonEntity({
     required this.id,
     required this.name,
+    required this.parentId,
+    required this.passesToChildren,
     required this.note,
     required this.created,
     required this.updated,
@@ -25,6 +34,10 @@ final class PersonEntity extends BaseEntity {
 
   final String name;
 
+  final String? parentId;
+
+  final bool passesToChildren;
+
   final String note;
 
   final AuditStampValueObject? created;
@@ -33,6 +46,8 @@ final class PersonEntity extends BaseEntity {
 
   static Either<BaseException, PersonEntity> create({
     required String name,
+    required String? parentId,
+    required bool passesToChildren,
     required String note,
   }) => NotBlankValidator(InputFieldEnum.personName.name)
       .validate(name)
@@ -40,14 +55,18 @@ final class PersonEntity extends BaseEntity {
         (String valid) => PersonEntity(
           id: CoreConstants.empty,
           name: valid.trim(),
+          parentId: parentId,
+          passesToChildren: passesToChildren,
           note: note.trim(),
           created: null,
           updated: null,
         ),
       );
 
-  Either<BaseException, PersonEntity> rename({
+  Either<BaseException, PersonEntity> edit({
     required String name,
+    required String? parentId,
+    required bool passesToChildren,
     required String note,
   }) => NotBlankValidator(InputFieldEnum.personName.name)
       .validate(name)
@@ -55,6 +74,8 @@ final class PersonEntity extends BaseEntity {
         (String valid) => PersonEntity(
           id: id,
           name: valid.trim(),
+          parentId: parentId,
+          passesToChildren: passesToChildren,
           note: note.trim(),
           created: created,
           updated: updated,

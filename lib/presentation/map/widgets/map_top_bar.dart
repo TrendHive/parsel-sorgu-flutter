@@ -111,7 +111,7 @@ class MapTopBar extends StatelessWidget {
                       PopupMenuItem<VoidCallback>(
                         value: onPeople,
                         child: ListTile(
-                          leading: const Icon(Icons.groups_outlined),
+                          leading: const Icon(Icons.account_tree_outlined),
                           title: ParcelInfoText(l10n.menuPeople),
                         ),
                       ),
@@ -134,7 +134,7 @@ class MapTopBar extends StatelessWidget {
             else ...<Widget>[
               IconButton.filledTonal(
                 tooltip: l10n.menuPeople,
-                icon: const Icon(Icons.groups_outlined),
+                icon: const Icon(Icons.account_tree_outlined),
                 onPressed: onPeople,
               ),
               IconButton.filledTonal(

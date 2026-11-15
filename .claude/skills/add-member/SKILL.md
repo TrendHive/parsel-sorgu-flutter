@@ -17,7 +17,7 @@ It creates `<username>@members.parcel-atlas.app`, adds the account id to
 `memberIds()` (and `adminIds()` with `--admin`) in `firestore.rules`, deploys
 the rules, and writes `members/{uid}`. Commit the rules change afterwards.
 
-Sign-in accounts are not parcel owners: owners are `persons` / `groups`,
+Sign-in accounts are not parcel owners: owners are `persons` in the family tree,
 created in the app.
 
 "Cannot sign in": wrong password → the member re-runs nothing, the admin

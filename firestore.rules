@@ -83,20 +83,11 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // Parcel owners and their groups (not sign-in accounts).
+    // Parcel owners and their family tree (not sign-in accounts).
     match /persons/{id} {
       allow read: if isMember();
       allow create: if isMember() && hasName() && stampedNow(data().created) && stampedNow(data().updated);
       allow update: if isMember() && hasName() && keptCreated() && stampedNow(data().updated);
-      allow delete: if isAdmin();
-    }
-
-    match /groups/{id} {
-      allow read: if isMember();
-      allow create: if isMember() && hasName() && data().memberIds is list
-        && stampedNow(data().created) && stampedNow(data().updated);
-      allow update: if isMember() && hasName() && data().memberIds is list
-        && keptCreated() && stampedNow(data().updated);
       allow delete: if isAdmin();
     }
 

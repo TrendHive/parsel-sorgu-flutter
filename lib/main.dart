@@ -19,9 +19,7 @@ import 'package:parcel_atlas/application/parcel/usecase/query_parcel_at_usecase.
 import 'package:parcel_atlas/application/parcel/usecase/refresh_parcel_usecase.dart';
 import 'package:parcel_atlas/application/person/cubit/holdings_cubit.dart';
 import 'package:parcel_atlas/application/person/cubit/persons_cubit.dart';
-import 'package:parcel_atlas/application/person/usecase/delete_group_usecase.dart';
 import 'package:parcel_atlas/application/person/usecase/delete_person_usecase.dart';
-import 'package:parcel_atlas/application/person/usecase/save_group_usecase.dart';
 import 'package:parcel_atlas/application/person/usecase/save_person_usecase.dart';
 import 'package:parcel_atlas/domain/activity/interface/activity_repository_interface.dart';
 import 'package:parcel_atlas/domain/auth/interface/auth_repository_interface.dart';
@@ -29,7 +27,6 @@ import 'package:parcel_atlas/domain/drawing/interface/drawn_parcel_repository_in
 import 'package:parcel_atlas/domain/map/interface/device_location_interface.dart';
 import 'package:parcel_atlas/domain/parcel/interface/official_parcel_repository_interface.dart';
 import 'package:parcel_atlas/domain/parcel/interface/parcel_registry_interface.dart';
-import 'package:parcel_atlas/domain/person/interface/person_group_repository_interface.dart';
 import 'package:parcel_atlas/domain/person/interface/person_repository_interface.dart';
 import 'package:parcel_atlas/firebase_options.dart';
 import 'package:parcel_atlas/infrastructure/activity/repository/activity_repository.dart';
@@ -40,7 +37,6 @@ import 'package:parcel_atlas/infrastructure/location/service/device_location_ser
 import 'package:parcel_atlas/infrastructure/network/dio_client.dart';
 import 'package:parcel_atlas/infrastructure/parcel/repository/official_parcel_repository.dart';
 import 'package:parcel_atlas/infrastructure/parcel/service/tkgm_parcel_service.dart';
-import 'package:parcel_atlas/infrastructure/person/repository/person_group_repository.dart';
 import 'package:parcel_atlas/infrastructure/person/repository/person_repository.dart';
 import 'package:parcel_atlas/infrastructure/store/service/firestore_store_service.dart';
 import 'package:parcel_atlas/presentation/app.dart';
@@ -82,14 +78,11 @@ void _register(FirebaseFirestore firestore, FirebaseAuth auth) {
       DrawnParcelRepository(store),
     )
     ..registerSingleton<PersonRepositoryInterface>(PersonRepository(store))
-    ..registerSingleton<PersonGroupRepositoryInterface>(
-      PersonGroupRepository(store),
-    )
     ..registerSingleton<ActivityRepositoryInterface>(ActivityRepository(store))
     ..registerFactory(() => SignInUseCase(getIt()))
     ..registerFactory(() => SignOutUseCase(getIt()))
     ..registerFactory(() => WatchMemberUseCase(getIt()))
-    ..registerFactory(() => WatchMapUseCase(getIt(), getIt(), getIt(), getIt()))
+    ..registerFactory(() => WatchMapUseCase(getIt(), getIt(), getIt()))
     ..registerFactory(() => LocateDeviceUseCase(getIt()))
     ..registerFactory(() => QueryParcelAtUseCase(getIt(), getIt(), getIt()))
     ..registerFactory(() => RefreshParcelUseCase(getIt(), getIt(), getIt()))
@@ -97,8 +90,6 @@ void _register(FirebaseFirestore firestore, FirebaseAuth auth) {
     ..registerFactory(() => DeleteDrawingUseCase(getIt(), getIt()))
     ..registerFactory(() => SavePersonUseCase(getIt(), getIt()))
     ..registerFactory(() => DeletePersonUseCase(getIt(), getIt()))
-    ..registerFactory(() => SaveGroupUseCase(getIt(), getIt()))
-    ..registerFactory(() => DeleteGroupUseCase(getIt(), getIt()))
     ..registerFactory(() => WatchActivityUseCase(getIt()))
     ..registerLazySingleton(() => SessionCubit(getIt(), getIt()))
     ..registerFactory(() => SignInCubit(getIt()))
@@ -113,9 +104,7 @@ void _register(FirebaseFirestore firestore, FirebaseAuth auth) {
         getIt(),
       ),
     )
-    ..registerFactory(
-      () => PersonsCubit(getIt(), getIt(), getIt(), getIt(), getIt(), getIt()),
-    )
+    ..registerFactory(() => PersonsCubit(getIt(), getIt(), getIt(), getIt()))
     ..registerFactory(() => HoldingsCubit(getIt()))
     ..registerFactory(() => ActivityCubit(getIt()));
 }
