@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.trendhive.parcelInfo</string>
+	<string>com.parcelatlas.app</string>
 	<key>PROJECT_ID</key>
 	<string>parcel-info</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:754115731999:ios:22484e7fad8d343a656b2a</string>
+	<string>1:754115731999:ios:a1cbc6f10ecf21f3656b2a</string>
 </dict>
 </plist>

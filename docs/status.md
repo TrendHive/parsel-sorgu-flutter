@@ -37,13 +37,17 @@ Version 2.1.0 is live on https://parcel-info.web.app (the only environment).
 
 - **Registry lookups do not work in the web app.** The registry refuses
   third-party websites (`docs/tkgm-api.md`). They work from a desktop or
-  mobile build. Decision pending with the owner (`docs/roadmap.md`).
+  mobile build. The owner asked for web lookups; a relay was not deployed
+  (`docs/roadmap.md`).
 - **Imagery.** The free aerial source has no data past level 18 for the
   family's area; deeper zoom enlarges it, so it softens. Sharper imagery and
-  3D need a licensed provider / another map engine (roadmap, owner's call).
-- **macOS build** is configured and signed with the iOS team, but needs a
-  provisioning profile: open `macos/Runner.xcworkspace` in Xcode once (or
-  build with `-allowProvisioningUpdates`) so Xcode creates it. Windows,
+  3D need a licensed provider / another map engine; the owner decided
+  against any paid service, so this stays as it is.
+- **Native builds.** The bundle id is `com.parcelatlas.app` on iOS, macOS
+  and Android (registered in the Firebase project; not in use on the App
+  Store or Google Play as of 2026-11-15). The macOS build still needs its
+  provisioning profile: open `macos/Runner.xcworkspace` in Xcode once so
+  Xcode registers the id and creates it. Windows,
   Android and iOS builds have not been run yet.
 
 ## Code audit (2026-11-15)
@@ -51,17 +55,11 @@ Version 2.1.0 is live on https://parcel-info.web.app (the only environment).
 Checked: layer imports (enforced, clean), analyzer at zero, formatting,
 one declaration per file, English-only code, tests.
 
-- **Unused legacy files** from the original scaffold, kept until the owner
-  decides (nothing imports them): `core/base/base_usecase.dart`,
-  `base_local_repository.dart`, `base_remote_repository.dart`,
-  `base_service.dart`, `core/storage_with_map/`,
-  `core/exception/internal_server_exception.dart`,
-  `infrastructure/storage/fcm_token_manager.dart`,
-  `infrastructure/utility/device_utils.dart`, `package_utils.dart`,
-  `domain/logger/logger.dart`, `domain_ui/dialog/info/`,
-  `domain_ui/dialog/error/`, `domain_ui/widgets/button/parcel_info_text_button.dart`.
-  Removing them would also drop `flutter_secure_storage`,
-  `device_info_plus`, `package_info_plus` and `flutter_svg`.
+- **Unused code removed.** Every file not reachable from `main.dart` (35
+  files from the original scaffold: unused bases, storage, device/package
+  utilities, info/error dialogs, spare widgets) was deleted, with the four
+  packages only they used (`flutter_secure_storage`, `device_info_plus`,
+  `package_info_plus`, `flutter_svg`).
 - **Tests:** domain rules, value objects, the snapshot, mappers and the main
   use cases and the map Cubit are covered. Not yet covered: repositories and
   the Firestore service (need an emulator or fakes of Firestore), the
@@ -71,9 +69,8 @@ one declaration per file, English-only code, tests.
 
 ## Next steps, in order
 
-1. Owner decisions in `docs/roadmap.md` (web lookups; imagery / 3D) and on
-   the unused legacy files above.
-2. Create the macOS provisioning profile, then query parcels from the app.
+1. Create the macOS provisioning profile, then query parcels from the app.
+2. Web lookups: see `docs/roadmap.md`.
 3. Fair-division analysis on the family tree (roadmap).
 4. Remaining tests listed in the audit; a rules test suite.
 5. Add the other family sign-in accounts with `tool/add_member.dart`.

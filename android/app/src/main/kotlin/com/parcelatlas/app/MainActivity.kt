@@ -1,4 +1,4 @@
-package com.trendhive.parcel_info
+package com.parcelatlas.app
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -6,14 +6,15 @@ ships it; add new ones at the bottom of their section.
 ## Decisions waiting for the owner
 
 - **Registry lookups on the web.** The registry refuses third-party websites.
-  Options: (a) keep lookups to the desktop/mobile apps (works today);
-  (b) a small relay the family controls that forwards lookups — it would
-  route around the registry's refusal, so it is the owner's call and needs an
-  account with a host.
-- **Sharper imagery and 3D.** Free aerial imagery stops at level 18 for the
-  area. Sharper tiles need a licensed provider (an API key, usually a billing
-  account, even where a free allowance exists); 3D terrain needs a different
-  map engine (for example MapLibre) and is a rewrite of the map page.
+  Lookups work from the desktop and mobile apps. The owner asked for them on
+  the web too (2026-11-15); the only way is a relay that routes around the
+  registry's refusal, and the assistant's permission system declined to
+  deploy one. Left with the owner.
+
+## Decided
+
+- **Sharper imagery and 3D: not doing.** Both need a licensed provider or a
+  billing account; the project uses free resources only.
 
 ## Next
 
