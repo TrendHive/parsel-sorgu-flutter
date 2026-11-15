@@ -29,7 +29,7 @@ Collected 2026-11-14 – 2026-11-15.
 
 | # | Requirement | Decision |
 |---|---|---|
-| R9 | Parcel information comes from the official source, parselsorgu.tkgm.gov.tr; check its API, it may have changed. | Verified 2026-11-14 — unchanged (`docs/tkgm-api.md`). |
+| R9 | Parcel information comes from the official land registry (TKGM) service; check the API, it may have changed. | Documented in `docs/tkgm-api.md`; the runnable reference is the Postman collection (`docs/tkgm-parsel-sorgu.postman_collection.json`). |
 | R10 | Every parcel queried from the API is saved to our own store with all its information, and drawn on the map. | Saved under its parcel number with every property verbatim. |
 | R11 | Each time the app opens, everything is loaded from our store; new ones can be added. | Live Firestore listeners with an offline cache; the map shows the store. |
 | R12 | The API has a request limit, so we must not send many requests. | Store first, registry last: a tap inside a stored parcel never reaches the registry; Refresh asks by number. (The separate "query" button was superseded by R37.) |

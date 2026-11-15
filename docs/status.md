@@ -35,10 +35,13 @@ Version 2.1.0 is live on https://parcel-info.web.app (the only environment).
 
 ## Known limits
 
-- **Registry lookups do not work in the web app.** The registry refuses
-  third-party websites (`docs/tkgm-api.md`). They work from a desktop or
-  mobile build. The owner asked for web lookups; a relay was not deployed
-  (`docs/roadmap.md`).
+- **Registry lookups do not work in the web app** — settled by design. The
+  registry refuses browser requests that carry another website's origin, and a
+  browser cannot omit that origin, so only a non-browser client (native app,
+  `curl`, Postman) gets through (`docs/tkgm-api.md`). Decided split: the
+  desktop/mobile apps do the lookups; the web app does drawing and viewing.
+  The runnable API reference is the Postman collection
+  (`docs/tkgm-parsel-sorgu.postman_collection.json`).
 - **Imagery.** The free aerial source has no data past level 18 for the
   family's area; deeper zoom enlarges it, so it softens. Sharper imagery and
   3D need a licensed provider / another map engine; the owner decided

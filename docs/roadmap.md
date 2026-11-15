@@ -3,16 +3,16 @@
 What is planned, in order. Move an item to the CHANGELOG-worthy commit that
 ships it; add new ones at the bottom of their section.
 
-## Decisions waiting for the owner
-
-- **Registry lookups on the web.** The registry refuses third-party websites.
-  Lookups work from the desktop and mobile apps. The owner asked for them on
-  the web too (2026-11-15); the only way is a relay that routes around the
-  registry's refusal, and the assistant's permission system declined to
-  deploy one. Left with the owner.
-
 ## Decided
 
+- **Registry lookups stay off the web: settled by design (2026-11-15).** The
+  registry refuses browser requests that carry another website's origin, and a
+  browser cannot omit that origin (it is a forbidden header), so no web-page
+  change can pass — only a non-browser client (native app, `curl`, Postman)
+  gets through. Split: the desktop/mobile apps do the lookups; the web app does
+  drawing and viewing. The runnable API reference is the Postman collection
+  (`docs/tkgm-parsel-sorgu.postman_collection.json`). A relay would work but is
+  server-side and was not pursued.
 - **Sharper imagery and 3D: not doing.** Both need a licensed provider or a
   billing account; the project uses free resources only.
 

@@ -20,5 +20,6 @@ allowance is spent until tomorrow. Full reference: `docs/tkgm-api.md`.
 - No custom headers on the GET (no CORS preflight → one request per lookup).
 - Test with `test/support/fixtures/tkgm_parcel_duzkoy_114_1.json` and fakes.
   A `curl` from your machine spends that machine's allowance.
-- If the API changes, re-verify against parselsorgu.tkgm.gov.tr's own network
-  traffic and update `docs/tkgm-api.md`.
+- If the API changes, re-verify with the Postman collection
+  (`docs/tkgm-parsel-sorgu.postman_collection.json`) and update
+  `docs/tkgm-api.md`.

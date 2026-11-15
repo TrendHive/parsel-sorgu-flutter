@@ -99,7 +99,7 @@ paid service.
 
 `docs/requirements.md` (what the owner asked, with each decision) ·
 `docs/research.md` (Flutter/Dart standards and where we deviate) ·
-`docs/data-model.md` · `docs/tkgm-api.md` · `docs/regressions.md` ·
+`docs/data-model.md` · `docs/tkgm-api.md` (+ `docs/tkgm-parsel-sorgu.postman_collection.json`, the runnable reference) · `docs/regressions.md` ·
 `docs/roadmap.md`. Skills in `.claude/skills/` (architecture-rules, new-page,
 i18n-copy, bug-fix, registry-quota, add-member, deploy, pr-flow); agents in
 `.claude/agents/` (flutter-developer, code-reviewer).
