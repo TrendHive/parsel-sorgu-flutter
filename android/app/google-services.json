@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:754115731999:android:0d7c82bbc6164aed656b2a",
+        "android_client_info": {
+          "package_name": "com.parcelatlas.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJpiXQcuH6yeBBKXq3Q5i7bkdDgeWX9kg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:754115731999:android:8171f0d59d51bdfb656b2a",
         "android_client_info": {
           "package_name": "com.trendhive.parcel_info"
