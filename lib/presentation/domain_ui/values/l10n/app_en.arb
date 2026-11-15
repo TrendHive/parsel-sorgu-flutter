@@ -162,5 +162,6 @@
   "splitEqualByCount": "Equal pieces by number (owners stay the same)",
   "splitEqualNote": "The parcel is cut into pieces of equal area along its long axis. You can adjust each piece's corners afterwards.",
   "errorDrawingOverlaps": "This drawing covers part of another drawing. Move the corners close to the neighbour's boundary; they snap onto it.",
-  "errorSplitMisses": "The parcel could not be split. Check the cut line or the number of pieces."
+  "errorSplitMisses": "The parcel could not be split. Check the cut line or the number of pieces.",
+  "noticeUseApp": "New parcel lookups cannot be made from the website. Use the Parsel Atlası app on your phone or computer; the parcel appears here at once."
 }

@@ -21,7 +21,7 @@ description: The Parcel Atlas git flow — feature branch from dev, the gate, a 
 
    ```bash
    git fetch origin && git checkout -b release/<version> origin/main
-   git merge --squash origin/dev || git checkout origin/dev -- .   # take dev's tree
+   git read-tree -u --reset origin/dev   # take dev's tree exactly (a squash merge conflicts on files deleted in dev)
    git diff --cached origin/dev --quiet && echo identical-to-dev  # must print
    git commit -m "release: <version> — <summary>"
    git push -u origin release/<version>

@@ -3,8 +3,8 @@
 **Parcel Atlas** — a family's shared map of land parcels. Members sign in with
 fixed accounts, look parcels up in the official land registry (TKGM), draw the
 real boundaries where the registry is wrong, and record who owns which share.
-Everything is stored once and seen live on every device. Flutter (web first,
-Android/iOS later) · package `parcel_atlas` · Firebase project `parcel-info`.
+Everything is stored once and seen live on every device. Flutter (web,
+macOS and Android in use; iOS and Windows not built yet) · package `parcel_atlas` · Firebase project `parcel-info`.
 
 **Read before exploring:** this file, then [docs/status.md](docs/status.md)
 (where the work stands and what is next), then [architecture.md](architecture.md)
@@ -60,7 +60,7 @@ dto/`. Features: `activity · auth · drawing · input · map · parcel · perso
 5. **One Cubit per page**, `application/<feature>/cubit/<page>_cubit.dart` + `<page>_state.dart` as a `part`. Cubits orchestrate; they never compute. They cancel their subscriptions in `close()`.
 6. **State is `sealed`**, one variant per thing the page shows.
 7. **Two data sources, two kinds of service.** Internal: the family store (Firestore) — `FirestoreStoreService`. External: the official registry (TKGM) — `TkgmParcelService`. Repositories are the single source of truth and combine them; nothing above infrastructure knows which one answered.
-8. **The registry is rationed.** It allows a few lookups per connection per day. Never call it for a point the store already covers, never on map move or in a loop; a tap on uncovered ground queries at once, and Refresh refetches one parcel by number. It refuses third-party websites, so lookups work only from the desktop and mobile apps (`docs/tkgm-api.md`); never disguise a request as the registry's own site.
+8. **The registry is rationed.** It allows a few lookups per connection per day. Never call it for a point the store already covers, never on map move or in a loop; a tap on uncovered ground queries at once, and Refresh refetches one parcel by number. It refuses third-party websites, so lookups work only from the desktop and mobile apps (`docs/tkgm-api.md`); never disguise a request as the registry's own site. On the web the app sends nothing and points the member to the desktop or mobile app (`MapCubit` `registryReachable`).
 9. **Registry parcels are read-only.** Only a registry answer changes them; members cannot edit or delete them (Firestore rules refuse it too). People, shares and notes live on drawn parcels — "Assign owner" on a registry parcel stores a drawing with the registry's outline.
 10. **Every write is signed and logged.** A repository write stamps `created`/`updated` with the member and server time and adds one `activity` line in the same atomic batch.
 11. **Geometry is computed in one place** — `GeoRules` (WGS84 ellipsoid, local tangent plane). Shares are exact fractions (`ShareValueObject`), never doubles. Drawings share boundaries, never ground: corners snap to stored corners and sides, an overlap is refused on save, and a split turns the drawing into its first piece and creates the rest in one batch. Who holds what today follows from the family tree (`FamilyRules`): a share recorded on an ancestor whose shares passed on is split equally among the children, generation by generation.
@@ -78,6 +78,7 @@ flutter run -d chrome                         # hot reload works (one package)
 flutter gen-l10n                              # after editing an .arb
 dart run build_runner build -d                # after editing a @JsonSerializable DTO
 dart run tool/add_member.dart <username> "<Name>" [--admin]   # create a family account
+dart run tool/import_parcels.dart <username> <neighbourhoodId> <block>/<parcel> ...   # store parcels by number
 flutter build web --release && firebase deploy               # publish (the deploy skill)
 ```
 

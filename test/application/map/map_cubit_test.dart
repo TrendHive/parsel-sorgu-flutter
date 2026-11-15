@@ -23,6 +23,7 @@ import 'package:parcel_atlas/domain/auth/enum/member_role_enum.dart';
 import 'package:parcel_atlas/domain/auth/interface/auth_repository_interface.dart';
 import 'package:parcel_atlas/domain/drawing/entity/drawn_parcel_entity.dart';
 import 'package:parcel_atlas/domain/drawing/interface/drawn_parcel_repository_interface.dart';
+import 'package:parcel_atlas/domain/map/enum/map_notice_enum.dart';
 import 'package:parcel_atlas/domain/map/interface/device_location_interface.dart';
 import 'package:parcel_atlas/domain/map/read_model/map_hit_read_model.dart';
 import 'package:parcel_atlas/domain/parcel/entity/official_parcel_entity.dart';
@@ -176,4 +177,41 @@ void main() {
     ]);
     verifyNever(() => registry.fetchAt(any()));
   });
+
+  test(
+    'on the website a tap on unknown ground asks nothing and points to the app',
+    () async {
+      when(
+        () => officials.watchAll(),
+      ).thenAnswer((_) => Stream.value(const Right(<OfficialParcelEntity>[])));
+      final MapCubit web = MapCubit(
+        WatchMapUseCase(officials, drawings, persons),
+        QueryParcelAtUseCase(auth, registry, officials),
+        RefreshParcelUseCase(auth, registry, officials),
+        QueryParcelByNumberUseCase(auth, registry, officials),
+        SaveDrawingUseCase(auth, drawings),
+        SplitDrawingUseCase(auth, drawings),
+        DeleteDrawingUseCase(auth, drawings),
+        LocateDeviceUseCase(_Location()),
+        auth,
+        registryReachable: false,
+      )..start();
+      await pumpEventQueue();
+
+      web.tap(openGround, metersPerPixel: 1);
+      await web.queryByNumber(neighborhoodId: 1, block: '2', parcel: '3');
+      await pumpEventQueue();
+
+      expect((web.state as MapReady).notice, MapNoticeEnum.useApp);
+      verifyNever(() => registry.fetchAt(any()));
+      verifyNever(
+        () => registry.fetchByNumber(
+          neighborhoodId: any(named: 'neighborhoodId'),
+          block: any(named: 'block'),
+          parcel: any(named: 'parcel'),
+        ),
+      );
+      await web.close();
+    },
+  );
 }

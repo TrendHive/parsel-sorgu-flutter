@@ -116,6 +116,7 @@ class _MapBodyState extends State<MapBody> {
         MapNoticeEnum.refreshed => l10n.noticeRefreshed,
         MapNoticeEnum.drawingSaved => l10n.noticeDrawingSaved,
         MapNoticeEnum.drawingDeleted => l10n.noticeDrawingDeleted,
+        MapNoticeEnum.useApp => l10n.noticeUseApp,
       });
     }
   }

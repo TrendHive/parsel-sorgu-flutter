@@ -1075,6 +1075,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Parsel bölünemedi. Kesme çizgisini ya da parça sayısını kontrol edin.'**
   String get errorSplitMisses;
+
+  /// No description provided for @noticeUseApp.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni parsel sorgusu web sitesinden yapılamıyor. Sorguyu telefondaki ya da bilgisayardaki Parsel Atlası uygulamasından yapın; sorgulanan parsel burada da hemen görünür.'**
+  String get noticeUseApp;
 }
 
 class _AppLocalizationsDelegate
