@@ -244,6 +244,7 @@ privately to the repository owner rather than in a public issue.
 | [`docs/research.md`](docs/research.md) | Flutter and Dart standards, and where the project deliberately differs |
 | [`docs/data-model.md`](docs/data-model.md) | Firestore collections and security rules |
 | [`docs/tkgm-api.md`](docs/tkgm-api.md) | The registry API and how to use it sparingly |
+| [`docs/tkgm-parsel-sorgu.postman_collection.json`](docs/tkgm-parsel-sorgu.postman_collection.json) | Runnable Postman collection for the registry API — import and send |
 | [`docs/regressions.md`](docs/regressions.md) | Bugs fixed, and the guard that keeps each fixed |
 | [`docs/roadmap.md`](docs/roadmap.md) | What comes next |
 
