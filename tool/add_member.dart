@@ -101,11 +101,20 @@ String _askPassword() {
     stderr.writeln('run this in a terminal: the password is read without echo');
     exit(_usageError);
   }
-  stdin.echoMode = false;
+  bool hidden = true;
+  try {
+    stdin.echoMode = false;
+  } on StdinException {
+    hidden = false;
+    stderr.writeln(
+      'warning: this terminal cannot hide input, so what you type will be '
+      'visible; run it in a real Terminal to keep the password hidden',
+    );
+  }
   try {
     stdout.write('password (min 8): ');
     final String first = stdin.readLineSync() ?? '';
-    stdout.write('\nrepeat: ');
+    stdout.write(hidden ? '\nrepeat: ' : 'repeat: ');
     final String second = stdin.readLineSync() ?? '';
     stdout.writeln();
     if (first.length < 8 || first != second) {
@@ -114,7 +123,9 @@ String _askPassword() {
     }
     return first;
   } finally {
-    stdin.echoMode = true;
+    if (hidden) {
+      stdin.echoMode = true;
+    }
   }
 }
 
