@@ -6,8 +6,8 @@ import 'package:parcel_atlas/core/constants.dart';
 import 'package:parcel_atlas/domain/drawing/value_object/drawing_draft_value_object.dart';
 import 'package:parcel_atlas/domain/map/rule/geo_rules.dart';
 import 'package:parcel_atlas/domain/map/rule/map_rules.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_color.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_dimens.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_color.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_dimens.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_corner_handle.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_edge_chip.dart';
 

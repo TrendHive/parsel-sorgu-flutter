@@ -4,6 +4,7 @@ import 'package:parcel_atlas/domain/drawing/entity/drawn_parcel_entity.dart';
 import 'package:parcel_atlas/domain/map/enum/map_layer_enum.dart';
 import 'package:parcel_atlas/domain/map/read_model/map_hit_read_model.dart';
 import 'package:parcel_atlas/domain/map/rule/geo_rules.dart';
+import 'package:parcel_atlas/domain/map/rule/map_rules.dart';
 import 'package:parcel_atlas/domain/parcel/entity/official_parcel_entity.dart';
 import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
 import 'package:parcel_atlas/domain/person/read_model/holding_line_read_model.dart';
@@ -19,8 +20,16 @@ import 'package:parcel_atlas/domain/person/value_object/share_value_object.dart'
 /// nothing. Only visible `layers` can be hit — a hidden layer is not tappable.
 ///
 /// [snapTo] pulls a point onto the nearest stored corner within
-/// `toleranceMeters`, so a drawn boundary that shares a corner with the
-/// registry, or with a neighbour's drawing, shares it exactly.
+/// `toleranceMeters`, or else onto the nearest side of a stored outline, so
+/// a drawn boundary that touches the registry's, or a neighbour's drawing,
+/// shares the line exactly — no gap and no overlap between them.
+/// [overlapping] is the first other drawing an outline would cover part of.
+///
+/// [generations] is how deep the family tree goes; [holdersAt] says which
+/// branches of the family, at one level of the tree, a drawing belongs to,
+/// and [branchesAt] lists every branch that holds something at that level,
+/// in the order the map's legend shows them. [neighbourhoods] are the
+/// neighbourhoods of the stored registry parcels, for a search by number.
 ///
 /// [officialById], [drawingById], [personById] look one record up; [drawingsCorrecting] is every drawing linked to a registry parcel;
 /// [allCorners] frames the map on what is stored.
@@ -86,7 +95,59 @@ final class MapSnapshotReadModel extends BaseReadModel {
         nearest = corner;
       }
     }
+    if (nearest != null) return nearest;
+    for (final List<LatLng> outline in _outlines) {
+      final ({LatLng point, double distanceMeters})? side =
+          GeoRules.nearestOnRing(outline, point);
+      if (side != null && side.distanceMeters <= best) {
+        best = side.distanceMeters;
+        nearest = side.point;
+      }
+    }
     return nearest;
+  }
+
+  Iterable<List<LatLng>> get _outlines => <List<LatLng>>[
+    for (final OfficialParcelEntity parcel in officials)
+      parcel.record.outline.corners,
+    for (final DrawnParcelEntity drawing in drawings) drawing.outline.corners,
+  ];
+
+  DrawnParcelEntity? overlapping(List<LatLng> outline, {String? exceptId}) {
+    for (final DrawnParcelEntity drawing in drawings) {
+      if (drawing.id == exceptId) continue;
+      if (GeoRules.overlapSquareMeters(outline, drawing.outline.corners) >
+          MapRules.overlapToleranceSquareMeters) {
+        return drawing;
+      }
+    }
+    return null;
+  }
+
+  int get generations => FamilyRules.generations(persons);
+
+  Set<String> holdersAt(DrawnParcelEntity drawing, int level) => <String>{
+    for (final OwnershipValueObject line in drawing.owners)
+      ...FamilyRules.holdersAt(persons, line.personId, level),
+  };
+
+  List<PersonEntity> branchesAt(int level) {
+    final Set<String> holding = <String>{
+      for (final DrawnParcelEntity drawing in drawings)
+        ...holdersAt(drawing, level),
+    };
+    return persons.where((PersonEntity p) => holding.contains(p.id)).toList();
+  }
+
+  List<({int id, String name})> get neighbourhoods {
+    final Map<int, String> known = <int, String>{
+      for (final OfficialParcelEntity parcel in officials)
+        parcel.record.neighborhoodId: parcel.record.neighborhoodName,
+    };
+    return <({int id, String name})>[
+      for (final MapEntry<int, String> entry in known.entries)
+        (id: entry.key, name: entry.value),
+    ];
   }
 
   List<LatLng> get allCorners => <LatLng>[

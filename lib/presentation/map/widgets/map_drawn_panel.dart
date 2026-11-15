@@ -1,15 +1,15 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:parcel_atlas/core/constants.dart';
-import 'package:parcel_atlas/core_ui/values/base_dimens.dart';
 import 'package:parcel_atlas/domain/drawing/entity/drawn_parcel_entity.dart';
 import 'package:parcel_atlas/domain/drawing/read_model/parcel_comparison_read_model.dart';
 import 'package:parcel_atlas/domain/map/read_model/map_snapshot_read_model.dart';
 import 'package:parcel_atlas/domain/parcel/entity/official_parcel_entity.dart';
 import 'package:parcel_atlas/domain/person/value_object/ownership_value_object.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_color.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_format.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_local_keys.dart';
-import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
+import 'package:parcel_atlas/presentation/core_ui/values/base_dimens.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_color.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_format.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_local_keys.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_audit_line.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_info_row.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_owner_tile.dart';
@@ -27,6 +27,8 @@ class MapDrawnPanel extends StatelessWidget {
     required this.canDelete,
     required this.onEditShape,
     required this.onEditDetails,
+    required this.onSplit,
+    required this.onSplitEqual,
     required this.onDelete,
     required this.onOpenOfficial,
     required this.onOpenOwner,
@@ -42,6 +44,10 @@ class MapDrawnPanel extends StatelessWidget {
   final VoidCallback onEditShape;
 
   final VoidCallback onEditDetails;
+
+  final VoidCallback onSplit;
+
+  final VoidCallback onSplitEqual;
 
   final VoidCallback onDelete;
 
@@ -138,6 +144,16 @@ class MapDrawnPanel extends StatelessWidget {
               onPressed: onEditShape,
               icon: const Icon(Icons.polyline_outlined),
               label: ParcelInfoText(l10n.editShape),
+            ),
+            OutlinedButton.icon(
+              onPressed: onSplit,
+              icon: const Icon(Icons.content_cut),
+              label: ParcelInfoText(l10n.splitButton),
+            ),
+            OutlinedButton.icon(
+              onPressed: onSplitEqual,
+              icon: const Icon(Icons.grid_view_outlined),
+              label: ParcelInfoText(l10n.splitEqualButton),
             ),
             if (canDelete)
               TextButton.icon(

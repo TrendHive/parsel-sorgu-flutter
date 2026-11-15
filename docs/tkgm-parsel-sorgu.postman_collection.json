@@ -1,0 +1,89 @@
+{
+	"info": {
+		"name": "TKGM Parsel Sorgu (Land Registry)",
+		"description": "The official Turkish land registry (TKGM) parcel query API — the single reference for Parcel Atlas. Import this file into Postman (File > Import) to run the requests.\n\nBase: https://cbsapi.tkgm.gov.tr/megsiswebapi.v3.1/api\nEvery call is a plain GET: no token, no auth header.\n\nACCESS POLICY (why native/Postman work and the web app does not):\nThe registry answers 200 to clients that send NO website origin — native apps, curl, and Postman — and returns 403 with the text \"Günlük sorgu limitini aştınız\" to a browser request that carries another website's origin. A browser always stamps the page's origin on the request and JavaScript cannot remove it (Origin is a forbidden header), so the web app cannot look parcels up directly; the desktop and mobile builds can, because they are not browsers. Verified 2026-11-15 on one connection within the same minute: no-origin 200, foreign browser origin 403.\n\nUsage rule: the daily limit is per connection (IP) and low. Query only on purpose — never on map move, on a timer, or in a loop.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Parcel by number (mahalle / ada / parsel)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://cbsapi.tkgm.gov.tr/megsiswebapi.v3.1/api/parsel/130241/114/1",
+					"protocol": "https",
+					"host": [
+						"cbsapi",
+						"tkgm",
+						"gov",
+						"tr"
+					],
+					"path": [
+						"megsiswebapi.v3.1",
+						"api",
+						"parsel",
+						"130241",
+						"114",
+						"1"
+					]
+				},
+				"description": "Fetch one parcel by its neighbourhood id, block (ada) and parcel number. Path: parsel/{mahalleId}/{ada}/{parsel}. The example queries Düzköy (mahalleId 130241), ada 114, parsel 1. Answers one GeoJSON Feature (Polygon + properties). This is what the app's Refresh-by-number uses."
+			},
+			"response": []
+		},
+		{
+			"name": "Parcel by point (lat / lng)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://cbsapi.tkgm.gov.tr/megsiswebapi.v3.1/api/parsel/40.55876/41.00085/",
+					"protocol": "https",
+					"host": [
+						"cbsapi",
+						"tkgm",
+						"gov",
+						"tr"
+					],
+					"path": [
+						"megsiswebapi.v3.1",
+						"api",
+						"parsel",
+						"40.55876",
+						"41.00085",
+						""
+					]
+				},
+				"description": "Fetch the parcel under a WGS84 coordinate. Path: parsel/{lat}/{lng}/ (note the trailing slash). Returns 200 with one GeoJSON Feature when a parcel covers the point, or 404 when none does. This is what one tap on uncovered ground uses in the app."
+			},
+			"response": []
+		},
+		{
+			"name": "Neighborhood list for a district (find mahalle id)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://cbsapi.tkgm.gov.tr/megsiswebapi.v3.1/api/idariYapi/mahalleListe/408",
+					"protocol": "https",
+					"host": [
+						"cbsapi",
+						"tkgm",
+						"gov",
+						"tr"
+					],
+					"path": [
+						"megsiswebapi.v3.1",
+						"api",
+						"idariYapi",
+						"mahalleListe",
+						"408"
+					]
+				},
+				"description": "List the neighbourhoods (mahalle) of a district (ilçe). Path: idariYapi/mahalleListe/{ilceId}. The example lists İspir (ilçe 408). Use it to find the mahalleId needed by the parcel-by-number request. Returns a GeoJSON FeatureCollection; each feature's id is the mahalleId."
+			},
+			"response": []
+		}
+	]
+}

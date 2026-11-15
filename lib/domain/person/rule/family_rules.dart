@@ -14,6 +14,13 @@ import 'package:parcel_atlas/domain/person/value_object/share_value_object.dart'
 /// split equally among the children, and it stops at the first person whose
 /// shares have not passed on. It is null when nothing reaches the heir.
 ///
+/// [depthOf] is how many ancestors a person has — a root is at level zero —
+/// and [generations] how many levels the tree has. [holdersAt] answers who,
+/// at one level of the tree, a share recorded on a person belongs to: the
+/// person's own ancestor at that level, or, for a person above it whose
+/// shares passed on, every heir of theirs at that level. It is what colours
+/// the map by branch of the family.
+///
 /// Every walk is bounded by [maxGenerations], so a corrupt record that
 /// loops cannot hang the app.
 abstract final class FamilyRules {
@@ -54,6 +61,47 @@ abstract final class FamilyRules {
       part = part.dividedBy(childrenOf(persons, path[i].id).length);
     }
     return part;
+  }
+
+  static int depthOf(List<PersonEntity> persons, String personId) =>
+      _pathUp(persons, personId).length - 1;
+
+  static int generations(List<PersonEntity> persons) => persons.fold(
+    0,
+    (int most, PersonEntity p) =>
+        depthOf(persons, p.id) + 1 > most ? depthOf(persons, p.id) + 1 : most,
+  );
+
+  static Set<String> holdersAt(
+    List<PersonEntity> persons,
+    String personId,
+    int level,
+  ) {
+    final List<PersonEntity> up = _pathUp(persons, personId);
+    if (up.isEmpty) return <String>{};
+    final int depth = up.length - 1;
+    if (depth >= level) return <String>{up[depth - level].id};
+    if (!passes(persons, up.first)) return <String>{personId};
+    return <String>{
+      for (final PersonEntity child in childrenOf(persons, personId))
+        ...holdersAt(persons, child.id, level),
+    };
+  }
+
+  static List<PersonEntity> _pathUp(
+    List<PersonEntity> persons,
+    String personId,
+  ) {
+    final Map<String, PersonEntity> byId = <String, PersonEntity>{
+      for (final PersonEntity p in persons) p.id: p,
+    };
+    final List<PersonEntity> up = <PersonEntity>[];
+    PersonEntity? current = byId[personId];
+    for (int i = 0; i < maxGenerations && current != null; i++) {
+      up.add(current);
+      current = byId[current.parentId];
+    }
+    return up;
   }
 
   static List<PersonEntity>? _pathDown(

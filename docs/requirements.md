@@ -29,7 +29,7 @@ Collected 2026-11-14 – 2026-11-15.
 
 | # | Requirement | Decision |
 |---|---|---|
-| R9 | Parcel information comes from the official source, parselsorgu.tkgm.gov.tr; check its API, it may have changed. | Verified 2026-11-14 — unchanged (`docs/tkgm-api.md`). |
+| R9 | Parcel information comes from the official land registry (TKGM) service; check the API, it may have changed. | Documented in `docs/tkgm-api.md`; the runnable reference is the Postman collection (`docs/tkgm-parsel-sorgu.postman_collection.json`). |
 | R10 | Every parcel queried from the API is saved to our own store with all its information, and drawn on the map. | Saved under its parcel number with every property verbatim. |
 | R11 | Each time the app opens, everything is loaded from our store; new ones can be added. | Live Firestore listeners with an offline cache; the map shows the store. |
 | R12 | The API has a request limit, so we must not send many requests. | Store first, registry last: a tap inside a stored parcel never reaches the registry; Refresh asks by number. (The separate "query" button was superseded by R37.) |
@@ -82,4 +82,11 @@ Collected 2026-11-14 – 2026-11-15.
 | R39 | Instead of groups, a family tree: fathers and children linked (a grandfather, his sons, their children), because later the app must compare whether land was divided correctly among siblings and who owes what. | People have a parent and a "share passed to children" flag; a share recorded on an ancestor reaches the heirs in equal parts, generation by generation. Groups removed. |
 | R40 | High-quality, unblurred imagery everywhere; 3D would be ideal. | Open. The free aerial source stops at level 18 for the area; sharper imagery and 3D need a licensed provider and a different map engine — see the roadmap. Owner's decision. |
 | R41 | Registry lookups must work. | They work from the desktop and mobile apps. The registry refuses third-party websites, so the web app cannot look parcels up; whether to route around that is the owner's decision (roadmap). |
-
+| R42 | Check whether `domain_ui` belongs inside presentation. | Yes — `core_ui` and `domain_ui` moved into `presentation/`; five layers remain, and the structure check keeps the design system below the pages. |
+| R43 | An English repository name. | Renamed to `parcel-atlas`. |
+| R44 | The app's name must not show as `parcel_info` anywhere a person sees it. | The app, its window and its file are "Parsel Atlası" on every platform; Windows and Linux binaries are `parcel_atlas`. Code identifiers keep the `ParcelInfo` prefix. |
+| R45 | Look a parcel up by entering its block and parcel number. | Search button on the map: neighbourhood (from the stored parcels, or its code), block, parcel. A stored number is answered from the store; an unknown one costs one lookup. |
+| R46 | Colour the land by owner, and by a chosen level of the family tree. | The palette button colours drawings by generation: one colour per branch at that level, a neutral colour for land several branches share, with a legend. |
+| R47 | Assign owners on registry parcels, choosing step by step down the tree without going to the bottom. | "Assign owner" on a registry parcel stores a drawing with the registry's outline and that owner (the registry record stays read-only, rule 9). People are picked by walking down the tree; a person whose share passed on shows their children as equal holders. |
+| R48 | Drawings must not overlap and must fit together without gaps. | Corners snap to stored corners and, failing that, onto the nearest stored side; a drawing that would cover more than 2 m² of another is refused. |
+| R49 | Split a chosen parcel in two; split equally, automatically, for example among a father's sons — without being complicated. | "Split in two": two taps set a cut line, the pieces are previewed with their areas. "Split equally": one tap gives each child of an owner an equal-area piece as sole owner, or a typed number of pieces keeps the owners. The original drawing becomes the first piece, so nothing is deleted. |

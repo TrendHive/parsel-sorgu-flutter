@@ -8,7 +8,10 @@ import 'package:parcel_atlas/domain/map/value_object/geo_polygon_value_object.da
 /// The family's shared store of drawn boundaries.
 ///
 /// [create] stores a new drawing and answers its id; [update] replaces an
-/// existing one's shape and details; [delete] removes it. Each write stores
+/// existing one's shape and details; [delete] removes it. [split] replaces
+/// one drawing by several pieces at once: the drawing itself becomes the
+/// first piece and the others are created beside it, so nothing has to be
+/// deleted and no moment exists when the land is stored twice or not at all. Each write stores
 /// the measurements computed from the outline beside it and logs one
 /// activity line in the same atomic batch.
 abstract interface class DrawnParcelRepositoryInterface {
@@ -24,6 +27,13 @@ abstract interface class DrawnParcelRepositoryInterface {
     DrawnParcelEntity drawing,
     GeoPolygonValueObject outline,
     DrawingDetailsValueObject details, {
+    required MemberEntity actor,
+  });
+
+  Future<Either<BaseException, String>> split(
+    DrawnParcelEntity drawing,
+    List<({GeoPolygonValueObject outline, DrawingDetailsValueObject details})>
+    pieces, {
     required MemberEntity actor,
   });
 

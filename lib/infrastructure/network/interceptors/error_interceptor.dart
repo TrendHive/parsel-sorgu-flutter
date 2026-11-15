@@ -12,7 +12,7 @@ import 'package:parcel_atlas/core/exception/quota_exceeded_exception.dart';
 import 'package:parcel_atlas/infrastructure/constants.dart';
 
 /// Turns every Dio failure into the app's own [BaseException], carried in
-/// `DioException.error`, where `BaseRemoteRepository` picks it up.
+/// `DioException.error`, where the calling service picks it up.
 ///
 /// A bad response is told apart by status: a 403 is the registry's daily
 /// limit in an app and its refusal of third-party websites in a browser —

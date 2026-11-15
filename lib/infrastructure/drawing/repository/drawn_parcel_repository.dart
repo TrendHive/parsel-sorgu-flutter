@@ -76,6 +76,49 @@ class DrawnParcelRepository implements DrawnParcelRepositoryInterface {
   }
 
   @override
+  Future<Either<BaseException, String>> split(
+    DrawnParcelEntity drawing,
+    List<({GeoPolygonValueObject outline, DrawingDetailsValueObject details})>
+    pieces, {
+    required MemberEntity actor,
+  }) {
+    final WriteBatch batch = _store.batch();
+    for (final (
+          int index,
+          ({GeoPolygonValueObject outline, DrawingDetailsValueObject details})
+          piece,
+        )
+        in pieces.indexed) {
+      final bool first = index == 0;
+      final DocumentReference<Map<String, dynamic>> doc = first
+          ? _store.doc(StoreCollection.drawnParcels, drawing.id)
+          : _store.doc(StoreCollection.drawnParcels);
+      final Map<String, Object?> data = _mapper.write(
+        piece.outline,
+        piece.details,
+        actor,
+      );
+      if (first) {
+        batch.update(doc, data);
+      } else {
+        batch.set(doc, <String, Object?>{
+          ...data,
+          DrawnParcelDocumentMapper.created: _store.stamps.write(actor),
+        });
+      }
+      _store.log(
+        batch,
+        action: first ? ActivityActionEnum.updated : ActivityActionEnum.created,
+        target: ActivityTargetEnum.drawnParcel,
+        targetId: doc.id,
+        label: piece.details.name,
+        actor: actor,
+      );
+    }
+    return _store.commit(batch, drawing.id);
+  }
+
+  @override
   Future<Either<BaseException, String>> delete(
     DrawnParcelEntity drawing, {
     required MemberEntity actor,

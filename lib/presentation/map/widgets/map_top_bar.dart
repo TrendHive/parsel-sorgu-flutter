@@ -1,16 +1,18 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:parcel_atlas/core_ui/values/base_dimens.dart';
 import 'package:parcel_atlas/domain/map/enum/base_map_enum.dart';
 import 'package:parcel_atlas/domain/map/enum/map_layer_enum.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_local_keys.dart';
-import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
+import 'package:parcel_atlas/presentation/core_ui/values/base_dimens.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_local_keys.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
 
 /// The bar over the map while browsing.
 ///
 /// The two layer switches are the first thing on it — comparing the
 /// registry's boundaries with the real ones is the app's main question.
-/// Then the imagery switch, and the actions: a new freehand drawing, the
-/// device's location, people, history and sign out.
+/// Then the imagery switch, and the actions: a search by parcel number, the
+/// colouring by a level of the family tree ([colourLabels] names each level,
+/// [colourLevel] is the one in use), a new freehand drawing, the device's
+/// location, people, history and sign out.
 ///
 /// In a [compact] window people, history and sign out fold into one menu,
 /// so the bar stays two rows high on a phone and the map stays visible.
@@ -22,6 +24,10 @@ class MapTopBar extends StatelessWidget {
     required this.baseMap,
     required this.onToggleLayer,
     required this.onBaseMap,
+    required this.colourLevel,
+    required this.colourLabels,
+    required this.onColour,
+    required this.onSearch,
     required this.onNewDrawing,
     required this.onMyLocation,
     required this.onPeople,
@@ -39,7 +45,17 @@ class MapTopBar extends StatelessWidget {
 
   final ValueChanged<BaseMapEnum> onBaseMap;
 
+  final int? colourLevel;
+
+  final List<String> colourLabels;
+
+  final ValueChanged<int?> onColour;
+
+  final VoidCallback onSearch;
+
   final VoidCallback onNewDrawing;
+
+  static const int _colourOff = -1;
 
   final VoidCallback onMyLocation;
 
@@ -90,6 +106,32 @@ class MapTopBar extends StatelessWidget {
               selected: <BaseMapEnum>{baseMap},
               onSelectionChanged: (Set<BaseMapEnum> value) =>
                   onBaseMap(value.first),
+            ),
+            IconButton.filledTonal(
+              tooltip: l10n.searchParcel,
+              icon: const Icon(Icons.search),
+              onPressed: onSearch,
+            ),
+            PopupMenuButton<int>(
+              tooltip: l10n.colourBy,
+              icon: Icon(
+                colourLevel == null ? Icons.palette_outlined : Icons.palette,
+              ),
+              onSelected: (int level) =>
+                  onColour(level == _colourOff ? null : level),
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
+                CheckedPopupMenuItem<int>(
+                  value: _colourOff,
+                  checked: colourLevel == null,
+                  child: ParcelInfoText(l10n.colourOff),
+                ),
+                for (final (int level, String label) in colourLabels.indexed)
+                  CheckedPopupMenuItem<int>(
+                    value: level,
+                    checked: colourLevel == level,
+                    child: ParcelInfoText(label),
+                  ),
+              ],
             ),
             IconButton.filledTonal(
               tooltip: l10n.newDrawing,

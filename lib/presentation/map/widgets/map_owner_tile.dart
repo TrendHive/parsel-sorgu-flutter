@@ -3,9 +3,9 @@ import 'package:parcel_atlas/domain/map/read_model/map_snapshot_read_model.dart'
 import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
 import 'package:parcel_atlas/domain/person/rule/family_rules.dart';
 import 'package:parcel_atlas/domain/person/value_object/ownership_value_object.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_format.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_local_keys.dart';
-import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_format.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_local_keys.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
 
 /// One owner line: who the share is recorded on and how much. When that
 /// person's shares have passed on, the children and what each of them gets

@@ -42,7 +42,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyAOSv4WY8dAjXhRbCcmk12YMj5J6t1A5WE',
-    appId: '1:754115731999:web:cae3ba26dcba59c4656b2a',
+    appId: '1:754115731999:web:2764aaffd667d1af656b2a',
     messagingSenderId: '754115731999',
     projectId: 'parcel-info',
     authDomain: 'parcel-info.firebaseapp.com',
@@ -51,26 +51,26 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBJpiXQcuH6yeBBKXq3Q5i7bkdDgeWX9kg',
-    appId: '1:754115731999:android:8171f0d59d51bdfb656b2a',
+    appId: '1:754115731999:android:0d7c82bbc6164aed656b2a',
     messagingSenderId: '754115731999',
     projectId: 'parcel-info',
     storageBucket: 'parcel-info.firebasestorage.app',
   );
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyC6BR6YB3cRjZRgcwAhjbquOVrxJ_9GvoE',
-    appId: '1:754115731999:ios:22484e7fad8d343a656b2a',
+    appId: '1:754115731999:ios:a1cbc6f10ecf21f3656b2a',
     messagingSenderId: '754115731999',
     projectId: 'parcel-info',
     storageBucket: 'parcel-info.firebasestorage.app',
-    iosBundleId: 'com.trendhive.parcelInfo',
+    iosBundleId: 'com.parcelatlas.app',
   );
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyC6BR6YB3cRjZRgcwAhjbquOVrxJ_9GvoE',
-    appId: '1:754115731999:ios:22484e7fad8d343a656b2a',
+    appId: '1:754115731999:ios:a1cbc6f10ecf21f3656b2a',
     messagingSenderId: '754115731999',
     projectId: 'parcel-info',
     storageBucket: 'parcel-info.firebasestorage.app',
-    iosBundleId: 'com.trendhive.parcelInfo',
+    iosBundleId: 'com.parcelatlas.app',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
