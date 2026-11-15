@@ -20,17 +20,17 @@ dart run tool/check_structure.dart   # layer imports, folders, English-only code
 flutter test
 ```
 
-## Architecture — one package, layers as folders
+## Architecture — one package, five layers as folders
 
 ```
 lib/
   core/            base types, exceptions + causes, constants, validators
-  core_ui/         app-agnostic base widgets (Base*) and values
   domain/          entities, value objects, read models, rules, ports (*Interface)
-  domain_ui/       the app's own widgets (ParcelInfo*), theme, colours, l10n
   application/     use cases + one Cubit per page, the getIt container
   infrastructure/  services (internal: Firestore · external: TKGM) + repositories
-  presentation/    pages, router, app shell
+  presentation/    pages, router, app shell, and the design system:
+    core_ui/         app-agnostic base widgets (Base*) and values
+    domain_ui/       the app's own widgets (ParcelInfo*), theme, colours, l10n
   main.dart        composition root — the only file that sees every layer
 ```
 
@@ -39,12 +39,12 @@ Allowed imports (enforced by `tool/check_structure.dart`):
 | Layer | May import |
 |---|---|
 | `core` | nothing in the app |
-| `core_ui` | core |
 | `domain` | core — and no Flutter |
-| `domain_ui` | core, core_ui, domain |
 | `application` | core, domain — never infrastructure, never widgets |
 | `infrastructure` | core, domain |
-| `presentation` | core, core_ui, domain, domain_ui, application — never infrastructure |
+| `presentation` | core, domain, application — never infrastructure |
+| `presentation/core_ui` | core only (not domain, not application, not pages) |
+| `presentation/domain_ui` | core, domain, `core_ui` (not application, not pages) |
 
 **Folders: `lib/<layer>/<feature>/<kind>/`**, kinds singular: domain
 `entity/ value_object/ read_model/ enum/ interface/ rule/ validator/`;
@@ -65,7 +65,7 @@ dto/`. Features: `activity · auth · drawing · input · map · parcel · perso
 10. **Every write is signed and logged.** A repository write stamps `created`/`updated` with the member and server time and adds one `activity` line in the same atomic batch.
 11. **Geometry is computed in one place** — `GeoRules` (WGS84 ellipsoid, local tangent plane). Shares are exact fractions (`ShareValueObject`), never doubles. Who holds what today follows from the family tree (`FamilyRules`): a share recorded on an ancestor whose shares passed on is split equally among the children, generation by generation.
 12. **`getIt` only in `main.dart` and a page's `BlocProvider`.** Everything else takes dependencies through its constructor.
-13. **English everywhere except the language files.** Code, comments, docs, commits: English. Turkish lives only in `lib/domain_ui/values/l10n/app_tr.arb` (and `app_en.arb` for English). No string literal a user reads is written in a widget.
+13. **English everywhere except the language files.** Code, comments, docs, commits: English. Turkish lives only in `lib/presentation/domain_ui/values/l10n/app_tr.arb` (and `app_en.arb` for English). No string literal a user reads is written in a widget.
 14. **Comments sit above a declaration** — one `///` block naming members as `[x]`; no comments inside bodies.
 15. **No magic values.** Numbers and strings that mean something are named: `CoreConstants`, `*Rules`, `BaseDimens`/`ParcelInfoDimens`, `ParcelInfoColor`.
 16. **A bug fix ships a test that fails without it**, named after the symptom.

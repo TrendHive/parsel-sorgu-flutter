@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:parcel_atlas/application/di/injection.dart';
 import 'package:parcel_atlas/application/map/cubit/map_cubit.dart';
-import 'package:parcel_atlas/domain_ui/widgets/scaffold/parcel_info_scaffold.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/scaffold/parcel_info_scaffold.dart';
 import 'package:parcel_atlas/presentation/map/body/map_body.dart';
 
 /// The home of the app: the family's parcels on aerial imagery.

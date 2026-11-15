@@ -88,6 +88,6 @@ one declaration per file, English-only code, tests.
 - The owner has allowed the assistant to merge pull requests once CI is
   green.
 - Everything in the repository is English; Turkish only in
-  `lib/domain_ui/values/l10n/app_tr.arb` (rule 13, enforced).
+  `lib/presentation/domain_ui/values/l10n/app_tr.arb` (rule 13, enforced).
 - Decisions and their reasons: `docs/requirements.md` (what was asked),
   `docs/research.md` (standards), `architecture.md` (design).

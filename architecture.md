@@ -28,12 +28,21 @@ has one. So the layers are folders with the same names, and what the package
 graph used to enforce, `tool/check_structure.dart` now enforces: a forbidden
 import fails the gate exactly as a missing dependency failed the build.
 
+## The design system belongs to presentation
+
+`core_ui` (app-agnostic base widgets) and `domain_ui` (the app's own widgets,
+theme, colours and copy) began as top-level layers. They are UI, and in both
+Clean Architecture and Flutter's own case study (its `ui/core` folder) shared
+widgets and themes are part of the UI layer — so they now live inside
+`presentation/`. What the separate layers gave is kept as a rule the
+structure check enforces: the design system never imports a page or the
+application layer, and `core_ui` knows nothing of the domain.
+
 ## The dependency rule
 
 ```
 presentation ──► application ──► domain ◄── infrastructure
-      │                            ▲
-      └──► domain_ui ──► core_ui   └── everything ──► core
+  (pages ──► domain_ui ──► core_ui)        everything ──► core
 main.dart (composition root) sees every layer
 ```
 

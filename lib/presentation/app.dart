@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:parcel_atlas/application/auth/cubit/session_cubit.dart';
-import 'package:parcel_atlas/domain_ui/values/l10n/app_localizations.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_local_keys.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_theme.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/l10n/app_localizations.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_local_keys.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_theme.dart';
 import 'package:parcel_atlas/presentation/router/parcel_info_router.dart';
 
 /// The app shell: theme, language and routes.

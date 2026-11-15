@@ -7,14 +7,14 @@ import 'package:parcel_atlas/domain/map/read_model/map_snapshot_read_model.dart'
 import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
 import 'package:parcel_atlas/domain/person/read_model/holdings_read_model.dart';
 import 'package:parcel_atlas/domain/person/rule/family_rules.dart';
-import 'package:parcel_atlas/domain_ui/copy/exception_copy.dart';
-import 'package:parcel_atlas/domain_ui/dialog/confirm/confirm_dialog.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_dimens.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_format.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_local_keys.dart';
-import 'package:parcel_atlas/domain_ui/widgets/feedback/parcel_info_toast.dart';
-import 'package:parcel_atlas/domain_ui/widgets/layout/parcel_info_readable_width.dart';
-import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
+import 'package:parcel_atlas/presentation/domain_ui/copy/exception_copy.dart';
+import 'package:parcel_atlas/presentation/domain_ui/dialog/confirm/confirm_dialog.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_dimens.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_format.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_local_keys.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/feedback/parcel_info_toast.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/layout/parcel_info_readable_width.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
 import 'package:parcel_atlas/presentation/people/dialog/person_dialog.dart';
 import 'package:parcel_atlas/presentation/router/parcel_info_router.dart';
 

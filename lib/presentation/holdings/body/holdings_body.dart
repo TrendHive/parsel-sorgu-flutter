@@ -3,16 +3,16 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:parcel_atlas/application/person/cubit/holdings_cubit.dart';
 import 'package:parcel_atlas/core/constants.dart';
-import 'package:parcel_atlas/core_ui/values/base_dimens.dart';
 import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
 import 'package:parcel_atlas/domain/person/read_model/holding_line_read_model.dart';
 import 'package:parcel_atlas/domain/person/read_model/holdings_read_model.dart';
-import 'package:parcel_atlas/domain_ui/copy/exception_copy.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_color.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_format.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_local_keys.dart';
-import 'package:parcel_atlas/domain_ui/widgets/layout/parcel_info_readable_width.dart';
-import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
+import 'package:parcel_atlas/presentation/core_ui/values/base_dimens.dart';
+import 'package:parcel_atlas/presentation/domain_ui/copy/exception_copy.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_color.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_format.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_local_keys.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/layout/parcel_info_readable_width.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
 import 'package:parcel_atlas/presentation/router/parcel_info_router.dart';
 
 /// Totals first — parcels, total area, owned area — then the person's place

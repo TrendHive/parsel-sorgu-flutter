@@ -1,9 +1,9 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:parcel_atlas/core_ui/values/base_dimens.dart';
 import 'package:parcel_atlas/domain/map/enum/base_map_enum.dart';
 import 'package:parcel_atlas/domain/map/enum/map_layer_enum.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_local_keys.dart';
-import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
+import 'package:parcel_atlas/presentation/core_ui/values/base_dimens.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_local_keys.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
 
 /// The bar over the map while browsing.
 ///

@@ -6,8 +6,8 @@ import 'package:parcel_atlas/domain/map/enum/map_layer_enum.dart';
 import 'package:parcel_atlas/domain/map/read_model/map_hit_read_model.dart';
 import 'package:parcel_atlas/domain/map/read_model/map_snapshot_read_model.dart';
 import 'package:parcel_atlas/domain/parcel/entity/official_parcel_entity.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_color.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_dimens.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_color.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_dimens.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_parcel_label.dart';
 
 /// The two stored layers: registry parcels (cyan) under the family's drawn

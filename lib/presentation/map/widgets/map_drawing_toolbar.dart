@@ -1,9 +1,9 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:parcel_atlas/core_ui/values/base_dimens.dart';
 import 'package:parcel_atlas/domain/drawing/read_model/map_drawing_read_model.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_format.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_local_keys.dart';
-import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
+import 'package:parcel_atlas/presentation/core_ui/values/base_dimens.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_format.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_local_keys.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
 
 /// The bar over the map while drawing.
 ///

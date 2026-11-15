@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:parcel_atlas/application/di/injection.dart';
 import 'package:parcel_atlas/application/person/cubit/holdings_cubit.dart';
-import 'package:parcel_atlas/domain_ui/widgets/scaffold/parcel_info_scaffold.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/scaffold/parcel_info_scaffold.dart';
 import 'package:parcel_atlas/presentation/holdings/body/holdings_body.dart';
 
 /// Everything that reaches one person: where each parcel is, its
