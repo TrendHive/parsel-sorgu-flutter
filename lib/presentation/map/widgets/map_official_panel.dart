@@ -25,6 +25,7 @@ class MapOfficialPanel extends StatelessWidget {
     required this.corrections,
     required this.querying,
     required this.onDrawReal,
+    required this.onAssign,
     required this.onRefresh,
     required this.onOpenDrawing,
     required this.onClose,
@@ -37,6 +38,8 @@ class MapOfficialPanel extends StatelessWidget {
   final bool querying;
 
   final VoidCallback onDrawReal;
+
+  final VoidCallback onAssign;
 
   final VoidCallback onRefresh;
 
@@ -72,6 +75,12 @@ class MapOfficialPanel extends StatelessWidget {
           onPressed: onDrawReal,
           icon: const Icon(Icons.draw_outlined),
           label: ParcelInfoText(l10n.drawRealButton),
+        ),
+        SizedBox(height: BaseDimens.height.xxSmall),
+        FilledButton.tonalIcon(
+          onPressed: onAssign,
+          icon: const Icon(Icons.person_add_alt),
+          label: ParcelInfoText(l10n.assignOwner),
         ),
         SizedBox(height: BaseDimens.height.xxSmall),
         OutlinedButton.icon(

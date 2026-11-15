@@ -27,6 +27,8 @@ class MapDrawnPanel extends StatelessWidget {
     required this.canDelete,
     required this.onEditShape,
     required this.onEditDetails,
+    required this.onSplit,
+    required this.onSplitEqual,
     required this.onDelete,
     required this.onOpenOfficial,
     required this.onOpenOwner,
@@ -42,6 +44,10 @@ class MapDrawnPanel extends StatelessWidget {
   final VoidCallback onEditShape;
 
   final VoidCallback onEditDetails;
+
+  final VoidCallback onSplit;
+
+  final VoidCallback onSplitEqual;
 
   final VoidCallback onDelete;
 
@@ -138,6 +144,16 @@ class MapDrawnPanel extends StatelessWidget {
               onPressed: onEditShape,
               icon: const Icon(Icons.polyline_outlined),
               label: ParcelInfoText(l10n.editShape),
+            ),
+            OutlinedButton.icon(
+              onPressed: onSplit,
+              icon: const Icon(Icons.content_cut),
+              label: ParcelInfoText(l10n.splitButton),
+            ),
+            OutlinedButton.icon(
+              onPressed: onSplitEqual,
+              icon: const Icon(Icons.grid_view_outlined),
+              label: ParcelInfoText(l10n.splitEqualButton),
             ),
             if (canDelete)
               TextButton.icon(

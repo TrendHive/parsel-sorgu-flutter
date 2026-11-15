@@ -19,7 +19,7 @@ and record who owns which share — live on every family member's device.
 [![Dart 3.14](https://img.shields.io/badge/Dart-3.14-0175C2?style=flat-square&logo=dart&logoColor=white)](https://dart.dev)
 [![Firebase Spark](https://img.shields.io/badge/Firebase-Spark%20(free)-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com)
 [![Analyzer](https://img.shields.io/badge/analyzer-0%20issues-3FB950?style=flat-square)](#-checking-your-work)
-[![Tests](https://img.shields.io/badge/tests-43-3FB950?style=flat-square)](#-checking-your-work)
+[![Tests](https://img.shields.io/badge/tests-59-3FB950?style=flat-square)](#-checking-your-work)
 
 [Features](#-features) · [How it is built](#-how-it-is-built) · [Getting started](#-getting-started) · [Checking your work](#-checking-your-work) · [Security](#-security) · [Docs](#-documentation)
 
@@ -46,7 +46,7 @@ Parcels come from the land registry's own service. A tap inside a stored parcel 
 <td width="33%" valign="top">
 
 #### ✏️ Drawing made easy
-Copy the registry outline and move only the wrong corners: drag numbered handles, tap "+" on an edge, place precisely with a crosshair, undo and redo.
+Copy the registry outline and move only the wrong corners: drag numbered handles, tap "+" on an edge, place precisely with a crosshair, undo and redo. Corners snap onto neighbours, drawings cannot overlap, and a parcel splits in two or into equal pieces for the heirs.
 
 </td>
 </tr>
@@ -60,7 +60,7 @@ Areas, perimeters and every side's length are computed on the WGS84 ellipsoid, s
 <td valign="top">
 
 #### 👨‍👩‍👧‍👦 A family tree of owners
-Owners hold deed-style shares (1/4). A share recorded on an ancestor passes down the tree, split equally among the children of each generation.
+Owners hold deed-style shares (1/4). A share recorded on an ancestor passes down the tree, split equally among the children of each generation. The map can be coloured by any generation of the tree.
 
 </td>
 <td valign="top">

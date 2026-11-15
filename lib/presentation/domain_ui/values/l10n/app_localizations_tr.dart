@@ -468,4 +468,114 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errorRegistryRefusesWeb =>
       'Resmi kayıt, web sitesinden yapılan sorguları kabul etmiyor. Yeni parsel sorgusunu masaüstü veya mobil uygulamadan yapın; kayıtlı parseller burada da görünür.';
+
+  @override
+  String get searchParcel => 'Ada / parsel ile sorgula';
+
+  @override
+  String get searchTitle => 'Parsel sorgula';
+
+  @override
+  String get searchNeighbourhood => 'Mahalle';
+
+  @override
+  String get searchNeighbourhoodCode => 'Mahalle kodu';
+
+  @override
+  String get searchOther => 'Başka mahalle (kodunu gir)';
+
+  @override
+  String get searchHint =>
+      'Listede daha önce sorgulanan parsellerin mahalleleri var. Yeni bir mahalle için önce haritada o mahalleden bir parsele dokunun ya da mahalle kodunu girin.';
+
+  @override
+  String get blockLabel => 'Ada';
+
+  @override
+  String get parcelNumberLabel => 'Parsel';
+
+  @override
+  String get searchButton => 'Sorgula';
+
+  @override
+  String get colourBy => 'Aileye göre renklendir';
+
+  @override
+  String get colourOff => 'Renklendirme kapalı';
+
+  @override
+  String colourLevel(int level, String names) {
+    return '$level. kuşak: $names';
+  }
+
+  @override
+  String get colourShared => 'Ortak';
+
+  @override
+  String get colourUnassigned => 'Sahibi yok';
+
+  @override
+  String get assignOwner => 'Sahip ata';
+
+  @override
+  String get assignOwnerTitle => 'Kime ait?';
+
+  @override
+  String get assignOwnerHint =>
+      'Kişiye dokununca seçilir. Oku ile çocuklarına inebilirsiniz; payı çocuklarına geçmiş birini seçerseniz çocukları eşit paydaş görünür.';
+
+  @override
+  String get showChildren => 'Çocuklarına in';
+
+  @override
+  String get treeBack => 'Bir üst kuşak';
+
+  @override
+  String get splitButton => 'İkiye böl';
+
+  @override
+  String get splitEqualButton => 'Eşit böl';
+
+  @override
+  String get splitHint =>
+      'Kesme çizgisi için iki noktaya dokunun; çizgi bu iki noktadan geçer. Noktalar köşelere ve kenarlara kendiliğinden oturur.';
+
+  @override
+  String get splitMissesHint =>
+      'Bu çizgi parseli ikiye ayırmıyor. İki noktayı yeniden seçin.';
+
+  @override
+  String splitReady(String first, String second) {
+    return 'İki parça: $first ve $second';
+  }
+
+  @override
+  String get confirmSplit => 'Böl ve kaydet';
+
+  @override
+  String get splitEqualTitle => 'Eşit böl';
+
+  @override
+  String splitEqualToChildren(String name, int count) {
+    return '$name çocuklarına: $count eşit parça';
+  }
+
+  @override
+  String get splitEqualCount => 'Parça sayısı';
+
+  @override
+  String get splitEqualByCount =>
+      'Sayıya göre eşit parça (sahipler aynı kalır)';
+
+  @override
+  String get splitEqualNote =>
+      'Parsel, uzun ekseni boyunca eşit alanlı parçalara bölünür. Sonra her parçanın köşelerini düzeltebilirsiniz.';
+
+  @override
+  String get errorDrawingOverlaps =>
+      'Bu çizim başka bir çizimin üstüne biniyor. Köşeleri komşu sınıra yaklaştırın; kendiliğinden o sınıra oturur.';
+
+  @override
+  String get errorSplitMisses =>
+      'Parsel bölünemedi. Kesme çizgisini ya da parça sayısını kontrol edin.';
 }

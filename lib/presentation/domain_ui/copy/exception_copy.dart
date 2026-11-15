@@ -25,6 +25,8 @@ class ExceptionCopy {
       CauseCode.sharesExceedWholeCode => l10n.errorSharesExceed,
       CauseCode.familyLoopCode => l10n.errorFamilyLoop,
       CauseCode.registryRefusesWebCode => l10n.errorRegistryRefusesWeb,
+      CauseCode.drawingOverlapsCode => l10n.errorDrawingOverlaps,
+      CauseCode.splitMissesCode => l10n.errorSplitMisses,
       CauseCode.emptyValueCode => l10n.errorEmptyField,
       _ => null,
     };
