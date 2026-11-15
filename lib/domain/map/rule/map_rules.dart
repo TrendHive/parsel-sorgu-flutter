@@ -1,4 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:latlong2/latlong.dart';
+import 'package:parcel_atlas/domain/map/enum/camera_move_enum.dart';
 
 /// The map's own numbers.
 ///
@@ -22,7 +25,36 @@ import 'package:latlong2/latlong.dart';
 /// the second is refused — enough to forgive a corner placed a hand's width
 /// over a neighbour's line, not a strip of someone else's land.
 /// [maxPieces] is the most strips one equal split makes.
+///
+/// [cameraMove] decides how the camera shows a place: not at all when it is
+/// already wholly in the `visible` box, a slide at the same zoom when part
+/// of it is, a move and zoom to fit only when it is off screen — a tap on a
+/// parcel in view never jumps the map. Boxes are south-west and north-east
+/// corners.
 abstract final class MapRules {
+  static CameraMoveEnum cameraMove({
+    required ({LatLng southWest, LatLng northEast}) visible,
+    required List<LatLng> target,
+  }) {
+    if (target.isEmpty) return CameraMoveEnum.stay;
+    bool inside(LatLng p) =>
+        p.latitude >= visible.southWest.latitude &&
+        p.latitude <= visible.northEast.latitude &&
+        p.longitude >= visible.southWest.longitude &&
+        p.longitude <= visible.northEast.longitude;
+    if (target.every(inside)) return CameraMoveEnum.stay;
+    final double south = target.map((LatLng p) => p.latitude).reduce(math.min);
+    final double north = target.map((LatLng p) => p.latitude).reduce(math.max);
+    final double west = target.map((LatLng p) => p.longitude).reduce(math.min);
+    final double east = target.map((LatLng p) => p.longitude).reduce(math.max);
+    final bool overlaps =
+        south <= visible.northEast.latitude &&
+        north >= visible.southWest.latitude &&
+        west <= visible.northEast.longitude &&
+        east >= visible.southWest.longitude;
+    return overlaps ? CameraMoveEnum.pan : CameraMoveEnum.frame;
+  }
+
   static const double overlapToleranceSquareMeters = 2;
 
   static const int maxPieces = 12;

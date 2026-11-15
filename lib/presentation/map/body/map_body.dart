@@ -10,6 +10,7 @@ import 'package:parcel_atlas/core/constants.dart';
 import 'package:parcel_atlas/domain/drawing/entity/drawn_parcel_entity.dart';
 import 'package:parcel_atlas/domain/drawing/read_model/map_drawing_read_model.dart';
 import 'package:parcel_atlas/domain/drawing/value_object/drawing_details_value_object.dart';
+import 'package:parcel_atlas/domain/map/enum/camera_move_enum.dart';
 import 'package:parcel_atlas/domain/map/enum/map_notice_enum.dart';
 import 'package:parcel_atlas/domain/map/read_model/map_hit_read_model.dart';
 import 'package:parcel_atlas/domain/map/rule/geo_rules.dart';
@@ -130,6 +131,19 @@ class _MapBodyState extends State<MapBody> {
     if (points.length == CoreConstants.one) {
       _controller.move(points.single, _focusZoom);
       return;
+    }
+    final LatLngBounds visible = _controller.camera.visibleBounds;
+    switch (MapRules.cameraMove(
+      visible: (southWest: visible.southWest, northEast: visible.northEast),
+      target: points,
+    )) {
+      case CameraMoveEnum.stay:
+        return;
+      case CameraMoveEnum.pan:
+        _controller.move(GeoRules.centre(points), _controller.camera.zoom);
+        return;
+      case CameraMoveEnum.frame:
+        break;
     }
     _controller.fitCamera(
       CameraFit.coordinates(

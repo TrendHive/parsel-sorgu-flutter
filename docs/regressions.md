@@ -94,3 +94,11 @@ moving the camera (`map_cubit_test`).
 generation menu. *Guard:* colouring by owner is the default, also on the
 registry layer.
 
+## Map camera
+
+**A tap on a parcel already on screen zoomed the map onto it.** Every
+selection that came back from the store or the registry framed the parcel.
+*Guard:* `MapRules.cameraMove` — a parcel wholly in view leaves the camera
+alone, one partly in view slides in at the same zoom, only one off screen is
+framed (`camera_move_test`).
+
