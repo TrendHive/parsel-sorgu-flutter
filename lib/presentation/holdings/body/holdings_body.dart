@@ -5,8 +5,6 @@ import 'package:parcel_atlas/application/person/cubit/holdings_cubit.dart';
 import 'package:parcel_atlas/core/constants.dart';
 import 'package:parcel_atlas/core_ui/values/base_dimens.dart';
 import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
-import 'package:parcel_atlas/domain/person/entity/person_group_entity.dart';
-import 'package:parcel_atlas/domain/person/enum/holder_kind_enum.dart';
 import 'package:parcel_atlas/domain/person/read_model/holding_line_read_model.dart';
 import 'package:parcel_atlas/domain/person/read_model/holdings_read_model.dart';
 import 'package:parcel_atlas/domain_ui/copy/exception_copy.dart';
@@ -17,14 +15,12 @@ import 'package:parcel_atlas/domain_ui/widgets/layout/parcel_info_readable_width
 import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
 import 'package:parcel_atlas/presentation/router/parcel_info_router.dart';
 
-/// Totals first — parcels, total area, owned area — then one card per parcel
-/// with where it is, its area, the share and what that share stands for, and
-/// "show on map". A group lists its members; a person their groups, and each
-/// parcel says when it comes through a group.
+/// Totals first — parcels, total area, owned area — then the person's place
+/// in the tree (parent and children, each a link), then one card per parcel
+/// with where it is, its area, the share that reaches the person, the
+/// ancestor it comes from, and "show on map".
 class HoldingsBody extends StatelessWidget {
-  const HoldingsBody({super.key, required this.kind});
-
-  final HolderKindEnum kind;
+  const HoldingsBody({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +43,10 @@ class HoldingsBody extends StatelessWidget {
     final ParcelInfoFormat format = ParcelInfoFormat(l10n);
     final TextTheme text = Theme.of(context).textTheme;
     final HoldingsReadModel holdings = state.holdings;
+    final PersonEntity? parent = state.parent;
     return CustomScrollView(
       slivers: <Widget>[
-        SliverAppBar.large(title: ParcelInfoText(state.title)),
+        SliverAppBar.large(title: ParcelInfoText(state.person.name)),
         SliverPadding(
           padding: EdgeInsets.all(BaseDimens.padding.xxxxMedium),
           sliver: SliverList.list(
@@ -70,61 +67,53 @@ class HoldingsBody extends StatelessWidget {
                   ),
                   _total(
                     context,
-                    l10n.holdingsOwnedArea,
+                    state.passedOn
+                        ? l10n.holdingsPassedArea
+                        : l10n.holdingsOwnedArea,
                     format.area(holdings.ownedArea),
                   ),
                 ],
               ),
-              if (state.members.isNotEmpty) ...<Widget>[
+              if (parent != null) ...<Widget>[
                 SizedBox(height: BaseDimens.height.small),
-                ParcelInfoText(l10n.groupMembersTitle, style: text.titleMedium),
-                Wrap(
-                  spacing: BaseDimens.margin.medium,
-                  children: <Widget>[
-                    for (final PersonEntity person in state.members)
-                      ActionChip(
-                        avatar: const Icon(Icons.person_outline),
-                        label: ParcelInfoText(person.name),
-                        onPressed: () => context.push(
-                          ParcelInfoRouter.holdingsOf(
-                            HolderKindEnum.person,
-                            person.id,
-                          ),
-                        ),
-                      ),
-                  ],
+                ParcelInfoText(l10n.parentLabel, style: text.titleMedium),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: _chip(context, parent),
                 ),
               ],
-              if (state.groups.isNotEmpty) ...<Widget>[
+              if (state.children.isNotEmpty) ...<Widget>[
                 SizedBox(height: BaseDimens.height.small),
-                ParcelInfoText(l10n.memberOfGroups, style: text.titleMedium),
+                ParcelInfoText(
+                  state.passedOn
+                      ? l10n.childrenInheritTitle
+                      : l10n.childrenTitle,
+                  style: text.titleMedium,
+                ),
                 Wrap(
                   spacing: BaseDimens.margin.medium,
                   children: <Widget>[
-                    for (final PersonGroupEntity group in state.groups)
-                      ActionChip(
-                        avatar: const Icon(Icons.groups_outlined),
-                        label: ParcelInfoText(group.name),
-                        onPressed: () => context.push(
-                          ParcelInfoRouter.holdingsOf(
-                            HolderKindEnum.group,
-                            group.id,
-                          ),
-                        ),
-                      ),
+                    for (final PersonEntity child in state.children)
+                      _chip(context, child),
                   ],
                 ),
               ],
               SizedBox(height: BaseDimens.height.small),
               if (holdings.lines.isEmpty) ParcelInfoText(l10n.holdingsEmpty),
               for (final HoldingLineReadModel line in holdings.lines)
-                _line(context, line, format, state.members.length),
+                _line(context, line, format),
             ],
           ),
         ),
       ],
     );
   }
+
+  Widget _chip(BuildContext context, PersonEntity person) => ActionChip(
+    avatar: const Icon(Icons.person_outline),
+    label: ParcelInfoText(person.name),
+    onPressed: () => context.push(ParcelInfoRouter.holdingsOf(person.id)),
+  );
 
   Widget _total(BuildContext context, String label, String value) {
     final TextTheme text = Theme.of(context).textTheme;
@@ -147,18 +136,16 @@ class HoldingsBody extends StatelessWidget {
     BuildContext context,
     HoldingLineReadModel line,
     ParcelInfoFormat format,
-    int memberCount,
   ) {
     final l10n = ParcelInfoLocalKeys.of(context);
     final String place = <String>[
       line.official?.record.neighborhoodName ?? CoreConstants.empty,
       line.official?.label ?? CoreConstants.empty,
-    ].where((String part) => part.isNotEmpty).join(' · ');
+    ].where((String part) => part.isNotEmpty).join(_separator);
     final List<String> share = <String>[
       '${l10n.shareLabel}: ${format.share(line.share)}',
-      if (line.viaGroup != null) l10n.viaGroup(line.viaGroup!.name),
-      if (kind == HolderKindEnum.group && memberCount > CoreConstants.zero)
-        l10n.perMemberShare(format.share(line.share.dividedBy(memberCount))),
+      if (line.via != null) l10n.viaAncestor(line.via!.name),
+      if (line.passedOn) l10n.passedOnBadge,
     ];
     return Card(
       child: ListTile(
@@ -171,8 +158,8 @@ class HoldingsBody extends StatelessWidget {
           <String>[
             if (place.isNotEmpty) place,
             '${format.area(line.area)} → ${format.area(line.ownedArea)}',
-            share.join(' · '),
-          ].join('\n'),
+            share.join(_separator),
+          ].join(CoreConstants.nextLine),
         ),
         isThreeLine: true,
         trailing: IconButton(
@@ -184,4 +171,6 @@ class HoldingsBody extends StatelessWidget {
       ),
     );
   }
+
+  static const String _separator = ' · ';
 }

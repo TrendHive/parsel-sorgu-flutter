@@ -19,6 +19,7 @@ class ParcelInfoDimens {
   static const double minTapTarget = 48;
   static const double readableWidth = 840;
   static const double fieldGap = 12;
+  static const double treeIndent = 28;
   static const double shareFieldWidth = 96;
   static const double progressSize = 20;
   static const double panelMaxWidth = 440;

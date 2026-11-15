@@ -6,20 +6,24 @@ then this page. Keep it current: update it at the end of every working
 session. This repository is public — never write passwords, keys, account
 ids beyond `firestore.rules`, or the family's personal data here.
 
-_Last updated: 2026-11-15._
+_Last updated: 2026-11-15 (after the owner's first use)._
 
 ## Released
 
-Version 2.0.0 is live on https://parcel-info.web.app (the only environment).
+Version 2.0.1 is live on https://parcel-info.web.app (the only environment):
+2.0.0 plus the responsive layout, the app icon and the docs.
 
 - Sign-in with fixed accounts; the main (admin) account exists.
 - Map with two layers (registry parcels, read-only; family-drawn real
   boundaries), satellite/street imagery, "my location".
-- Registry lookups store-first; Refresh by parcel number.
+- Registry lookups store-first, one tap; Refresh by parcel number. Lookups
+  work from the desktop and mobile apps only — the registry refuses
+  third-party websites (`docs/tkgm-api.md`).
 - Drawing: copy the registry outline, drag corners, "+" edge chips with live
   lengths, snapping, crosshair mode, undo/redo; save with name, owners and
   shares, note.
-- People and groups; deed-style shares; holdings pages with totals.
+- A family tree of owners; deed-style shares that pass down the tree;
+  holdings pages with totals.
 - Change history; every change signed with member and server time.
 - Firestore rules: member allowlist, signed stamps, read-only registry
   records, admin-only deletes, append-only log.
@@ -43,7 +47,7 @@ Version 2.0.0 is live on https://parcel-info.web.app (the only environment).
 
 1. Sign in on production and walk the full journey above; fix what breaks
    (the `bug-fix` skill).
-2. Enter the family's first owner group and its members in the app (the
+2. Enter the family tree in the app (the
    owner provides the names; they are not stored in this repository).
 3. Add the remaining family sign-in accounts with `tool/add_member.dart`
    (the owner runs it), committing the rules change through a pull request.
@@ -55,8 +59,8 @@ Version 2.0.0 is live on https://parcel-info.web.app (the only environment).
 ## How work is done here
 
 - Flow: feature branch from `dev` → PR to `dev` (CI "Gate" must pass) →
-  squash merge → release PR `dev → main` → deploy (`pr-flow`, `deploy`
-  skills). `main` and `dev` are protected and cannot be deleted.
+  squash merge → release branch cut from `main` with `dev` squashed in →
+  PR to `main` → deploy (`pr-flow`, `deploy` skills). `main` and `dev` are protected and cannot be deleted.
 - The owner has allowed the assistant to merge pull requests once CI is
   green.
 - Everything in the repository is English; Turkish only in

@@ -63,13 +63,28 @@ One GeoJSON `Feature`:
   warning for it).
 - Every property is kept verbatim in the stored record's `attributes`.
 
+## Who may call it
+
+Verified 2026-11-15: the service refuses requests that carry the `Origin` of
+a website other than its own. A request from this app's website gets 403 with
+the "daily limit" text on its very first call, while the same request with no
+`Origin` — what a desktop or mobile app sends — gets 200.
+
+So **lookups work from the desktop and mobile apps and not from the web
+app.** The web app shows everything already stored and does all drawing and
+ownership work; a 403 in the browser is reported as `RegistryRefusesWebCause`
+("query from the desktop or mobile app"), in an app as `RegistryQuotaCause`.
+The app does not disguise its requests as the registry's own site, and no
+relay is used: getting around the refusal is the owner's decision to make,
+not the code's (see `docs/roadmap.md`).
+
 ## Status codes
 
 | Status | Meaning | App exception |
 |---|---|---|
 | 200 | the parcel | — |
 | 404 | no parcel at that point | `NotFoundException(NoParcelCause)` |
-| 403 | daily query limit for this connection reached ("Günlük sorgu limitini aştınız") | `QuotaExceededException(RegistryQuotaCause)` |
+| 403 | daily query limit reached, or (in a browser) a third-party website refused — same text for both ("Günlük sorgu limitini aştınız") | `QuotaExceededException` with `RegistryQuotaCause` in an app, `RegistryRefusesWebCause` on the web |
 | 401 / 412 | the site asks for e-Devlet login | treated as a bad response |
 
 ## Rules for using it
@@ -78,8 +93,9 @@ The limit is per connection (IP address) per day and is low. Everything in the
 app is arranged so it is spent only on purpose:
 
 1. Never call it for a point inside a stored parcel — the store answers.
-2. Never call it automatically, on map move, or in a loop; only on a member's
-   explicit "query the registry" or "Refresh".
+2. Never call it on map move, at startup, on a timer or in a loop. A tap on
+   ground the store does not cover queries at once (the owner's choice: one
+   tap, not two); Refresh is explicit.
 3. Refresh asks by number, never by point.
 4. Do not test against it casually — every `curl` from a developer's machine
    spends that machine's allowance. Use the fixture.

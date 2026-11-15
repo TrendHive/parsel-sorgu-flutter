@@ -7,7 +7,7 @@ import 'package:parcel_atlas/domain_ui/widgets/scaffold/parcel_info_scaffold.dar
 import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
 import 'package:parcel_atlas/presentation/people/body/people_body.dart';
 
-/// Parcel owners — people and groups. Not sign-in accounts: these are who
+/// Parcel owners, as a family tree. Not sign-in accounts: these are who
 /// the parcels belong to.
 class PeoplePage extends StatelessWidget {
   const PeoplePage({super.key});

@@ -10,31 +10,34 @@ final class HoldingsLoading extends HoldingsState {
   const HoldingsLoading();
 }
 
-/// The store could not be read, or the person or group no longer exists.
+/// The store could not be read, or the person no longer exists.
 final class HoldingsFailed extends HoldingsState {
   const HoldingsFailed(this.exception);
 
   final BaseException exception;
 }
 
-/// One holder's parcels with totals.
+/// One person's parcels with totals.
 ///
-/// [title] is the person's or group's name; [holdings] their parcels;
-/// [members] the group's people (empty for a person) and [groups] the
-/// person's groups (empty for a group).
+/// [person] is whose page it is; [holdings] what reaches them; [parent]
+/// their parent in the tree, if any, and [children] their children.
+/// [passedOn] is whether their shares have gone on to those children.
 final class HoldingsReady extends HoldingsState {
   const HoldingsReady({
-    required this.title,
+    required this.person,
     required this.holdings,
-    required this.members,
-    required this.groups,
+    required this.parent,
+    required this.children,
+    required this.passedOn,
   });
 
-  final String title;
+  final PersonEntity person;
 
   final HoldingsReadModel holdings;
 
-  final List<PersonEntity> members;
+  final PersonEntity? parent;
 
-  final List<PersonGroupEntity> groups;
+  final List<PersonEntity> children;
+
+  final bool passedOn;
 }

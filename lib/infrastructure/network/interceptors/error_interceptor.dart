@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:parcel_atlas/core/base/base_exception.dart';
 import 'package:parcel_atlas/core/cause/no_parcel_cause.dart';
 import 'package:parcel_atlas/core/cause/registry_quota_cause.dart';
+import 'package:parcel_atlas/core/cause/registry_refuses_web_cause.dart';
 import 'package:parcel_atlas/core/cause/unknown_cause.dart';
 import 'package:parcel_atlas/core/exception/bad_response_exception.dart';
 import 'package:parcel_atlas/core/exception/network_exception.dart';
@@ -12,8 +14,10 @@ import 'package:parcel_atlas/infrastructure/constants.dart';
 /// Turns every Dio failure into the app's own [BaseException], carried in
 /// `DioException.error`, where `BaseRemoteRepository` picks it up.
 ///
-/// A bad response is told apart by status: the registry's daily limit
-/// becomes a [QuotaExceededException] (the screen says "try tomorrow", not
+/// A bad response is told apart by status: a 403 is the registry's daily
+/// limit in an app and its refusal of third-party websites in a browser —
+/// the same status and text for both, so the platform tells them apart —
+/// and becomes a [QuotaExceededException] (the screen says "try tomorrow", not
 /// "something went wrong") and a point with no parcel a
 /// [NotFoundException]. Connection problems of every kind are a
 /// [NetworkException].
@@ -51,7 +55,7 @@ class ErrorInterceptor extends Interceptor {
   BaseException _fromStatus(DioException err) =>
       switch (err.response?.statusCode) {
         InfrastructureConstants.quotaStatus => QuotaExceededException(
-          cause: RegistryQuotaCause(),
+          cause: kIsWeb ? RegistryRefusesWebCause() : RegistryQuotaCause(),
         ),
         InfrastructureConstants.notFoundStatus => NotFoundException(
           cause: NoParcelCause(),

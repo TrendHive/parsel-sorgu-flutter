@@ -26,14 +26,11 @@
   "layerDrawn": "Gerçek sınırlar",
   "baseSatellite": "Uydu",
   "baseStreet": "Harita",
-  "menuPeople": "Kişiler",
+  "menuPeople": "Aile",
   "menuActivity": "Geçmiş",
   "signOut": "Çıkış yap",
   "myLocation": "Konumum",
   "newDrawing": "Yeni çizim",
-  "noParcelStoredTitle": "Burada kayıtlı parsel yok",
-  "noParcelStoredBody": "Resmi kayıttan sorgulamak günlük sorgu hakkından birini kullanır.",
-  "queryRegistryButton": "Resmi kayıttan sorgula",
   "querying": "Sorgulanıyor…",
   "officialParcelTitle": "Ada {block} · Parsel {parcel}",
   "@officialParcelTitle": {
@@ -134,14 +131,6 @@
     }
   },
   "noteLabel": "Not",
-  "viaGroup": "{group} üzerinden",
-  "@viaGroup": {
-    "placeholders": {
-      "group": {
-        "type": "String"
-      }
-    }
-  },
   "drawingHint": "Köşe eklemek için haritaya dokunun. Köşeleri sürükleyerek taşıyın, kenardaki + ile araya köşe ekleyin.",
   "crosshairHint": "Haritayı kaydırıp nişangâhı noktaya getirin, sonra köşe ekleyin.",
   "drawingCorners": "{count, plural, =0{Köşe yok} =1{1 köşe} other{{count} köşe}}",
@@ -173,15 +162,10 @@
   "shareLabel": "Pay",
   "shareHint": "örn. 1/4",
   "invalidShare": "Geçerli bir pay yazın (örn. 1/4).",
-  "pickOwnerTitle": "Kişi veya grup seçin",
-  "peopleTitle": "Kişiler ve gruplar",
-  "peopleTab": "Kişiler",
-  "groupsTab": "Gruplar",
+  "pickOwnerTitle": "Kişi seçin",
+  "peopleTitle": "Aile ağacı",
   "addPersonButton": "Kişi ekle",
-  "addGroupButton": "Grup ekle",
   "personDialogTitle": "Kişi",
-  "groupDialogTitle": "Grup",
-  "groupMembersLabel": "Üyeler",
   "parcelCount": "{count, plural, =0{Parsel yok} =1{1 parsel} other{{count} parsel}}",
   "@parcelCount": {
     "placeholders": {
@@ -190,31 +174,12 @@
       }
     }
   },
-  "memberCount": "{count, plural, =0{Üye yok} =1{1 kişi} other{{count} kişi}}",
-  "@memberCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "noPeople": "Henüz kişi yok. Parsel sahiplerini buradan ekleyin.",
-  "noGroups": "Henüz grup yok. Aynı yerleri paylaşan kişileri grup yapın.",
+  "noPeople": "Henüz kişi yok. En büyük atadan başlayarak aileyi ekleyin.",
   "holdingsParcels": "Parsel",
   "holdingsTotalArea": "Toplam parsel alanı",
   "holdingsOwnedArea": "Sahip olunan alan",
   "showOnMap": "Haritada göster",
   "holdingsEmpty": "Atanmış parsel yok.",
-  "groupMembersTitle": "Grup üyeleri",
-  "memberOfGroups": "Üye olduğu gruplar",
-  "perMemberShare": "Kişi başı {share}",
-  "@perMemberShare": {
-    "placeholders": {
-      "share": {
-        "type": "String"
-      }
-    }
-  },
   "activityTitle": "Değişiklik geçmişi",
   "activityEmpty": "Henüz değişiklik yok.",
   "actionQueried": "resmi kayıttan sorguladı",
@@ -225,7 +190,6 @@
   "targetOfficial": "Resmi parsel",
   "targetDrawn": "Gerçek sınır",
   "targetPerson": "Kişi",
-  "targetGroup": "Grup",
   "noticeFromStore": "Bu parsel zaten kayıtlı — sorgu hakkı harcanmadı.",
   "noticeQueried": "Parsel resmi kayıttan alındı ve kaydedildi.",
   "noticeRefreshed": "Parsel resmi kayıttan güncellendi.",
@@ -260,5 +224,44 @@
         "type": "String"
       }
     }
-  }
+  },
+  "pickOwnerEmpty": "Eklenecek kişi yok. Önce Aile sayfasından kişileri ekleyin.",
+  "childCount": "{count, plural, =1{1 çocuk} other{{count} çocuk}}",
+  "@childCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "parentLabel": "Babası / annesi",
+  "parentNone": "Yok (ağacın başı)",
+  "passesToChildrenLabel": "Payı çocuklarına geçti",
+  "passesToChildrenHint": "Açıkken bu kişinin payları çocukları arasında eşit bölünür.",
+  "passedToChildren": "{names} · kişi başı {share}",
+  "@passedToChildren": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      },
+      "share": {
+        "type": "String"
+      }
+    }
+  },
+  "passedOnBadge": "çocuklarına geçti",
+  "addChildButton": "Çocuk ekle",
+  "childrenTitle": "Çocukları",
+  "childrenInheritTitle": "Mirasçıları (çocukları)",
+  "holdingsPassedArea": "Bıraktığı alan",
+  "viaAncestor": "{name} üzerinden",
+  "@viaAncestor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errorFamilyLoop": "Bir kişi kendi soyundan birinin çocuğu olamaz.",
+  "errorRegistryRefusesWeb": "Resmi kayıt, web sitesinden yapılan sorguları kabul etmiyor. Yeni parsel sorgusunu masaüstü veya mobil uygulamadan yapın; kayıtlı parseller burada da görünür."
 }
