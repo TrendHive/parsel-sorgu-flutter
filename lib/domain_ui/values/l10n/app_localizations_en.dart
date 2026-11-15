@@ -70,7 +70,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get baseStreet => 'Map';
 
   @override
-  String get menuPeople => 'People';
+  String get menuPeople => 'Family';
 
   @override
   String get menuActivity => 'History';
@@ -83,16 +83,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get newDrawing => 'New drawing';
-
-  @override
-  String get noParcelStoredTitle => 'No stored parcel here';
-
-  @override
-  String get noParcelStoredBody =>
-      'Querying the official registry uses one of today\'s few lookups.';
-
-  @override
-  String get queryRegistryButton => 'Query the official registry';
 
   @override
   String get querying => 'Querying…';
@@ -211,11 +201,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noteLabel => 'Note';
 
   @override
-  String viaGroup(String group) {
-    return 'via $group';
-  }
-
-  @override
   String get drawingHint =>
       'Tap the map to add a corner. Drag corners to move them; use + on an edge to insert one.';
 
@@ -280,31 +265,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invalidShare => 'Enter a valid share (e.g. 1/4).';
 
   @override
-  String get pickOwnerTitle => 'Choose a person or group';
+  String get pickOwnerTitle => 'Choose a person';
 
   @override
-  String get peopleTitle => 'People and groups';
-
-  @override
-  String get peopleTab => 'People';
-
-  @override
-  String get groupsTab => 'Groups';
+  String get peopleTitle => 'Family tree';
 
   @override
   String get addPersonButton => 'Add person';
 
   @override
-  String get addGroupButton => 'Add group';
-
-  @override
   String get personDialogTitle => 'Person';
-
-  @override
-  String get groupDialogTitle => 'Group';
-
-  @override
-  String get groupMembersLabel => 'Members';
 
   @override
   String parcelCount(int count) {
@@ -319,23 +289,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String memberCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count people',
-      one: '1 person',
-      zero: 'No members',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get noPeople => 'No people yet. Add parcel owners here.';
-
-  @override
-  String get noGroups =>
-      'No groups yet. Group people who share the same places.';
+  String get noPeople =>
+      'No people yet. Add the family, starting from the eldest ancestor.';
 
   @override
   String get holdingsParcels => 'Parcels';
@@ -351,17 +306,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get holdingsEmpty => 'No parcels assigned.';
-
-  @override
-  String get groupMembersTitle => 'Group members';
-
-  @override
-  String get memberOfGroups => 'Member of';
-
-  @override
-  String perMemberShare(String share) {
-    return '$share each';
-  }
 
   @override
   String get activityTitle => 'Change history';
@@ -392,9 +336,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get targetPerson => 'Person';
-
-  @override
-  String get targetGroup => 'Group';
 
   @override
   String get noticeFromStore =>
@@ -466,4 +407,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String meters(String value) {
     return '$value m';
   }
+
+  @override
+  String get pickOwnerEmpty =>
+      'Nobody to add. Add people on the Family page first.';
+
+  @override
+  String childCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count children',
+      one: '1 child',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get parentLabel => 'Parent';
+
+  @override
+  String get parentNone => 'None (top of the tree)';
+
+  @override
+  String get passesToChildrenLabel => 'Share passed to children';
+
+  @override
+  String get passesToChildrenHint =>
+      'When on, this person\'s shares are split equally among their children.';
+
+  @override
+  String passedToChildren(String names, String share) {
+    return '$names · $share each';
+  }
+
+  @override
+  String get passedOnBadge => 'passed to children';
+
+  @override
+  String get addChildButton => 'Add child';
+
+  @override
+  String get childrenTitle => 'Children';
+
+  @override
+  String get childrenInheritTitle => 'Heirs (children)';
+
+  @override
+  String get holdingsPassedArea => 'Area left to heirs';
+
+  @override
+  String viaAncestor(String name) {
+    return 'from $name';
+  }
+
+  @override
+  String get errorFamilyLoop =>
+      'A person cannot be the child of their own descendant.';
+
+  @override
+  String get errorRegistryRefusesWeb =>
+      'The registry does not accept lookups from this website. Query new parcels from the desktop or mobile app; stored parcels show here too.';
 }

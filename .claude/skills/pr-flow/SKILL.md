@@ -15,5 +15,18 @@ description: The Parcel Atlas git flow — feature branch from dev, the gate, a 
    ends with the session's PR attribution line.
 6. Merge only when CI is green: `gh pr checks <n> --watch` then
    `gh pr merge <n> --squash --delete-branch`.
-7. Release: a PR `dev → main`; merging it is a release (ask the owner), then
-   the `deploy` skill.
+7. Release — never a PR straight from `dev` (after a squash release `dev`
+   is behind `main`, and `main` requires branches to be up to date). Cut a
+   release branch from `main` and squash `dev` into it:
+
+   ```bash
+   git fetch origin && git checkout -b release/<version> origin/main
+   git merge --squash origin/dev || git checkout origin/dev -- .   # take dev's tree
+   git diff --cached origin/dev --quiet && echo identical-to-dev  # must print
+   git commit -m "release: <version> — <summary>"
+   git push -u origin release/<version>
+   gh pr create --base main --head release/<version>
+   ```
+
+   Merge when the Gate is green, then the `deploy` skill. Never loosen a
+   branch protection rule to get a release through.

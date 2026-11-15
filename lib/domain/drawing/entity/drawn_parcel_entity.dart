@@ -1,7 +1,6 @@
 import 'package:parcel_atlas/core/base/base_entity.dart';
 import 'package:parcel_atlas/domain/activity/value_object/audit_stamp_value_object.dart';
 import 'package:parcel_atlas/domain/map/value_object/geo_polygon_value_object.dart';
-import 'package:parcel_atlas/domain/person/enum/holder_kind_enum.dart';
 import 'package:parcel_atlas/domain/person/value_object/ownership_value_object.dart';
 import 'package:parcel_atlas/domain/person/value_object/share_value_object.dart';
 
@@ -12,10 +11,10 @@ import 'package:parcel_atlas/domain/person/value_object/share_value_object.dart'
 /// parcel it corrects, when there is one — the registry record itself is
 /// never changed. [owners] and [note] live here and only here: a drawn
 /// boundary is the family's record of what is really theirs, so it is what
-/// people and groups hold shares of.
+/// people hold shares of.
 ///
 /// [allocated] is the sum of all shares; [isFullyAllocated] whether it is
-/// exactly the whole parcel. [holds] is whether a person or group has a line.
+/// exactly the whole parcel.
 final class DrawnParcelEntity extends BaseEntity {
   const DrawnParcelEntity({
     required this.id,
@@ -51,7 +50,4 @@ final class DrawnParcelEntity extends BaseEntity {
   );
 
   bool get isFullyAllocated => allocated.isWhole;
-
-  bool holds(HolderKindEnum kind, String id) =>
-      owners.any((OwnershipValueObject line) => line.holds(kind, id));
 }

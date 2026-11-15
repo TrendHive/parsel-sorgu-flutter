@@ -215,7 +215,7 @@ abstract class AppLocalizations {
   /// No description provided for @menuPeople.
   ///
   /// In tr, this message translates to:
-  /// **'Kişiler'**
+  /// **'Aile'**
   String get menuPeople;
 
   /// No description provided for @menuActivity.
@@ -241,24 +241,6 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Yeni çizim'**
   String get newDrawing;
-
-  /// No description provided for @noParcelStoredTitle.
-  ///
-  /// In tr, this message translates to:
-  /// **'Burada kayıtlı parsel yok'**
-  String get noParcelStoredTitle;
-
-  /// No description provided for @noParcelStoredBody.
-  ///
-  /// In tr, this message translates to:
-  /// **'Resmi kayıttan sorgulamak günlük sorgu hakkından birini kullanır.'**
-  String get noParcelStoredBody;
-
-  /// No description provided for @queryRegistryButton.
-  ///
-  /// In tr, this message translates to:
-  /// **'Resmi kayıttan sorgula'**
-  String get queryRegistryButton;
 
   /// No description provided for @querying.
   ///
@@ -458,12 +440,6 @@ abstract class AppLocalizations {
   /// **'Not'**
   String get noteLabel;
 
-  /// No description provided for @viaGroup.
-  ///
-  /// In tr, this message translates to:
-  /// **'{group} üzerinden'**
-  String viaGroup(String group);
-
   /// No description provided for @drawingHint.
   ///
   /// In tr, this message translates to:
@@ -569,26 +545,14 @@ abstract class AppLocalizations {
   /// No description provided for @pickOwnerTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Kişi veya grup seçin'**
+  /// **'Kişi seçin'**
   String get pickOwnerTitle;
 
   /// No description provided for @peopleTitle.
   ///
   /// In tr, this message translates to:
-  /// **'Kişiler ve gruplar'**
+  /// **'Aile ağacı'**
   String get peopleTitle;
-
-  /// No description provided for @peopleTab.
-  ///
-  /// In tr, this message translates to:
-  /// **'Kişiler'**
-  String get peopleTab;
-
-  /// No description provided for @groupsTab.
-  ///
-  /// In tr, this message translates to:
-  /// **'Gruplar'**
-  String get groupsTab;
 
   /// No description provided for @addPersonButton.
   ///
@@ -596,29 +560,11 @@ abstract class AppLocalizations {
   /// **'Kişi ekle'**
   String get addPersonButton;
 
-  /// No description provided for @addGroupButton.
-  ///
-  /// In tr, this message translates to:
-  /// **'Grup ekle'**
-  String get addGroupButton;
-
   /// No description provided for @personDialogTitle.
   ///
   /// In tr, this message translates to:
   /// **'Kişi'**
   String get personDialogTitle;
-
-  /// No description provided for @groupDialogTitle.
-  ///
-  /// In tr, this message translates to:
-  /// **'Grup'**
-  String get groupDialogTitle;
-
-  /// No description provided for @groupMembersLabel.
-  ///
-  /// In tr, this message translates to:
-  /// **'Üyeler'**
-  String get groupMembersLabel;
 
   /// No description provided for @parcelCount.
   ///
@@ -626,23 +572,11 @@ abstract class AppLocalizations {
   /// **'{count, plural, =0{Parsel yok} =1{1 parsel} other{{count} parsel}}'**
   String parcelCount(int count);
 
-  /// No description provided for @memberCount.
-  ///
-  /// In tr, this message translates to:
-  /// **'{count, plural, =0{Üye yok} =1{1 kişi} other{{count} kişi}}'**
-  String memberCount(int count);
-
   /// No description provided for @noPeople.
   ///
   /// In tr, this message translates to:
-  /// **'Henüz kişi yok. Parsel sahiplerini buradan ekleyin.'**
+  /// **'Henüz kişi yok. En büyük atadan başlayarak aileyi ekleyin.'**
   String get noPeople;
-
-  /// No description provided for @noGroups.
-  ///
-  /// In tr, this message translates to:
-  /// **'Henüz grup yok. Aynı yerleri paylaşan kişileri grup yapın.'**
-  String get noGroups;
 
   /// No description provided for @holdingsParcels.
   ///
@@ -673,24 +607,6 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Atanmış parsel yok.'**
   String get holdingsEmpty;
-
-  /// No description provided for @groupMembersTitle.
-  ///
-  /// In tr, this message translates to:
-  /// **'Grup üyeleri'**
-  String get groupMembersTitle;
-
-  /// No description provided for @memberOfGroups.
-  ///
-  /// In tr, this message translates to:
-  /// **'Üye olduğu gruplar'**
-  String get memberOfGroups;
-
-  /// No description provided for @perMemberShare.
-  ///
-  /// In tr, this message translates to:
-  /// **'Kişi başı {share}'**
-  String perMemberShare(String share);
 
   /// No description provided for @activityTitle.
   ///
@@ -751,12 +667,6 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Kişi'**
   String get targetPerson;
-
-  /// No description provided for @targetGroup.
-  ///
-  /// In tr, this message translates to:
-  /// **'Grup'**
-  String get targetGroup;
 
   /// No description provided for @noticeFromStore.
   ///
@@ -883,6 +793,96 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'{value} m'**
   String meters(String value);
+
+  /// No description provided for @pickOwnerEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eklenecek kişi yok. Önce Aile sayfasından kişileri ekleyin.'**
+  String get pickOwnerEmpty;
+
+  /// No description provided for @childCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count, plural, =1{1 çocuk} other{{count} çocuk}}'**
+  String childCount(int count);
+
+  /// No description provided for @parentLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Babası / annesi'**
+  String get parentLabel;
+
+  /// No description provided for @parentNone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yok (ağacın başı)'**
+  String get parentNone;
+
+  /// No description provided for @passesToChildrenLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Payı çocuklarına geçti'**
+  String get passesToChildrenLabel;
+
+  /// No description provided for @passesToChildrenHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Açıkken bu kişinin payları çocukları arasında eşit bölünür.'**
+  String get passesToChildrenHint;
+
+  /// No description provided for @passedToChildren.
+  ///
+  /// In tr, this message translates to:
+  /// **'{names} · kişi başı {share}'**
+  String passedToChildren(String names, String share);
+
+  /// No description provided for @passedOnBadge.
+  ///
+  /// In tr, this message translates to:
+  /// **'çocuklarına geçti'**
+  String get passedOnBadge;
+
+  /// No description provided for @addChildButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çocuk ekle'**
+  String get addChildButton;
+
+  /// No description provided for @childrenTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çocukları'**
+  String get childrenTitle;
+
+  /// No description provided for @childrenInheritTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mirasçıları (çocukları)'**
+  String get childrenInheritTitle;
+
+  /// No description provided for @holdingsPassedArea.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bıraktığı alan'**
+  String get holdingsPassedArea;
+
+  /// No description provided for @viaAncestor.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} üzerinden'**
+  String viaAncestor(String name);
+
+  /// No description provided for @errorFamilyLoop.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir kişi kendi soyundan birinin çocuğu olamaz.'**
+  String get errorFamilyLoop;
+
+  /// No description provided for @errorRegistryRefusesWeb.
+  ///
+  /// In tr, this message translates to:
+  /// **'Resmi kayıt, web sitesinden yapılan sorguları kabul etmiyor. Yeni parsel sorgusunu masaüstü veya mobil uygulamadan yapın; kayıtlı parseller burada da görünür.'**
+  String get errorRegistryRefusesWeb;
 }
 
 class _AppLocalizationsDelegate

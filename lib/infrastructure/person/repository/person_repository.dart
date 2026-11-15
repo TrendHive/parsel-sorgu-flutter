@@ -5,10 +5,8 @@ import 'package:parcel_atlas/domain/activity/enum/activity_action_enum.dart';
 import 'package:parcel_atlas/domain/activity/enum/activity_target_enum.dart';
 import 'package:parcel_atlas/domain/auth/entity/member_entity.dart';
 import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
-import 'package:parcel_atlas/domain/person/enum/holder_kind_enum.dart';
 import 'package:parcel_atlas/domain/person/interface/person_repository_interface.dart';
 import 'package:parcel_atlas/infrastructure/person/mapper/person_document_mapper.dart';
-import 'package:parcel_atlas/infrastructure/person/mapper/person_group_document_mapper.dart';
 import 'package:parcel_atlas/infrastructure/person/service/holder_cascade_service.dart';
 import 'package:parcel_atlas/infrastructure/store/service/firestore_store_service.dart';
 import 'package:parcel_atlas/infrastructure/store/service/store_collection.dart';
@@ -16,7 +14,7 @@ import 'package:parcel_atlas/infrastructure/store/service/store_collection.dart'
 /// The family's people in the store.
 ///
 /// [delete] is one batch: the person, their lines on every drawing, their
-/// place in every group, and the activity line.
+/// children's link to them, and the activity line.
 class PersonRepository implements PersonRepositoryInterface {
   PersonRepository(this._store) : _cascade = HolderCascade(_store);
 
@@ -71,8 +69,7 @@ class PersonRepository implements PersonRepositoryInterface {
       ..delete(_store.doc(StoreCollection.persons, person.id));
     final Either<BaseException, int> drawings = await _cascade.removeFrom(
       batch,
-      kind: HolderKindEnum.person,
-      holderId: person.id,
+      personId: person.id,
       actor: actor,
     );
     if (drawings.isLeft) return Left(drawings.left);
@@ -80,19 +77,17 @@ class PersonRepository implements PersonRepositoryInterface {
       BaseException,
       List<QueryDocumentSnapshot<Map<String, dynamic>>>
     >
-    groups = await _store.query(
+    children = await _store.query(
       _store
-          .collection(StoreCollection.groups)
-          .where(PersonGroupDocumentMapper.memberIds, arrayContains: person.id),
+          .collection(StoreCollection.persons)
+          .where(PersonDocumentMapper.parentId, isEqualTo: person.id),
     );
-    if (groups.isLeft) return Left(groups.left);
-    for (final QueryDocumentSnapshot<Map<String, dynamic>> group
-        in groups.right) {
-      batch.update(group.reference, <String, Object?>{
-        PersonGroupDocumentMapper.memberIds: FieldValue.arrayRemove(<String>[
-          person.id,
-        ]),
-        PersonGroupDocumentMapper.updated: _store.stamps.write(actor),
+    if (children.isLeft) return Left(children.left);
+    for (final QueryDocumentSnapshot<Map<String, dynamic>> child
+        in children.right) {
+      batch.update(child.reference, <String, Object?>{
+        PersonDocumentMapper.parentId: null,
+        PersonDocumentMapper.updated: _store.stamps.write(actor),
       });
     }
     _store.log(

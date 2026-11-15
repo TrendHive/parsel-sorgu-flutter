@@ -34,9 +34,10 @@ part 'map_state.dart';
 /// "where does this corner snap", "what is the area" is answered by the
 /// domain types it holds.
 ///
-/// Browsing: [tap] selects what was tapped from the store, never the registry;
-/// a tap on nothing selects the point, and only [queryAt] — a deliberate
-/// button — spends a registry lookup. [refresh] is the Refresh button.
+/// Browsing: [tap] selects what was tapped when the store has it — no
+/// registry call. A tap on ground nobody has looked up goes straight to the
+/// registry ([queryAt]) and the answer is stored, so each parcel costs one
+/// lookup ever. [refresh] is the Refresh button.
 ///
 /// Drawing: [startDrawing] opens a session, empty or seeded from a registry
 /// parcel's outline (the usual way: copy, then move the corners that are
@@ -167,11 +168,12 @@ final class MapCubit extends Cubit<MapState> {
       _placeCorner(current, drawing, point, metersPerPixel);
       return;
     }
-    emit(
-      current.copyWith(
-        selection: () => current.snapshot.hitAt(point, current.layers),
-      ),
-    );
+    final MapHitReadModel hit = current.snapshot.hitAt(point, current.layers);
+    if (hit is MapHitNone) {
+      unawaited(queryAt(point));
+      return;
+    }
+    emit(current.copyWith(selection: () => hit));
   }
 
   void closeSelection() {

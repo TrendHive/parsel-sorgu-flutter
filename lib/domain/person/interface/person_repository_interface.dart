@@ -7,7 +7,7 @@ import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
 ///
 /// [save] creates a person whose id is empty and updates one that has an id,
 /// answering the id. [delete] removes the person AND takes them off every
-/// drawing's shares and every group in the same atomic batch, so nothing is
+/// drawing's shares and unlinks their children in the same atomic batch, so nothing is
 /// ever left pointing at someone who no longer exists.
 abstract interface class PersonRepositoryInterface {
   Stream<Either<BaseException, List<PersonEntity>>> watchAll();

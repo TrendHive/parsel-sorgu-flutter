@@ -31,7 +31,6 @@ import 'package:parcel_atlas/presentation/map/widgets/map_attribution.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_drawing_layer.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_drawing_toolbar.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_drawn_panel.dart';
-import 'package:parcel_atlas/presentation/map/widgets/map_empty_point_panel.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_official_panel.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_parcel_layers.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_tile_layer.dart';
@@ -345,11 +344,7 @@ class _MapBodyState extends State<MapBody> {
 
   Widget _panel(MapReady state, MapHitReadModel selection) =>
       switch (selection) {
-        MapHitNone(:final LatLng point) => MapEmptyPointPanel(
-          querying: state.querying,
-          onQuery: () => _cubit.queryAt(point),
-          onClose: _cubit.closeSelection,
-        ),
+        MapHitNone() => const SizedBox.shrink(),
         MapHitOfficial(:final parcel) => MapOfficialPanel(
           parcel: parcel,
           corrections: state.snapshot.drawingsCorrecting(parcel.id),
@@ -368,9 +363,8 @@ class _MapBodyState extends State<MapBody> {
           onEditDetails: () => _editDetails(state, drawing),
           onDelete: () => _delete(drawing),
           onOpenOfficial: (parcel) => _cubit.focusOn(parcel.id),
-          onOpenOwner: (OwnershipValueObject line) => context.push(
-            ParcelInfoRouter.holdingsOf(line.kind, line.holderId),
-          ),
+          onOpenOwner: (OwnershipValueObject line) =>
+              context.push(ParcelInfoRouter.holdingsOf(line.personId)),
           onClose: _cubit.closeSelection,
         ),
       };
