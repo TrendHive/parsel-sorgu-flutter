@@ -6,6 +6,15 @@ plugins {
     id "com.google.gms.google-services"
 }
 
+// Release signing is read from key.properties (never committed; see
+// android/.gitignore). Without it, the release build is debug-signed so a
+// clone still runs.
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.parcelatlas.app"
     compileSdk = flutter.compileSdkVersion
@@ -31,11 +40,22 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                keyAlias = keystoreProperties["keyAlias"]
+                keyPassword = keystoreProperties["keyPassword"]
+                storeFile = file(keystoreProperties["storeFile"])
+                storePassword = keystoreProperties["storePassword"]
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
+            // Use the release keystore when key.properties is present,
+            // otherwise fall back to debug signing so a clone still builds.
+            signingConfig = keystorePropertiesFile.exists() ? signingConfigs.release : signingConfigs.debug
         }
     }
 }
