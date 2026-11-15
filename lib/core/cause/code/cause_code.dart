@@ -2,6 +2,7 @@ import 'package:parcel_atlas/core/base/base_cause.dart';
 import 'package:parcel_atlas/core/cause/admin_only_cause.dart';
 import 'package:parcel_atlas/core/cause/email_exist_cause.dart';
 import 'package:parcel_atlas/core/cause/empty_value_cause.dart';
+import 'package:parcel_atlas/core/cause/family_loop_cause.dart';
 import 'package:parcel_atlas/core/cause/invalid_credentials_cause.dart';
 import 'package:parcel_atlas/core/cause/max_length_cause.dart';
 import 'package:parcel_atlas/core/cause/min_length_cause.dart';
@@ -12,6 +13,7 @@ import 'package:parcel_atlas/core/cause/not_valid_email_cause.dart';
 import 'package:parcel_atlas/core/cause/null_value_cause.dart';
 import 'package:parcel_atlas/core/cause/record_missing_cause.dart';
 import 'package:parcel_atlas/core/cause/registry_quota_cause.dart';
+import 'package:parcel_atlas/core/cause/registry_refuses_web_cause.dart';
 import 'package:parcel_atlas/core/cause/shares_exceed_whole_cause.dart';
 import 'package:parcel_atlas/core/cause/token_expired_cause.dart';
 import 'package:parcel_atlas/core/cause/too_few_corners_cause.dart';
@@ -39,6 +41,8 @@ class CauseCode {
   static const int recordMissingCode = 1015;
   static const int registryQuotaCode = 1016;
   static const int sharesExceedWholeCode = 1017;
+  static const int familyLoopCode = 1018;
+  static const int registryRefusesWebCode = 1019;
 
   final int code;
 
@@ -78,6 +82,10 @@ class CauseCode {
 
   CauseCode.sharesExceedWhole() : code = sharesExceedWholeCode;
 
+  CauseCode.familyLoop() : code = familyLoopCode;
+
+  CauseCode.registryRefusesWeb() : code = registryRefusesWebCode;
+
   BaseCause getCauseByCode() {
     switch (code) {
       case unknownCode:
@@ -114,6 +122,10 @@ class CauseCode {
         return RegistryQuotaCause();
       case sharesExceedWholeCode:
         return SharesExceedWholeCause();
+      case familyLoopCode:
+        return FamilyLoopCause();
+      case registryRefusesWebCode:
+        return RegistryRefusesWebCause();
       default:
         return UnknownCause();
     }

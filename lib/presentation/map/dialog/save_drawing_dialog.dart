@@ -5,8 +5,6 @@ import 'package:parcel_atlas/core_ui/values/base_dimens.dart';
 import 'package:parcel_atlas/domain/drawing/value_object/drawing_details_value_object.dart';
 import 'package:parcel_atlas/domain/map/read_model/map_snapshot_read_model.dart';
 import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
-import 'package:parcel_atlas/domain/person/entity/person_group_entity.dart';
-import 'package:parcel_atlas/domain/person/enum/holder_kind_enum.dart';
 import 'package:parcel_atlas/domain/person/value_object/ownership_value_object.dart';
 import 'package:parcel_atlas/domain/person/value_object/share_value_object.dart';
 import 'package:parcel_atlas/domain_ui/copy/exception_copy.dart';
@@ -76,8 +74,7 @@ class _SaveDrawingDialogState extends State<SaveDrawingDialog> {
   late final List<OwnerDraft> _owners = <OwnerDraft>[
     for (final OwnershipValueObject line in widget.owners)
       OwnerDraft(
-        kind: line.kind,
-        holderId: line.holderId,
+        personId: line.personId,
         share: '${line.share.numerator}/${line.share.denominator}',
       ),
   ];
@@ -93,55 +90,44 @@ class _SaveDrawingDialogState extends State<SaveDrawingDialog> {
     super.dispose();
   }
 
-  String _holderName(OwnerDraft owner) => switch (owner.kind) {
-    HolderKindEnum.person =>
-      widget.snapshot.personById(owner.holderId)?.name ?? owner.holderId,
-    HolderKindEnum.group =>
-      widget.snapshot.groupById(owner.holderId)?.name ?? owner.holderId,
-  };
+  String _holderName(OwnerDraft owner) =>
+      widget.snapshot.personById(owner.personId)?.name ?? owner.personId;
 
   Future<void> _addOwner() async {
     final l10n = ParcelInfoLocalKeys.of(context);
-    bool taken(HolderKindEnum kind, String id) =>
-        _owners.any((OwnerDraft o) => o.kind == kind && o.holderId == id);
+    final List<PersonEntity> free = widget.snapshot.persons
+        .where(
+          (PersonEntity p) =>
+              !_owners.any((OwnerDraft o) => o.personId == p.id),
+        )
+        .toList();
     final OwnerDraft? picked = await showDialog<OwnerDraft>(
       context: context,
       builder: (BuildContext context) => SimpleDialog(
         title: ParcelInfoText(l10n.pickOwnerTitle),
         children: <Widget>[
-          for (final PersonGroupEntity group in widget.snapshot.groups)
-            if (!taken(HolderKindEnum.group, group.id))
-              SimpleDialogOption(
-                onPressed: () => Navigator.of(context).pop(
-                  OwnerDraft(
-                    kind: HolderKindEnum.group,
-                    holderId: group.id,
-                    share: _wholeText,
-                  ),
-                ),
-                child: ListTile(
-                  leading: const Icon(Icons.groups_outlined),
-                  title: ParcelInfoText(group.name),
-                  subtitle: ParcelInfoText(
-                    l10n.memberCount(group.memberIds.length),
-                  ),
-                ),
+          if (free.isEmpty)
+            Padding(
+              padding: EdgeInsets.all(BaseDimens.padding.xLarge),
+              child: ParcelInfoText(l10n.pickOwnerEmpty),
+            ),
+          for (final PersonEntity person in free)
+            SimpleDialogOption(
+              onPressed: () =>
+                  Navigator.of(context)
+                      .pop(OwnerDraft(personId: person.id, share: _wholeText)),
+              child: ListTile(
+                leading: const Icon(Icons.person_outline),
+                title: ParcelInfoText(person.name),
+                subtitle: widget.snapshot.childrenOf(person.id).isEmpty
+                    ? null
+                    : ParcelInfoText(
+                        l10n.childCount(
+                          widget.snapshot.childrenOf(person.id).length,
+                        ),
+                      ),
               ),
-          for (final PersonEntity person in widget.snapshot.persons)
-            if (!taken(HolderKindEnum.person, person.id))
-              SimpleDialogOption(
-                onPressed: () => Navigator.of(context).pop(
-                  OwnerDraft(
-                    kind: HolderKindEnum.person,
-                    holderId: person.id,
-                    share: _wholeText,
-                  ),
-                ),
-                child: ListTile(
-                  leading: const Icon(Icons.person_outline),
-                  title: ParcelInfoText(person.name),
-                ),
-              ),
+            ),
         ],
       ),
     );
@@ -171,13 +157,7 @@ class _SaveDrawingDialogState extends State<SaveDrawingDialog> {
         setState(() => _error = l10n.invalidShare);
         return;
       }
-      lines.add(
-        OwnershipValueObject(
-          kind: owner.kind,
-          holderId: owner.holderId,
-          share: share,
-        ),
-      );
+      lines.add(OwnershipValueObject(personId: owner.personId, share: share));
     }
     final DrawingDetailsValueObject details = DrawingDetailsValueObject((
       name: _name.text,
@@ -223,11 +203,7 @@ class _SaveDrawingDialogState extends State<SaveDrawingDialog> {
                   ),
                   child: Row(
                     children: <Widget>[
-                      Icon(
-                        owner.kind == HolderKindEnum.group
-                            ? Icons.groups_outlined
-                            : Icons.person_outline,
-                      ),
+                      const Icon(Icons.person_outline),
                       SizedBox(width: BaseDimens.width.small),
                       Expanded(child: ParcelInfoText(_holderName(owner))),
                       SizedBox(

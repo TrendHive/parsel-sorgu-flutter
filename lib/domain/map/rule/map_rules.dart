@@ -11,9 +11,12 @@ import 'package:latlong2/latlong.dart';
 /// [snapPixels] is how close, on screen, a tap must land to an existing corner
 /// to be pulled onto it; a fingertip covers about this much.
 ///
-/// [maxZoom] is the deepest the map goes, past the imagery's own detail
-/// ([maxNativeZoom]) so a corner can still be placed precisely on an
-/// enlarged tile.
+/// [maxZoom] is the deepest the map goes — far past the imagery's own
+/// detail, so a corner can be placed to the centimetre on an enlarged tile.
+/// [satelliteNativeZoom] and [streetNativeZoom] are the deepest levels the
+/// two free imagery sources really have for the family's area; asking for
+/// more returns a "map data not yet available" tile, so deeper levels
+/// enlarge the last real one instead.
 abstract final class MapRules {
   static const int minimumCorners = 3;
 
@@ -23,7 +26,9 @@ abstract final class MapRules {
 
   static const double snapPixels = 14;
 
-  static const double maxZoom = 22;
+  static const double maxZoom = 24;
 
-  static const int maxNativeZoom = 19;
+  static const int satelliteNativeZoom = 18;
+
+  static const int streetNativeZoom = 19;
 }

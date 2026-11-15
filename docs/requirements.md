@@ -32,7 +32,7 @@ Collected 2026-11-14 – 2026-11-15.
 | R9 | Parcel information comes from the official source, parselsorgu.tkgm.gov.tr; check its API, it may have changed. | Verified 2026-11-14 — unchanged (`docs/tkgm-api.md`). |
 | R10 | Every parcel queried from the API is saved to our own store with all its information, and drawn on the map. | Saved under its parcel number with every property verbatim. |
 | R11 | Each time the app opens, everything is loaded from our store; new ones can be added. | Live Firestore listeners with an offline cache; the map shows the store. |
-| R12 | The API has a request limit, so we must not send many requests. | Store first, registry last: a tap inside a stored parcel never reaches the registry; a lookup is a deliberate button; Refresh asks by number. 403 is shown as "daily limit reached". |
+| R12 | The API has a request limit, so we must not send many requests. | Store first, registry last: a tap inside a stored parcel never reaches the registry; Refresh asks by number. (The separate "query" button was superseded by R37.) |
 | R13 | Tap a parcel to update it. | "Refresh" refetches that one parcel from the registry. |
 | R14 | Information from the registry changes only through the API — members never edit it; it is used for analysis and as a source to copy into drawings. | Registry parcels are read-only (rules enforce it); no edit, no delete. |
 
@@ -53,8 +53,8 @@ Collected 2026-11-14 – 2026-11-15.
 |---|---|---|
 | R21 | Create people and assign parcels to them; it must be saved. | People are records; ownership lines live on drawn parcels. |
 | R22 | Several people per parcel, each with a share. | Ownership lines with deed-style fractions (1/4), exact arithmetic, total may not exceed 1. |
-| R23 | Groups — e.g. father and his three siblings receive the same places; add them to a parcel as a group. | Groups are records; a group holds a share, split equally among its members; changing the group updates every parcel. |
-| R24 | See all parcels assigned to a person, and to a group: how many m², where, and the totals. | A holdings page per person and per group: each parcel's place, area, share and owned area; totals. |
+| R23 | Groups — e.g. father and his three siblings receive the same places; add them to a parcel as a group. | Superseded by R39 (family tree). |
+| R24 | See all parcels assigned to a person, and to a group: how many m², where, and the totals. | A holdings page per person: each parcel's place, area, the share that reaches them (and from which ancestor), owned area; totals. |
 
 ## Engineering
 
@@ -72,3 +72,14 @@ Collected 2026-11-14 – 2026-11-15.
 | R34 | Document what the owner explains so it is permanent. | This file. |
 | R35 | `main` and `dev` protected and undeletable; a Recipely-style flow with pull requests and checks on every push. | Both branches: pull request required, "Gate" check required, no deletion, no force-push, admins included. CI on every push and pull request. |
 | R36 | Only one environment: production. | One Firebase project (`parcel-info`); no flavors or staging; `dev` deploys nowhere, `main` releases. |
+
+## Added 2026-11-15, after first use
+
+| # | Requirement | Decision |
+|---|---|---|
+| R37 | A tap on a parcel nobody has queried should query it directly — not a second press. | A tap on ground the store does not cover goes straight to the registry and the answer is stored. |
+| R38 | The map must go much deeper for fine drawing, without "map data not yet available". | Zoom to level 24; imagery is requested only at levels that exist (18 for the free aerial source there) and enlarged beyond. |
+| R39 | Instead of groups, a family tree: fathers and children linked (a grandfather, his sons, their children), because later the app must compare whether land was divided correctly among siblings and who owes what. | People have a parent and a "share passed to children" flag; a share recorded on an ancestor reaches the heirs in equal parts, generation by generation. Groups removed. |
+| R40 | High-quality, unblurred imagery everywhere; 3D would be ideal. | Open. The free aerial source stops at level 18 for the area; sharper imagery and 3D need a licensed provider and a different map engine — see the roadmap. Owner's decision. |
+| R41 | Registry lookups must work. | They work from the desktop and mobile apps. The registry refuses third-party websites, so the web app cannot look parcels up; whether to route around that is the owner's decision (roadmap). |
+

@@ -28,3 +28,24 @@ gap.
 **Each lookup cost two requests.** Sending `Content-Type: application/json`
 on a GET made browsers send a CORS preflight first. *Guard:* `DioClient` sets
 no custom headers; documented in `docs/tkgm-api.md`.
+
+## Map
+
+**Zooming in showed "map data not yet available" tiles.** The app asked the
+aerial imagery for level 19, which the source does not have for the area; it
+answers such requests with a placeholder image, not an error. *Guard:*
+`MapRules.satelliteNativeZoom` is the deepest real level (checked against the
+source's tile map), and deeper zoom enlarges that level.
+
+**A parcel needed two presses to look up.** A tap on unknown ground only
+opened a panel with a query button. *Guard:* `map_cubit_test.dart` — "one tap
+on ground nobody looked up queries the registry".
+
+## Registry (web)
+
+**Every lookup from the website said the daily limit was reached.** The
+registry refuses third-party website origins with the same 403 and text as
+its real limit. *Guard:* documented in `docs/tkgm-api.md`; a browser 403 is
+`RegistryRefusesWebCause` with an accurate message, and the web build no
+longer implies a quota problem.
+

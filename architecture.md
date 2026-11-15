@@ -63,15 +63,15 @@ The order of questions is always **store first, registry last**:
 
 1. A tap on the map is answered from the store (`MapSnapshotReadModel.hitAt`) —
    no network at all.
-2. Only a tap on a spot the store does not cover offers "query the registry",
-   and only a deliberate press spends a lookup.
+2. A tap on a spot the store does not cover asks the registry at once; the
+   answer is stored, so each parcel costs one lookup ever.
 3. A registry answer is saved under its parcel number
    (`neighbourhood-block-parcel`), so the same parcel queried from two phones
    is one record.
 4. "Refresh" refetches one stored parcel by number, never by point.
 
-The registry's GET carries no custom header, so a browser sends it as a simple
-cross-origin request — one request per lookup, no preflight. A 403 becomes a
+The registry refuses third-party websites, so lookups work from the desktop
+and mobile apps only; the web app works on what is stored (`docs/tkgm-api.md`). A 403 becomes a
 `QuotaExceededException`; a 404, `NotFoundException(NoParcelCause)`.
 
 ## Registry parcels are reference data
@@ -82,22 +82,26 @@ the state's records, so the app does not let anyone edit one: its only write is
 parcels — that may link to the registry parcel they correct. The map shows both
 layers and either can be hidden, so they can be compared.
 
-People, groups, shares and notes belong to drawn parcels: a drawn parcel is the
+People, shares and notes belong to drawn parcels: a drawn parcel is the
 family's record of what is really theirs.
 
-## Ownership: people, groups, shares
+## Ownership: a family tree and shares
 
-A drawn parcel holds a list of ownership lines; each line is a person or a
-group with a share written as a deed writes it (1/4). Shares are integer
-fractions (`ShareValueObject`) — three thirds make exactly one — and together
-may not exceed the whole parcel.
+A drawn parcel holds a list of ownership lines; each line is a person with a
+share written as a deed writes it (1/4). Shares are integer fractions
+(`ShareValueObject`) — three thirds make exactly one — and together may not
+exceed the whole parcel.
 
-A group (four siblings who inherit alike) is stored as the group, not as its
-members at the time, so changing the group changes every parcel it holds. A
-person's holdings are their direct lines plus their part of each group's line
-(the group's share divided equally). Holdings, totals and owned areas are
-derivations on `MapSnapshotReadModel` — computed live from the store, never
-stored.
+People form a family tree: each person may name a parent, and may be marked
+"share passed to children". A parcel is recorded on whoever it is recorded
+on — often an ancestor — and `FamilyRules` works out who holds it today: at
+each generation whose shares have passed on, the share is split equally among
+the children. Recording a field on a grandfather is enough for every
+grandchild's page to show their eighth. An earlier design used flat groups of
+people; the tree replaced it because the family's real question is
+inheritance: was the land divided as the tree says it should have been, and
+who holds more or less than their part. Holdings, totals and owned areas are
+derivations on `MapSnapshotReadModel` — computed live, never stored.
 
 ## Geometry
 

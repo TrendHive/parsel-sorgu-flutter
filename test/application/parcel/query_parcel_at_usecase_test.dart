@@ -18,7 +18,6 @@ import 'package:parcel_atlas/domain/parcel/interface/official_parcel_repository_
 import 'package:parcel_atlas/domain/parcel/interface/parcel_registry_interface.dart';
 import 'package:parcel_atlas/domain/parcel/value_object/registry_record_value_object.dart';
 import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
-import 'package:parcel_atlas/domain/person/entity/person_group_entity.dart';
 import 'package:parcel_atlas/infrastructure/parcel/dto/tkgm_parcel_dto.dart';
 import 'package:parcel_atlas/infrastructure/parcel/mapper/tkgm_parcel_mapper.dart';
 
@@ -76,7 +75,6 @@ void main() {
         officials: officials,
         drawings: const <DrawnParcelEntity>[],
         persons: const <PersonEntity>[],
-        groups: const <PersonGroupEntity>[],
       );
 
   test('a tap inside a stored parcel never spends a registry lookup', () async {

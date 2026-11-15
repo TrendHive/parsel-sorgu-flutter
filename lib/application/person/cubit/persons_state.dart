@@ -17,7 +17,7 @@ final class PersonsFailed extends PersonsState {
   final BaseException exception;
 }
 
-/// People and groups, with what each holds.
+/// The family tree, with what reaches each person.
 ///
 /// [snapshot] answers every holdings question; [member] decides whether
 /// delete buttons show. [exception] is the last refused change, [saved] the

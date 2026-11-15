@@ -6,11 +6,11 @@ import 'package:parcel_atlas/domain/map/read_model/map_hit_read_model.dart';
 import 'package:parcel_atlas/domain/map/rule/geo_rules.dart';
 import 'package:parcel_atlas/domain/parcel/entity/official_parcel_entity.dart';
 import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
-import 'package:parcel_atlas/domain/person/entity/person_group_entity.dart';
-import 'package:parcel_atlas/domain/person/enum/holder_kind_enum.dart';
 import 'package:parcel_atlas/domain/person/read_model/holding_line_read_model.dart';
 import 'package:parcel_atlas/domain/person/read_model/holdings_read_model.dart';
+import 'package:parcel_atlas/domain/person/rule/family_rules.dart';
 import 'package:parcel_atlas/domain/person/value_object/ownership_value_object.dart';
+import 'package:parcel_atlas/domain/person/value_object/share_value_object.dart';
 
 /// Everything the family has stored, as the map sees it.
 ///
@@ -22,27 +22,23 @@ import 'package:parcel_atlas/domain/person/value_object/ownership_value_object.d
 /// `toleranceMeters`, so a drawn boundary that shares a corner with the
 /// registry, or with a neighbour's drawing, shares it exactly.
 ///
-/// [officialById], [drawingById], [personById], [groupById] look one record
-/// up; [drawingsCorrecting] is every drawing linked to a registry parcel;
+/// [officialById], [drawingById], [personById] look one record up; [drawingsCorrecting] is every drawing linked to a registry parcel;
 /// [allCorners] frames the map on what is stored.
 ///
-/// [holdingsOfPerson] is everything a person holds — directly, and through
-/// every group they belong to, a group's share split equally among its
-/// members. [holdingsOfGroup] is everything a group holds, at the group's
-/// share. [groupsOf] is the groups a person is in.
+/// [holdingsOfPerson] is everything that reaches a person: what is recorded
+/// on them, and their part of what is recorded on an ancestor whose shares
+/// passed down the family tree. [childrenOf] is a person's children.
 final class MapSnapshotReadModel extends BaseReadModel {
   const MapSnapshotReadModel({
     required this.officials,
     required this.drawings,
     required this.persons,
-    required this.groups,
   });
 
   static const MapSnapshotReadModel empty = MapSnapshotReadModel(
     officials: <OfficialParcelEntity>[],
     drawings: <DrawnParcelEntity>[],
     persons: <PersonEntity>[],
-    groups: <PersonGroupEntity>[],
   );
 
   final List<OfficialParcelEntity> officials;
@@ -51,14 +47,11 @@ final class MapSnapshotReadModel extends BaseReadModel {
 
   final List<PersonEntity> persons;
 
-  final List<PersonGroupEntity> groups;
-
   @override
   List<Object?> get props => <Object?>[
     officials.map((OfficialParcelEntity p) => p.refreshed.at).toList(),
     drawings.map((DrawnParcelEntity d) => d.updated.at).toList(),
     persons.map((PersonEntity p) => p.updated?.at).toList(),
-    groups.map((PersonGroupEntity g) => g.updated?.at).toList(),
   ];
 
   bool get isEmpty => officials.isEmpty && drawings.isEmpty;
@@ -124,54 +117,40 @@ final class MapSnapshotReadModel extends BaseReadModel {
     return null;
   }
 
-  PersonGroupEntity? groupById(String id) {
-    for (final PersonGroupEntity group in groups) {
-      if (group.id == id) return group;
-    }
-    return null;
-  }
-
-  List<PersonGroupEntity> groupsOf(String personId) => groups
-      .where((PersonGroupEntity group) => group.hasMember(personId))
-      .toList();
+  List<PersonEntity> childrenOf(String personId) =>
+      FamilyRules.childrenOf(persons, personId);
 
   HoldingsReadModel holdingsOfPerson(String personId) {
+    final PersonEntity? person = personById(personId);
+    if (person == null) {
+      return HoldingsReadModel(const <HoldingLineReadModel>[]);
+    }
+    final bool passedOn = FamilyRules.passes(persons, person);
     final List<HoldingLineReadModel> lines = <HoldingLineReadModel>[];
     for (final DrawnParcelEntity drawing in drawings) {
       for (final OwnershipValueObject line in drawing.owners) {
-        final PersonGroupEntity? group = line.kind == HolderKindEnum.group
-            ? groupById(line.holderId)
-            : null;
-        final bool direct = line.holds(HolderKindEnum.person, personId);
-        final bool viaGroup = group != null && group.hasMember(personId);
-        if (!direct && !viaGroup) continue;
+        final bool direct = line.personId == personId;
+        final ShareValueObject? part = direct
+            ? ShareValueObject.whole
+            : FamilyRules.inheritedPart(
+                persons,
+                ancestorId: line.personId,
+                heirId: personId,
+              );
+        if (part == null) continue;
         lines.add(
           HoldingLineReadModel(
             drawing: drawing,
             official: officialById(drawing.officialParcelId),
-            share: direct
-                ? line.share
-                : line.share.dividedBy(group!.memberIds.length),
-            viaGroup: direct ? null : group,
+            share: line.share.times(part),
+            via: direct ? null : personById(line.personId),
+            passedOn: passedOn,
           ),
         );
       }
     }
     return HoldingsReadModel(lines);
   }
-
-  HoldingsReadModel holdingsOfGroup(String groupId) =>
-      HoldingsReadModel(<HoldingLineReadModel>[
-        for (final DrawnParcelEntity drawing in drawings)
-          for (final OwnershipValueObject line in drawing.owners)
-            if (line.holds(HolderKindEnum.group, groupId))
-              HoldingLineReadModel(
-                drawing: drawing,
-                official: officialById(drawing.officialParcelId),
-                share: line.share,
-                viaGroup: null,
-              ),
-      ]);
 
   List<DrawnParcelEntity> drawingsCorrecting(String officialId) => drawings
       .where((DrawnParcelEntity d) => d.officialParcelId == officialId)

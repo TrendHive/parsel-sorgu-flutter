@@ -20,6 +20,5 @@ class ActivityCopy {
         ActivityTargetEnum.officialParcel => l10n.targetOfficial,
         ActivityTargetEnum.drawnParcel => l10n.targetDrawn,
         ActivityTargetEnum.person => l10n.targetPerson,
-        ActivityTargetEnum.group => l10n.targetGroup,
       };
 }

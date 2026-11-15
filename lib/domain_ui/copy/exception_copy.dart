@@ -23,6 +23,8 @@ class ExceptionCopy {
       CauseCode.recordMissingCode => l10n.errorRecordMissing,
       CauseCode.registryQuotaCode => l10n.errorQuota,
       CauseCode.sharesExceedWholeCode => l10n.errorSharesExceed,
+      CauseCode.familyLoopCode => l10n.errorFamilyLoop,
+      CauseCode.registryRefusesWebCode => l10n.errorRegistryRefusesWeb,
       CauseCode.emptyValueCode => l10n.errorEmptyField,
       _ => null,
     };
