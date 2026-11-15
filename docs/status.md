@@ -10,7 +10,7 @@ _Last updated: 2026-11-15 (after the owner's first use)._
 
 ## Released
 
-Version 2.1.0 is live on https://parcel-info.web.app (the only environment).
+Version 2.2.0 is live on https://parcel-info.web.app (the only environment).
 
 - Sign-in with fixed accounts; the main (admin) account exists.
 - Map with two layers (registry parcels, read-only; family-drawn real
@@ -20,7 +20,7 @@ Version 2.1.0 is live on https://parcel-info.web.app (the only environment).
 - Drawing: copy the registry outline, drag corners, "+" edge chips with live
   lengths, snapping, crosshair mode, undo/redo, keyboard shortcuts.
 
-On `dev`, not yet released (2026-11-15): search by block/parcel number;
+New in 2.2.0: search by block/parcel number;
 colouring by a level of the family tree with a legend; "Assign owner" on a
 registry parcel with a walk-down-the-tree picker; snapping onto sides and a
 refusal of overlapping drawings; split in two by a cut line and split into

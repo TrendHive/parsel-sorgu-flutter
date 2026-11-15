@@ -2,7 +2,7 @@ name: parcel_atlas
 description: "Parcel Atlas — a family's shared map of land parcels: the official registry's boundaries beside the ones the family drew."
 publish_to: "none"
 
-version: 2.0.0+1
+version: 2.2.0+3
 
 environment:
   sdk: ^3.14.0
