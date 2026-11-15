@@ -16,7 +16,7 @@ analyzer:
   exclude:
     - "**/*.g.dart"
     - "lib/firebase_options.dart"
-    - "lib/domain_ui/values/l10n/app_localizations*.dart"
+    - "lib/presentation/domain_ui/values/l10n/app_localizations*.dart"
     - build/**
     - android/**
     - ios/**

@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:parcel_atlas/core_ui/values/base_dimens.dart';
-import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
+import 'package:parcel_atlas/presentation/core_ui/values/base_dimens.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
 
 /// One labelled fact in a panel: "Deed area   165,22 m²".
 class MapInfoRow extends StatelessWidget {

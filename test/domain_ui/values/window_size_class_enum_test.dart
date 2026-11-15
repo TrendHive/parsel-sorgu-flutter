@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:parcel_atlas/domain_ui/values/window_size_class_enum.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/window_size_class_enum.dart';
 
 void main() {
   test('a phone, a tablet and a desktop window get Material size classes', () {

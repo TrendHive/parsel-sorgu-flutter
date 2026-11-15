@@ -1,18 +1,18 @@
 import 'package:either_dart/either.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:parcel_atlas/core/base/base_exception.dart';
-import 'package:parcel_atlas/core_ui/values/base_dimens.dart';
 import 'package:parcel_atlas/domain/drawing/value_object/drawing_details_value_object.dart';
 import 'package:parcel_atlas/domain/map/read_model/map_snapshot_read_model.dart';
 import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
 import 'package:parcel_atlas/domain/person/value_object/ownership_value_object.dart';
 import 'package:parcel_atlas/domain/person/value_object/share_value_object.dart';
-import 'package:parcel_atlas/domain_ui/copy/exception_copy.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_dimens.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_format.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_local_keys.dart';
-import 'package:parcel_atlas/domain_ui/widgets/input/parcel_info_text_field.dart';
-import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
+import 'package:parcel_atlas/presentation/core_ui/values/base_dimens.dart';
+import 'package:parcel_atlas/presentation/domain_ui/copy/exception_copy.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_dimens.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_format.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_local_keys.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/input/parcel_info_text_field.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
 import 'package:parcel_atlas/presentation/map/dialog/owner_draft.dart';
 
 /// Name, owners with their shares, and a note — asked when a drawing is

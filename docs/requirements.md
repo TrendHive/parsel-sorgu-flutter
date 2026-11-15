@@ -82,4 +82,5 @@ Collected 2026-11-14 – 2026-11-15.
 | R39 | Instead of groups, a family tree: fathers and children linked (a grandfather, his sons, their children), because later the app must compare whether land was divided correctly among siblings and who owes what. | People have a parent and a "share passed to children" flag; a share recorded on an ancestor reaches the heirs in equal parts, generation by generation. Groups removed. |
 | R40 | High-quality, unblurred imagery everywhere; 3D would be ideal. | Open. The free aerial source stops at level 18 for the area; sharper imagery and 3D need a licensed provider and a different map engine — see the roadmap. Owner's decision. |
 | R41 | Registry lookups must work. | They work from the desktop and mobile apps. The registry refuses third-party websites, so the web app cannot look parcels up; whether to route around that is the owner's decision (roadmap). |
-
+| R42 | Check whether `domain_ui` belongs inside presentation. | Yes — `core_ui` and `domain_ui` moved into `presentation/`; five layers remain, and the structure check keeps the design system below the pages. |
+| R43 | An English repository name. | Renamed to `parcel-atlas`. |

@@ -98,23 +98,19 @@ public parcel query service.
 
 ## 🧱 How it is built
 
-Seven layers in one package. Arrows point the only way imports may go.
+Five layers in one package; the design system lives inside presentation. Arrows point the only way imports may go.
 
 ```mermaid
 flowchart LR
-  P["<b>presentation</b><br/>pages · router"] --> A["<b>application</b><br/>use cases · Cubits"] --> D["<b>domain</b><br/>entities · value objects · ports"]
-  P --> DU["<b>domain_ui</b><br/>widgets · theme · copy"] --> CU["<b>core_ui</b><br/>base widgets"]
-  DU --> D
+  P["<b>presentation</b><br/>pages · router · design system"] --> A["<b>application</b><br/>use cases · Cubits"] --> D["<b>domain</b><br/>entities · value objects · ports"]
   I["<b>infrastructure</b><br/>Firestore · TKGM · Auth"] -. implements .-> D
   classDef pres fill:#0f7f93,stroke:#0f7f93,color:#ffffff
   classDef app fill:#2747d6,stroke:#2747d6,color:#ffffff
   classDef dom fill:#1d7a4c,stroke:#1d7a4c,color:#ffffff
-  classDef ui fill:#6b4fbb,stroke:#6b4fbb,color:#ffffff
   classDef infra fill:#b45a0c,stroke:#b45a0c,color:#ffffff
   class P pres
   class A app
   class D dom
-  class DU,CU ui
   class I infra
 ```
 
@@ -184,12 +180,12 @@ profile. Sign-in accounts are not parcel owners: owners are added in the app.
 ```
 lib/
   core/            base types, exceptions + causes, validators, constants
-  core_ui/         app-agnostic base widgets
   domain/          entities, value objects, read models, rules, ports — no Flutter
-  domain_ui/       the app's widgets, theme, colours, l10n (Turkish template)
   application/     use cases, one Cubit per page
   infrastructure/  store and registry services, repositories, mappers, DTOs
   presentation/    pages, router, app shell
+    core_ui/         app-agnostic base widgets
+    domain_ui/       the app's widgets, theme, colours, l10n (Turkish template)
   main.dart        composition root
 tool/              check_structure.dart, add_member.dart
 docs/              requirements, research, data model, registry API, status, roadmap
