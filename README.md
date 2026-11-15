@@ -14,7 +14,7 @@ and record who owns which share — live on every family member's device.
 
 [![Open the app](https://img.shields.io/badge/open%20the%20app-parcel--info.web.app-FFA726?style=for-the-badge&logo=googlechrome&logoColor=white)](https://parcel-info.web.app)
 
-[![CI](https://github.com/TrendHive/parsel-sorgu-flutter/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/TrendHive/parsel-sorgu-flutter/actions/workflows/ci.yml)
+[![CI](https://github.com/TrendHive/parcel-atlas/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/TrendHive/parcel-atlas/actions/workflows/ci.yml)
 [![Flutter 3.50](https://img.shields.io/badge/Flutter-3.50-02569B?style=flat-square&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart 3.14](https://img.shields.io/badge/Dart-3.14-0175C2?style=flat-square&logo=dart&logoColor=white)](https://dart.dev)
 [![Firebase Spark](https://img.shields.io/badge/Firebase-Spark%20(free)-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com)
