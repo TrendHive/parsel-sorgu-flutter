@@ -578,4 +578,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorSplitMisses =>
       'The parcel could not be split. Check the cut line or the number of pieces.';
+
+  @override
+  String get noticeUseApp =>
+      'New parcel lookups cannot be made from the website. Use the Parsel Atlası app on your phone or computer; the parcel appears here at once.';
 }

@@ -30,7 +30,11 @@ ships it; add new ones at the bottom of their section.
 - Turkish permission prompts on iOS/macOS (`InfoPlist.strings`).
 - Disable the anonymous sign-in provider left from the first version
   (Firebase console → Authentication → Sign-in method).
-- Build and try the macOS, Windows, Android and iOS apps (lookups need them).
+- Desktop downloads: a signed, notarised macOS build and a Windows build on
+  GitHub Releases (Windows needs a Windows machine or a CI runner).
+- iOS: build, then TestFlight or App Distribution with the owner's account.
+- Migrate the Android build to built-in Kotlin (Flutter warns that a
+  future version will require it).
 
 ## Later
 

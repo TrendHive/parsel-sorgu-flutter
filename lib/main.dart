@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:parcel_atlas/application/activity/cubit/activity_cubit.dart';
 import 'package:parcel_atlas/application/activity/usecase/watch_activity_usecase.dart';
@@ -110,6 +111,7 @@ void _register(FirebaseFirestore firestore, FirebaseAuth auth) {
         getIt(),
         getIt(),
         getIt(),
+        registryReachable: !kIsWeb,
       ),
     )
     ..registerFactory(() => PersonsCubit(getIt(), getIt(), getIt(), getIt()))
