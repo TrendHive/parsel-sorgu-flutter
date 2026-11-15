@@ -5,9 +5,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:parcel_atlas/application/drawing/usecase/delete_drawing_usecase.dart';
 import 'package:parcel_atlas/application/drawing/usecase/save_drawing_usecase.dart';
+import 'package:parcel_atlas/application/drawing/usecase/split_drawing_usecase.dart';
 import 'package:parcel_atlas/application/map/usecase/locate_device_usecase.dart';
 import 'package:parcel_atlas/application/map/usecase/watch_map_usecase.dart';
 import 'package:parcel_atlas/application/parcel/usecase/query_parcel_at_usecase.dart';
+import 'package:parcel_atlas/application/parcel/usecase/query_parcel_by_number_usecase.dart';
 import 'package:parcel_atlas/application/parcel/usecase/refresh_parcel_usecase.dart';
 import 'package:parcel_atlas/core/base/base_exception.dart';
 import 'package:parcel_atlas/core/constants.dart';
@@ -15,6 +17,7 @@ import 'package:parcel_atlas/domain/auth/entity/member_entity.dart';
 import 'package:parcel_atlas/domain/auth/interface/auth_repository_interface.dart';
 import 'package:parcel_atlas/domain/drawing/entity/drawn_parcel_entity.dart';
 import 'package:parcel_atlas/domain/drawing/read_model/map_drawing_read_model.dart';
+import 'package:parcel_atlas/domain/drawing/read_model/map_split_read_model.dart';
 import 'package:parcel_atlas/domain/drawing/value_object/drawing_details_value_object.dart';
 import 'package:parcel_atlas/domain/drawing/value_object/drawing_draft_value_object.dart';
 import 'package:parcel_atlas/domain/map/enum/base_map_enum.dart';
@@ -22,8 +25,12 @@ import 'package:parcel_atlas/domain/map/enum/map_layer_enum.dart';
 import 'package:parcel_atlas/domain/map/enum/map_notice_enum.dart';
 import 'package:parcel_atlas/domain/map/read_model/map_hit_read_model.dart';
 import 'package:parcel_atlas/domain/map/read_model/map_snapshot_read_model.dart';
+import 'package:parcel_atlas/domain/map/rule/geo_rules.dart';
 import 'package:parcel_atlas/domain/map/rule/map_rules.dart';
 import 'package:parcel_atlas/domain/parcel/entity/official_parcel_entity.dart';
+import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
+import 'package:parcel_atlas/domain/person/value_object/ownership_value_object.dart';
+import 'package:parcel_atlas/domain/person/value_object/share_value_object.dart';
 
 part 'map_state.dart';
 
@@ -37,7 +44,17 @@ part 'map_state.dart';
 /// Browsing: [tap] selects what was tapped when the store has it — no
 /// registry call. A tap on ground nobody has looked up goes straight to the
 /// registry ([queryAt]) and the answer is stored, so each parcel costs one
-/// lookup ever. [refresh] is the Refresh button.
+/// lookup ever. [refresh] is the Refresh button, and [queryByNumber] finds a
+/// parcel by neighbourhood, block and parcel number.
+///
+/// Ownership: [assignOwner] records a person on a registry parcel in one
+/// step — the registry record stays untouched, so it stores a drawing with
+/// the registry's outline and that person as its owner. [setColourLevel]
+/// colours the drawings by a level of the family tree.
+///
+/// Dividing: [startSplit] opens a cut on a drawing; the next two taps set
+/// the line and [confirmSplit] stores the two halves. [splitEqual] cuts a
+/// drawing into strips of equal area, one per heir when heirs are given.
 ///
 /// Drawing: [startDrawing] opens a session, empty or seeded from a registry
 /// parcel's outline (the usual way: copy, then move the corners that are
@@ -55,7 +72,9 @@ final class MapCubit extends Cubit<MapState> {
     this._watchMap,
     this._queryAt,
     this._refresh,
+    this._queryByNumber,
     this._saveDrawing,
+    this._splitDrawing,
     this._deleteDrawing,
     this._locate,
     this._auth,
@@ -67,7 +86,11 @@ final class MapCubit extends Cubit<MapState> {
 
   final RefreshParcelUseCase _refresh;
 
+  final QueryParcelByNumberUseCase _queryByNumber;
+
   final SaveDrawingUseCase _saveDrawing;
+
+  final SplitDrawingUseCase _splitDrawing;
 
   final DeleteDrawingUseCase _deleteDrawing;
 
@@ -168,6 +191,15 @@ final class MapCubit extends Cubit<MapState> {
       _placeCorner(current, drawing, point, metersPerPixel);
       return;
     }
+    final MapSplitReadModel? split = current.split;
+    if (split != null) {
+      emit(
+        current.copyWith(
+          split: () => split.add(_snap(current, point, metersPerPixel)),
+        ),
+      );
+      return;
+    }
     final MapHitReadModel hit = current.snapshot.hitAt(point, current.layers);
     if (hit is MapHitNone) {
       unawaited(queryAt(point));
@@ -201,6 +233,117 @@ final class MapCubit extends Cubit<MapState> {
     if (current is! MapReady || current.querying) return;
     emit(current.copyWith(querying: true));
     _afterRegistry(await _refresh(parcel), MapNoticeEnum.refreshed);
+  }
+
+  Future<void> queryByNumber({
+    required int neighborhoodId,
+    required String block,
+    required String parcel,
+  }) async {
+    final MapState current = state;
+    if (current is! MapReady || current.querying) return;
+    emit(current.copyWith(querying: true));
+    _afterRegistry(
+      await _queryByNumber(
+        neighborhoodId: neighborhoodId,
+        block: block,
+        parcel: parcel,
+        snapshot: current.snapshot,
+      ),
+      MapNoticeEnum.queried,
+    );
+  }
+
+  Future<void> assignOwner(
+    OfficialParcelEntity parcel,
+    PersonEntity person, {
+    required String name,
+  }) async {
+    final MapState current = state;
+    if (current is! MapReady) return;
+    _afterDrawingWrite(
+      await _saveDrawing(
+        outline: parcel.record.outline,
+        details: DrawingDetailsValueObject((
+          name: name,
+          officialParcelId: parcel.id,
+          owners: <OwnershipValueObject>[
+            OwnershipValueObject(
+              personId: person.id,
+              share: ShareValueObject.whole,
+            ),
+          ],
+          note: CoreConstants.empty,
+        )),
+        snapshot: current.snapshot,
+      ),
+    );
+  }
+
+  void setColourLevel(int? level) {
+    final MapState current = state;
+    if (current is MapReady) emit(current.copyWith(colourLevel: () => level));
+  }
+
+  void startSplit(DrawnParcelEntity drawing) {
+    final MapState current = state;
+    if (current is! MapReady) return;
+    emit(
+      current.copyWith(
+        selection: () => null,
+        split: () => MapSplitReadModel(drawing: drawing),
+        focus: drawing.outline.corners,
+      ),
+    );
+  }
+
+  void cancelSplit() {
+    final MapState current = state;
+    if (current is MapReady) emit(current.copyWith(split: () => null));
+  }
+
+  Future<void> confirmSplit() async {
+    final MapState current = state;
+    if (current is! MapReady) return;
+    final MapSplitReadModel? split = current.split;
+    if (split == null || !split.canConfirm) return;
+    _afterDrawingWrite(
+      await _splitDrawing(drawing: split.drawing, outlines: split.pieces),
+    );
+  }
+
+  Future<void> splitEqual(
+    DrawnParcelEntity drawing, {
+    required int pieces,
+    List<PersonEntity>? heirs,
+  }) async => _afterDrawingWrite(
+    await _splitDrawing(
+      drawing: drawing,
+      outlines: GeoRules.splitEqual(drawing.outline.corners, pieces),
+      heirs: heirs,
+    ),
+  );
+
+  void _afterDrawingWrite(Either<BaseException, String> result) {
+    if (isClosed) return;
+    final MapState after = state;
+    if (after is! MapReady) return;
+    switch (result) {
+      case Left(:final BaseException value):
+        emit(after.copyWith(exception: value));
+      case Right(:final String value):
+        _pendingSelection = value;
+        emit(
+          _resolvePending(
+            after.copyWith(
+              drawing: () => null,
+              split: () => null,
+              layers: <MapLayerEnum>{...after.layers, MapLayerEnum.drawn},
+              notice: MapNoticeEnum.drawingSaved,
+            ),
+          ),
+        );
+    }
   }
 
   void _afterRegistry(
@@ -327,29 +470,14 @@ final class MapCubit extends Cubit<MapState> {
     if (current is! MapReady) return;
     final MapDrawingReadModel? drawing = current.drawing;
     if (drawing == null) return;
-    final Either<BaseException, String> result = await _saveDrawing(
-      outline: drawing.draft.outline,
-      details: details,
-      existing: drawing.editing,
+    _afterDrawingWrite(
+      await _saveDrawing(
+        outline: drawing.draft.outline,
+        details: details,
+        existing: drawing.editing,
+        snapshot: current.snapshot,
+      ),
     );
-    if (isClosed) return;
-    final MapState after = state;
-    if (after is! MapReady) return;
-    switch (result) {
-      case Left(:final BaseException value):
-        emit(after.copyWith(exception: value));
-      case Right(:final String value):
-        _pendingSelection = value;
-        emit(
-          _resolvePending(
-            after.copyWith(
-              drawing: () => null,
-              layers: <MapLayerEnum>{...after.layers, MapLayerEnum.drawn},
-              notice: MapNoticeEnum.drawingSaved,
-            ),
-          ),
-        );
-    }
   }
 
   Future<void> saveDetails(

@@ -14,12 +14,12 @@ and record who owns which share — live on every family member's device.
 
 [![Open the app](https://img.shields.io/badge/open%20the%20app-parcel--info.web.app-FFA726?style=for-the-badge&logo=googlechrome&logoColor=white)](https://parcel-info.web.app)
 
-[![CI](https://github.com/TrendHive/parsel-sorgu-flutter/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/TrendHive/parsel-sorgu-flutter/actions/workflows/ci.yml)
+[![CI](https://github.com/TrendHive/parcel-atlas/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/TrendHive/parcel-atlas/actions/workflows/ci.yml)
 [![Flutter 3.50](https://img.shields.io/badge/Flutter-3.50-02569B?style=flat-square&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart 3.14](https://img.shields.io/badge/Dart-3.14-0175C2?style=flat-square&logo=dart&logoColor=white)](https://dart.dev)
 [![Firebase Spark](https://img.shields.io/badge/Firebase-Spark%20(free)-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com)
 [![Analyzer](https://img.shields.io/badge/analyzer-0%20issues-3FB950?style=flat-square)](#-checking-your-work)
-[![Tests](https://img.shields.io/badge/tests-43-3FB950?style=flat-square)](#-checking-your-work)
+[![Tests](https://img.shields.io/badge/tests-59-3FB950?style=flat-square)](#-checking-your-work)
 
 [Features](#-features) · [How it is built](#-how-it-is-built) · [Getting started](#-getting-started) · [Checking your work](#-checking-your-work) · [Security](#-security) · [Docs](#-documentation)
 
@@ -46,7 +46,7 @@ Parcels come from the land registry's own service. A tap inside a stored parcel 
 <td width="33%" valign="top">
 
 #### ✏️ Drawing made easy
-Copy the registry outline and move only the wrong corners: drag numbered handles, tap "+" on an edge, place precisely with a crosshair, undo and redo.
+Copy the registry outline and move only the wrong corners: drag numbered handles, tap "+" on an edge, place precisely with a crosshair, undo and redo. Corners snap onto neighbours, drawings cannot overlap, and a parcel splits in two or into equal pieces for the heirs.
 
 </td>
 </tr>
@@ -60,7 +60,7 @@ Areas, perimeters and every side's length are computed on the WGS84 ellipsoid, s
 <td valign="top">
 
 #### 👨‍👩‍👧‍👦 A family tree of owners
-Owners hold deed-style shares (1/4). A share recorded on an ancestor passes down the tree, split equally among the children of each generation.
+Owners hold deed-style shares (1/4). A share recorded on an ancestor passes down the tree, split equally among the children of each generation. The map can be coloured by any generation of the tree.
 
 </td>
 <td valign="top">
@@ -98,23 +98,19 @@ public parcel query service.
 
 ## 🧱 How it is built
 
-Seven layers in one package. Arrows point the only way imports may go.
+Five layers in one package; the design system lives inside presentation. Arrows point the only way imports may go.
 
 ```mermaid
 flowchart LR
-  P["<b>presentation</b><br/>pages · router"] --> A["<b>application</b><br/>use cases · Cubits"] --> D["<b>domain</b><br/>entities · value objects · ports"]
-  P --> DU["<b>domain_ui</b><br/>widgets · theme · copy"] --> CU["<b>core_ui</b><br/>base widgets"]
-  DU --> D
+  P["<b>presentation</b><br/>pages · router · design system"] --> A["<b>application</b><br/>use cases · Cubits"] --> D["<b>domain</b><br/>entities · value objects · ports"]
   I["<b>infrastructure</b><br/>Firestore · TKGM · Auth"] -. implements .-> D
   classDef pres fill:#0f7f93,stroke:#0f7f93,color:#ffffff
   classDef app fill:#2747d6,stroke:#2747d6,color:#ffffff
   classDef dom fill:#1d7a4c,stroke:#1d7a4c,color:#ffffff
-  classDef ui fill:#6b4fbb,stroke:#6b4fbb,color:#ffffff
   classDef infra fill:#b45a0c,stroke:#b45a0c,color:#ffffff
   class P pres
   class A app
   class D dom
-  class DU,CU ui
   class I infra
 ```
 
@@ -184,12 +180,12 @@ profile. Sign-in accounts are not parcel owners: owners are added in the app.
 ```
 lib/
   core/            base types, exceptions + causes, validators, constants
-  core_ui/         app-agnostic base widgets
   domain/          entities, value objects, read models, rules, ports — no Flutter
-  domain_ui/       the app's widgets, theme, colours, l10n (Turkish template)
   application/     use cases, one Cubit per page
   infrastructure/  store and registry services, repositories, mappers, DTOs
   presentation/    pages, router, app shell
+    core_ui/         app-agnostic base widgets
+    domain_ui/       the app's widgets, theme, colours, l10n (Turkish template)
   main.dart        composition root
 tool/              check_structure.dart, add_member.dart
 docs/              requirements, research, data model, registry API, status, roadmap
@@ -248,6 +244,7 @@ privately to the repository owner rather than in a public issue.
 | [`docs/research.md`](docs/research.md) | Flutter and Dart standards, and where the project deliberately differs |
 | [`docs/data-model.md`](docs/data-model.md) | Firestore collections and security rules |
 | [`docs/tkgm-api.md`](docs/tkgm-api.md) | The registry API and how to use it sparingly |
+| [`docs/tkgm-parsel-sorgu.postman_collection.json`](docs/tkgm-parsel-sorgu.postman_collection.json) | Runnable Postman collection for the registry API — import and send |
 | [`docs/regressions.md`](docs/regressions.md) | Bugs fixed, and the guard that keeps each fixed |
 | [`docs/roadmap.md`](docs/roadmap.md) | What comes next |
 

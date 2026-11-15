@@ -41,19 +41,19 @@ void main() {
 
 const Map<String, List<String>> _mayImport = <String, List<String>>{
   'core': <String>['core'],
-  'core_ui': <String>['core', 'core_ui'],
   'domain': <String>['core', 'domain'],
-  'domain_ui': <String>['core', 'core_ui', 'domain', 'domain_ui'],
   'application': <String>['core', 'domain', 'application'],
   'infrastructure': <String>['core', 'domain', 'infrastructure'],
-  'presentation': <String>[
-    'core',
-    'core_ui',
-    'domain',
-    'domain_ui',
-    'application',
-    'presentation',
-  ],
+  'presentation': <String>['core', 'domain', 'application', 'presentation'],
+};
+
+/// Inside presentation the design system sits below the pages: `core_ui`
+/// (app-agnostic widgets) sees only itself, `domain_ui` (the app's widgets,
+/// theme and copy) sees `core_ui` and itself, and neither sees a page or
+/// the application layer.
+const Map<String, List<String>> _uiMayImport = <String, List<String>>{
+  'core_ui': <String>['core_ui'],
+  'domain_ui': <String>['core_ui', 'domain_ui'],
 };
 
 const Map<String, String> _kindSuffix = <String, String>{
@@ -70,7 +70,9 @@ const Map<String, String> _kindSuffix = <String, String>{
   'infrastructure/dto': '_dto.dart',
 };
 
-const Set<String> _knownDebt = <String>{'lib/core_ui/values/base_dimens.dart'};
+const Set<String> _knownDebt = <String>{
+  'lib/presentation/core_ui/values/base_dimens.dart',
+};
 
 final RegExp _turkish = RegExp(
   '[\\u00e7\\u011f\\u0131\\u00f6\\u015f\\u00fc\\u00c7\\u011e\\u0130\\u00d6\\u015e\\u00dc]',
@@ -110,6 +112,26 @@ List<String> _layerImports(File file) {
       if (!allowed.contains(m.group(1)))
         '${file.path}  $layer may not import ${m.group(1)} (CLAUDE.md, layer table)',
   ];
+  final List<String> parts = file.path.split('/');
+  final List<String>? ui = layer == 'presentation' && parts.length > 3
+      ? _uiMayImport[parts[2]]
+      : null;
+  if (ui != null) {
+    for (final RegExpMatch m in RegExp(
+      r"^import 'package:parcel_atlas/(\w+)/(\w+)",
+      multiLine: true,
+    ).allMatches(text)) {
+      final bool wrong = m.group(1) == 'presentation'
+          ? !ui.contains(m.group(2))
+          : m.group(1) == 'application' ||
+                (parts[2] == 'core_ui' && m.group(1) == 'domain');
+      if (wrong) {
+        problems.add(
+          '${file.path}  ${parts[2]} may not import ${m.group(1)}/${m.group(2)} (CLAUDE.md, layer table)',
+        );
+      }
+    }
+  }
   if (layer == 'domain' &&
       RegExp(
         r"^import 'package:(flutter|material_ui|cupertino_ui)/",

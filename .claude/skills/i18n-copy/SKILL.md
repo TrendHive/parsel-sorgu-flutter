@@ -5,7 +5,7 @@ description: Adding or changing user-visible text in Parcel Atlas — keys in ap
 
 # Copy
 
-Turkish lives only in `lib/domain_ui/values/l10n/app_tr.arb` (rule 13);
+Turkish lives only in `lib/presentation/domain_ui/values/l10n/app_tr.arb` (rule 13);
 `tool/check_structure.dart` fails on Turkish anywhere else.
 
 1. Add the key to `app_tr.arb` first (the template) — natural Turkish; then

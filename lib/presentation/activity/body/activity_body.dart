@@ -3,12 +3,12 @@ import 'package:material_ui/material_ui.dart';
 import 'package:parcel_atlas/application/activity/cubit/activity_cubit.dart';
 import 'package:parcel_atlas/domain/activity/entity/activity_entity.dart';
 import 'package:parcel_atlas/domain/activity/enum/activity_action_enum.dart';
-import 'package:parcel_atlas/domain_ui/copy/activity_copy.dart';
-import 'package:parcel_atlas/domain_ui/copy/exception_copy.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_format.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_local_keys.dart';
-import 'package:parcel_atlas/domain_ui/widgets/layout/parcel_info_readable_width.dart';
-import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
+import 'package:parcel_atlas/presentation/domain_ui/copy/activity_copy.dart';
+import 'package:parcel_atlas/presentation/domain_ui/copy/exception_copy.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_format.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_local_keys.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/layout/parcel_info_readable_width.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
 
 /// One line per change: "`member` `did what`", then the record and the time.
 class ActivityBody extends StatelessWidget {

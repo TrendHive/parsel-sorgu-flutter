@@ -1,7 +1,7 @@
 /// Addresses and limits of the services infrastructure talks to.
 ///
 /// [baseURL] and [api] are the official land registry (TKGM) parcel query
-/// service — the same one parselsorgu.tkgm.gov.tr calls. [parcelAtPoint] is
+/// service (see `docs/tkgm-api.md`). [parcelAtPoint] is
 /// `parsel/{lat}/{lng}/` and [parcelByNumber] `parsel/{neighbourhood}/{block}/
 /// {parcel}`; both answer one GeoJSON feature. [quotaStatus] is the status the
 /// registry answers with once a connection's daily allowance is spent, and

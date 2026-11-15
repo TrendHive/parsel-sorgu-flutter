@@ -8,10 +8,12 @@ import 'package:latlong2/latlong.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:parcel_atlas/application/drawing/usecase/delete_drawing_usecase.dart';
 import 'package:parcel_atlas/application/drawing/usecase/save_drawing_usecase.dart';
+import 'package:parcel_atlas/application/drawing/usecase/split_drawing_usecase.dart';
 import 'package:parcel_atlas/application/map/cubit/map_cubit.dart';
 import 'package:parcel_atlas/application/map/usecase/locate_device_usecase.dart';
 import 'package:parcel_atlas/application/map/usecase/watch_map_usecase.dart';
 import 'package:parcel_atlas/application/parcel/usecase/query_parcel_at_usecase.dart';
+import 'package:parcel_atlas/application/parcel/usecase/query_parcel_by_number_usecase.dart';
 import 'package:parcel_atlas/application/parcel/usecase/refresh_parcel_usecase.dart';
 import 'package:parcel_atlas/core/base/base_exception.dart';
 import 'package:parcel_atlas/core/cause/registry_refuses_web_cause.dart';
@@ -104,7 +106,9 @@ void main() {
       WatchMapUseCase(officials, drawings, persons),
       QueryParcelAtUseCase(auth, registry, officials),
       RefreshParcelUseCase(auth, registry, officials),
+      QueryParcelByNumberUseCase(auth, registry, officials),
       SaveDrawingUseCase(auth, drawings),
+      SplitDrawingUseCase(auth, drawings),
       DeleteDrawingUseCase(auth, drawings),
       LocateDeviceUseCase(_Location()),
       auth,

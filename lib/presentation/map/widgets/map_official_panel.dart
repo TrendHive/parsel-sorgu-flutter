@@ -1,13 +1,13 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:parcel_atlas/core/constants.dart';
-import 'package:parcel_atlas/core_ui/values/base_dimens.dart';
 import 'package:parcel_atlas/domain/drawing/entity/drawn_parcel_entity.dart';
 import 'package:parcel_atlas/domain/parcel/entity/official_parcel_entity.dart';
 import 'package:parcel_atlas/domain/parcel/value_object/registry_record_value_object.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_color.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_format.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_local_keys.dart';
-import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
+import 'package:parcel_atlas/presentation/core_ui/values/base_dimens.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_color.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_format.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_local_keys.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_audit_line.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_info_row.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_panel_frame.dart';
@@ -25,6 +25,7 @@ class MapOfficialPanel extends StatelessWidget {
     required this.corrections,
     required this.querying,
     required this.onDrawReal,
+    required this.onAssign,
     required this.onRefresh,
     required this.onOpenDrawing,
     required this.onClose,
@@ -37,6 +38,8 @@ class MapOfficialPanel extends StatelessWidget {
   final bool querying;
 
   final VoidCallback onDrawReal;
+
+  final VoidCallback onAssign;
 
   final VoidCallback onRefresh;
 
@@ -72,6 +75,12 @@ class MapOfficialPanel extends StatelessWidget {
           onPressed: onDrawReal,
           icon: const Icon(Icons.draw_outlined),
           label: ParcelInfoText(l10n.drawRealButton),
+        ),
+        SizedBox(height: BaseDimens.height.xxSmall),
+        FilledButton.tonalIcon(
+          onPressed: onAssign,
+          icon: const Icon(Icons.person_add_alt),
+          label: ParcelInfoText(l10n.assignOwner),
         ),
         SizedBox(height: BaseDimens.height.xxSmall),
         OutlinedButton.icon(

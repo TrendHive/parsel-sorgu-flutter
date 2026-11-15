@@ -1,5 +1,6 @@
 import 'package:parcel_atlas/core/base/base_cause.dart';
 import 'package:parcel_atlas/core/cause/admin_only_cause.dart';
+import 'package:parcel_atlas/core/cause/drawing_overlaps_cause.dart';
 import 'package:parcel_atlas/core/cause/email_exist_cause.dart';
 import 'package:parcel_atlas/core/cause/empty_value_cause.dart';
 import 'package:parcel_atlas/core/cause/family_loop_cause.dart';
@@ -15,6 +16,7 @@ import 'package:parcel_atlas/core/cause/record_missing_cause.dart';
 import 'package:parcel_atlas/core/cause/registry_quota_cause.dart';
 import 'package:parcel_atlas/core/cause/registry_refuses_web_cause.dart';
 import 'package:parcel_atlas/core/cause/shares_exceed_whole_cause.dart';
+import 'package:parcel_atlas/core/cause/split_misses_cause.dart';
 import 'package:parcel_atlas/core/cause/token_expired_cause.dart';
 import 'package:parcel_atlas/core/cause/too_few_corners_cause.dart';
 import 'package:parcel_atlas/core/cause/unknown_cause.dart';
@@ -43,6 +45,8 @@ class CauseCode {
   static const int sharesExceedWholeCode = 1017;
   static const int familyLoopCode = 1018;
   static const int registryRefusesWebCode = 1019;
+  static const int drawingOverlapsCode = 1020;
+  static const int splitMissesCode = 1021;
 
   final int code;
 
@@ -86,6 +90,10 @@ class CauseCode {
 
   CauseCode.registryRefusesWeb() : code = registryRefusesWebCode;
 
+  CauseCode.drawingOverlaps() : code = drawingOverlapsCode;
+
+  CauseCode.splitMisses() : code = splitMissesCode;
+
   BaseCause getCauseByCode() {
     switch (code) {
       case unknownCode:
@@ -126,6 +134,10 @@ class CauseCode {
         return FamilyLoopCause();
       case registryRefusesWebCode:
         return RegistryRefusesWebCause();
+      case drawingOverlapsCode:
+        return DrawingOverlapsCause();
+      case splitMissesCode:
+        return SplitMissesCause();
       default:
         return UnknownCause();
     }

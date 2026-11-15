@@ -1,7 +1,7 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:parcel_atlas/core_ui/values/base_dimens.dart';
-import 'package:parcel_atlas/domain_ui/values/parcel_info_color.dart';
-import 'package:parcel_atlas/domain_ui/widgets/text/parcel_info_text.dart';
+import 'package:parcel_atlas/presentation/core_ui/values/base_dimens.dart';
+import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_color.dart';
+import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
 
 /// The middle of a drawing's edge: its live [length], and a "+" that puts a
 /// new corner there ([onInsert]) — the way to bend a straight edge to follow
