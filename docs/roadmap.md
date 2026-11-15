@@ -34,7 +34,7 @@ ships it; add new ones at the bottom of their section.
 
 ## Later
 
-- Search by neighbourhood / block / parcel number (the registry's
-  `idariYapi` lists), for parcels not near anyone.
+- Neighbourhood list for a district in the search dialog (the registry's
+  `idariYapi` lists), so a new neighbourhood needs no code.
 - Export a person's or group's holdings as PDF.
 - Overlap analysis between a drawn and a registry outline.

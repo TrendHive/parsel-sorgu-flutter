@@ -11,7 +11,9 @@
 /// Map: [cornerHandle] and [edgeHandle] are the touch sizes of a drawing's
 /// corner and "+" handles; [outline] and [selectedOutline] stroke widths;
 /// [crosshair] the precise-placement sight; [fillAlpha] the polygons'
-/// see-through fill.
+/// see-through fill, [branchFillAlpha] the stronger fill of a drawing
+/// coloured by family branch; [legendDot] and [legendMaxWidth] size the
+/// colour legend and [cutPoint] a point of a cut line.
 class ParcelInfoDimens {
   ParcelInfoDimens._();
 
@@ -33,6 +35,10 @@ class ParcelInfoDimens {
   static const double drawingOutline = 3;
   static const double crosshair = 44;
   static const double fillAlpha = 0.22;
+  static const double branchFillAlpha = 0.45;
+  static const double legendDot = 14;
+  static const double legendMaxWidth = 260;
+  static const double cutPoint = 14;
   static const double dash = 8;
   static const double draggingScale = 1.35;
   static const double restScale = 1;

@@ -468,4 +468,114 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorRegistryRefusesWeb =>
       'The registry does not accept lookups from this website. Query new parcels from the desktop or mobile app; stored parcels show here too.';
+
+  @override
+  String get searchParcel => 'Find by block / parcel';
+
+  @override
+  String get searchTitle => 'Find a parcel';
+
+  @override
+  String get searchNeighbourhood => 'Neighbourhood';
+
+  @override
+  String get searchNeighbourhoodCode => 'Neighbourhood code';
+
+  @override
+  String get searchOther => 'Another neighbourhood (enter its code)';
+
+  @override
+  String get searchHint =>
+      'The list holds the neighbourhoods of parcels already looked up. For a new neighbourhood, tap one of its parcels on the map first, or enter its code.';
+
+  @override
+  String get blockLabel => 'Block';
+
+  @override
+  String get parcelNumberLabel => 'Parcel';
+
+  @override
+  String get searchButton => 'Find';
+
+  @override
+  String get colourBy => 'Colour by family';
+
+  @override
+  String get colourOff => 'No colouring';
+
+  @override
+  String colourLevel(int level, String names) {
+    return 'Generation $level: $names';
+  }
+
+  @override
+  String get colourShared => 'Shared';
+
+  @override
+  String get colourUnassigned => 'No owner';
+
+  @override
+  String get assignOwner => 'Assign owner';
+
+  @override
+  String get assignOwnerTitle => 'Whose is it?';
+
+  @override
+  String get assignOwnerHint =>
+      'Tap a person to choose them. Use the arrow to go down to their children; if you choose someone whose share passed on, their children show as equal holders.';
+
+  @override
+  String get showChildren => 'Go to children';
+
+  @override
+  String get treeBack => 'Up one generation';
+
+  @override
+  String get splitButton => 'Split in two';
+
+  @override
+  String get splitEqualButton => 'Split equally';
+
+  @override
+  String get splitHint =>
+      'Tap two points for the cut; the line runs through both. Points snap to corners and sides.';
+
+  @override
+  String get splitMissesHint =>
+      'This line does not divide the parcel. Choose the two points again.';
+
+  @override
+  String splitReady(String first, String second) {
+    return 'Two pieces: $first and $second';
+  }
+
+  @override
+  String get confirmSplit => 'Split and save';
+
+  @override
+  String get splitEqualTitle => 'Split equally';
+
+  @override
+  String splitEqualToChildren(String name, int count) {
+    return 'To the children of $name: $count equal pieces';
+  }
+
+  @override
+  String get splitEqualCount => 'Number of pieces';
+
+  @override
+  String get splitEqualByCount =>
+      'Equal pieces by number (owners stay the same)';
+
+  @override
+  String get splitEqualNote =>
+      'The parcel is cut into pieces of equal area along its long axis. You can adjust each piece\'s corners afterwards.';
+
+  @override
+  String get errorDrawingOverlaps =>
+      'This drawing covers part of another drawing. Move the corners close to the neighbour\'s boundary; they snap onto it.';
+
+  @override
+  String get errorSplitMisses =>
+      'The parcel could not be split. Check the cut line or the number of pieces.';
 }

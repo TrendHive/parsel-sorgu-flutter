@@ -26,6 +26,16 @@ import 'package:parcel_atlas/core/constants.dart';
 ///
 /// [metersPerPixel] converts a tap tolerance from screen pixels to the ground
 /// at a zoom level, for snapping a corner to a reference vertex.
+///
+/// [fromLocalPlane] is the way back from metres to latitude/longitude.
+/// [nearestOnRing] is the closest point of an outline's sides to a point, so
+/// a corner can sit exactly on a neighbour's boundary. [overlapSquareMeters]
+/// estimates the area two outlines share by sampling a grid over the box
+/// they have in common — sides that merely touch share nothing.
+///
+/// [splitByLine] cuts an outline along the straight line through two points
+/// and answers the two pieces, or nothing when the line does not divide it.
+/// [splitEqual] cuts it into strips of equal area across its long axis.
 abstract final class GeoRules {
   static const double semiMajorAxis = 6378137;
 
@@ -150,7 +160,313 @@ abstract final class GeoRules {
       math.cos(_radians(latitudeDegrees)) /
       math.pow(CoreConstants.two, zoom);
 
+  static List<LatLng> fromLocalPlane(
+    List<math.Point<double>> points,
+    LatLng origin,
+  ) {
+    final double north = meridianRadius(origin.latitude);
+    final double east =
+        primeVerticalRadius(origin.latitude) *
+        math.cos(_radians(origin.latitude));
+    return <LatLng>[
+      for (final math.Point<double> point in points)
+        LatLng(
+          origin.latitude + _degrees(point.y / north),
+          origin.longitude + _degrees(point.x / east),
+        ),
+    ];
+  }
+
+  static ({LatLng point, double distanceMeters})? nearestOnRing(
+    List<LatLng> points,
+    LatLng target,
+  ) {
+    final List<LatLng> ring = _closed(points);
+    if (ring.length < CoreConstants.two) return null;
+    final List<math.Point<double>> plane = toLocalPlane(ring, target);
+    const math.Point<double> origin = math.Point<double>(
+      CoreConstants.zeroDouble,
+      CoreConstants.zeroDouble,
+    );
+    math.Point<double>? best;
+    double bestDistance = double.infinity;
+    for (int i = CoreConstants.zero; i < plane.length - 1; i++) {
+      final math.Point<double> candidate = _closestOnSegment(
+        plane[i],
+        plane[i + 1],
+        origin,
+      );
+      final double distance = candidate.distanceTo(origin);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = candidate;
+      }
+    }
+    if (best == null) return null;
+    return (
+      point: fromLocalPlane(<math.Point<double>>[best], target).single,
+      distanceMeters: bestDistance,
+    );
+  }
+
+  static double overlapSquareMeters(
+    List<LatLng> first,
+    List<LatLng> second, {
+    int grid = _overlapGrid,
+  }) {
+    final List<LatLng> a = _open(first);
+    final List<LatLng> b = _open(second);
+    if (a.length < _minimumCorners || b.length < _minimumCorners) {
+      return CoreConstants.zeroDouble;
+    }
+    final LatLng origin = centre(a);
+    final List<math.Point<double>> planeA = toLocalPlane(a, origin);
+    final List<math.Point<double>> planeB = toLocalPlane(b, origin);
+    final double left = math.max(_minX(planeA), _minX(planeB));
+    final double right = math.min(_maxX(planeA), _maxX(planeB));
+    final double bottom = math.max(_minY(planeA), _minY(planeB));
+    final double top = math.min(_maxY(planeA), _maxY(planeB));
+    if (right <= left || top <= bottom) return CoreConstants.zeroDouble;
+    final double stepX = (right - left) / grid;
+    final double stepY = (top - bottom) / grid;
+    int shared = CoreConstants.zero;
+    for (int i = CoreConstants.zero; i < grid; i++) {
+      for (int j = CoreConstants.zero; j < grid; j++) {
+        final math.Point<double> sample = math.Point<double>(
+          left + (i + _half) * stepX,
+          bottom + (j + _half) * stepY,
+        );
+        if (_inside(planeA, sample) && _inside(planeB, sample)) shared++;
+      }
+    }
+    return shared * stepX * stepY;
+  }
+
+  static List<List<LatLng>> splitByLine(
+    List<LatLng> points,
+    LatLng from,
+    LatLng to,
+  ) {
+    final List<LatLng> open = _open(points);
+    if (open.length < _minimumCorners || from == to) return <List<LatLng>>[];
+    final LatLng origin = centre(open);
+    final List<math.Point<double>> plane = toLocalPlane(open, origin);
+    final List<math.Point<double>> line = toLocalPlane(<LatLng>[
+      from,
+      to,
+    ], origin);
+    final List<List<math.Point<double>>> pieces = <List<math.Point<double>>>[
+      _clip(plane, line.first, line.last),
+      _clip(plane, line.last, line.first),
+    ];
+    final double whole = _planeArea(plane);
+    if (pieces.any(
+      (List<math.Point<double>> piece) =>
+          piece.length < _minimumCorners ||
+          _planeArea(piece) < whole * _smallestPiece,
+    )) {
+      return <List<LatLng>>[];
+    }
+    return <List<LatLng>>[
+      for (final List<math.Point<double>> piece in pieces)
+        fromLocalPlane(piece, origin),
+    ];
+  }
+
+  static List<List<LatLng>> splitEqual(List<LatLng> points, int pieces) {
+    final List<LatLng> open = _open(points);
+    if (open.length < _minimumCorners || pieces < CoreConstants.two) {
+      return <List<LatLng>>[];
+    }
+    final LatLng origin = centre(open);
+    final double angle = _longAxisAngle(toLocalPlane(open, origin));
+    final List<math.Point<double>> turned = _rotate(
+      toLocalPlane(open, origin),
+      -angle,
+    );
+    final double whole = _planeArea(turned);
+    final List<double> cuts = <double>[
+      _minX(turned),
+      for (int k = CoreConstants.one; k < pieces; k++)
+        _cutAt(turned, whole * k / pieces),
+      _maxX(turned),
+    ];
+    final List<List<LatLng>> strips = <List<LatLng>>[];
+    for (int k = CoreConstants.zero; k < pieces; k++) {
+      final List<math.Point<double>> strip = _rightOf(
+        _leftOf(turned, cuts[k + 1]),
+        cuts[k],
+      );
+      if (strip.length < _minimumCorners) return <List<LatLng>>[];
+      strips.add(fromLocalPlane(_rotate(strip, angle), origin));
+    }
+    return strips;
+  }
+
+  static double _cutAt(List<math.Point<double>> plane, double area) {
+    double low = _minX(plane);
+    double high = _maxX(plane);
+    for (int i = CoreConstants.zero; i < _bisections; i++) {
+      final double middle = (low + high) / CoreConstants.two;
+      if (_planeArea(_leftOf(plane, middle)) < area) {
+        low = middle;
+      } else {
+        high = middle;
+      }
+    }
+    return (low + high) / CoreConstants.two;
+  }
+
+  static List<math.Point<double>> _leftOf(
+    List<math.Point<double>> plane,
+    double x,
+  ) => _clip(
+    plane,
+    math.Point<double>(x, CoreConstants.zeroDouble),
+    math.Point<double>(x, CoreConstants.oneDouble),
+  );
+
+  static List<math.Point<double>> _rightOf(
+    List<math.Point<double>> plane,
+    double x,
+  ) => _clip(
+    plane,
+    math.Point<double>(x, CoreConstants.oneDouble),
+    math.Point<double>(x, CoreConstants.zeroDouble),
+  );
+
+  static List<math.Point<double>> _clip(
+    List<math.Point<double>> plane,
+    math.Point<double> from,
+    math.Point<double> to,
+  ) {
+    double side(math.Point<double> p) =>
+        (to.x - from.x) * (p.y - from.y) - (to.y - from.y) * (p.x - from.x);
+    final List<math.Point<double>> kept = <math.Point<double>>[];
+    for (int i = CoreConstants.zero; i < plane.length; i++) {
+      final math.Point<double> current = plane[i];
+      final math.Point<double> next = plane[(i + 1) % plane.length];
+      final double a = side(current);
+      final double b = side(next);
+      if (a >= CoreConstants.zeroDouble) kept.add(current);
+      if ((a > CoreConstants.zeroDouble && b < CoreConstants.zeroDouble) ||
+          (a < CoreConstants.zeroDouble && b > CoreConstants.zeroDouble)) {
+        final double t = a / (a - b);
+        kept.add(
+          math.Point<double>(
+            current.x + (next.x - current.x) * t,
+            current.y + (next.y - current.y) * t,
+          ),
+        );
+      }
+    }
+    return _distinct(kept);
+  }
+
+  static List<math.Point<double>> _distinct(List<math.Point<double>> points) {
+    final List<math.Point<double>> result = <math.Point<double>>[];
+    for (final math.Point<double> point in points) {
+      if (result.isEmpty || result.last.distanceTo(point) > _samePoint) {
+        result.add(point);
+      }
+    }
+    if (result.length > CoreConstants.one &&
+        result.first.distanceTo(result.last) <= _samePoint) {
+      result.removeLast();
+    }
+    return result;
+  }
+
+  static double _longAxisAngle(List<math.Point<double>> plane) {
+    double xx = CoreConstants.zeroDouble;
+    double yy = CoreConstants.zeroDouble;
+    double xy = CoreConstants.zeroDouble;
+    for (final math.Point<double> p in plane) {
+      xx += p.x * p.x;
+      yy += p.y * p.y;
+      xy += p.x * p.y;
+    }
+    return math.atan2(CoreConstants.two * xy, xx - yy) / CoreConstants.two;
+  }
+
+  static List<math.Point<double>> _rotate(
+    List<math.Point<double>> plane,
+    double angle,
+  ) {
+    final double c = math.cos(angle);
+    final double s = math.sin(angle);
+    return <math.Point<double>>[
+      for (final math.Point<double> p in plane)
+        math.Point<double>(p.x * c - p.y * s, p.x * s + p.y * c),
+    ];
+  }
+
+  static double _planeArea(List<math.Point<double>> plane) {
+    double twice = CoreConstants.zeroDouble;
+    for (int i = CoreConstants.zero; i < plane.length; i++) {
+      final math.Point<double> a = plane[i];
+      final math.Point<double> b = plane[(i + 1) % plane.length];
+      twice += a.x * b.y - b.x * a.y;
+    }
+    return twice.abs() / CoreConstants.two;
+  }
+
+  static bool _inside(List<math.Point<double>> plane, math.Point<double> p) {
+    bool inside = false;
+    for (
+      int i = CoreConstants.zero, j = plane.length - 1;
+      i < plane.length;
+      j = i++
+    ) {
+      final math.Point<double> a = plane[i];
+      final math.Point<double> b = plane[j];
+      if ((a.y > p.y) != (b.y > p.y) &&
+          p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x) {
+        inside = !inside;
+      }
+    }
+    return inside;
+  }
+
+  static math.Point<double> _closestOnSegment(
+    math.Point<double> a,
+    math.Point<double> b,
+    math.Point<double> p,
+  ) {
+    final double dx = b.x - a.x;
+    final double dy = b.y - a.y;
+    final double lengthSquared = dx * dx + dy * dy;
+    if (lengthSquared == CoreConstants.zeroDouble) return a;
+    final double t = (((p.x - a.x) * dx + (p.y - a.y) * dy) / lengthSquared)
+        .clamp(CoreConstants.zeroDouble, CoreConstants.oneDouble);
+    return math.Point<double>(a.x + dx * t, a.y + dy * t);
+  }
+
+  static double _minX(List<math.Point<double>> plane) =>
+      plane.map((math.Point<double> p) => p.x).reduce(math.min);
+
+  static double _maxX(List<math.Point<double>> plane) =>
+      plane.map((math.Point<double> p) => p.x).reduce(math.max);
+
+  static double _minY(List<math.Point<double>> plane) =>
+      plane.map((math.Point<double> p) => p.y).reduce(math.min);
+
+  static double _maxY(List<math.Point<double>> plane) =>
+      plane.map((math.Point<double> p) => p.y).reduce(math.max);
+
   static const int _minimumCorners = 3;
+
+  static const int _overlapGrid = 48;
+
+  static const int _bisections = 48;
+
+  static const double _half = 0.5;
+
+  static const double _samePoint = 0.001;
+
+  static const double _smallestPiece = 0.001;
+
+  static double _degrees(double radians) => radians * 180 / math.pi;
 
   static double _radians(double degrees) => degrees * math.pi / 180;
 

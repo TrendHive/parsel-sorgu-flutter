@@ -14,6 +14,7 @@ import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_local_key
 import 'package:parcel_atlas/presentation/domain_ui/widgets/input/parcel_info_text_field.dart';
 import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
 import 'package:parcel_atlas/presentation/map/dialog/owner_draft.dart';
+import 'package:parcel_atlas/presentation/map/dialog/owner_tree_dialog.dart';
 
 /// Name, owners with their shares, and a note — asked when a drawing is
 /// finished, and again by "Edit details".
@@ -94,44 +95,16 @@ class _SaveDrawingDialogState extends State<SaveDrawingDialog> {
       widget.snapshot.personById(owner.personId)?.name ?? owner.personId;
 
   Future<void> _addOwner() async {
-    final l10n = ParcelInfoLocalKeys.of(context);
-    final List<PersonEntity> free = widget.snapshot.persons
-        .where(
-          (PersonEntity p) =>
-              !_owners.any((OwnerDraft o) => o.personId == p.id),
-        )
-        .toList();
-    final OwnerDraft? picked = await showDialog<OwnerDraft>(
-      context: context,
-      builder: (BuildContext context) => SimpleDialog(
-        title: ParcelInfoText(l10n.pickOwnerTitle),
-        children: <Widget>[
-          if (free.isEmpty)
-            Padding(
-              padding: EdgeInsets.all(BaseDimens.padding.xLarge),
-              child: ParcelInfoText(l10n.pickOwnerEmpty),
-            ),
-          for (final PersonEntity person in free)
-            SimpleDialogOption(
-              onPressed: () =>
-                  Navigator.of(context)
-                      .pop(OwnerDraft(personId: person.id, share: _wholeText)),
-              child: ListTile(
-                leading: const Icon(Icons.person_outline),
-                title: ParcelInfoText(person.name),
-                subtitle: widget.snapshot.childrenOf(person.id).isEmpty
-                    ? null
-                    : ParcelInfoText(
-                        l10n.childCount(
-                          widget.snapshot.childrenOf(person.id).length,
-                        ),
-                      ),
-              ),
-            ),
-        ],
-      ),
+    final PersonEntity? picked = await OwnerTreeDialog.open(
+      context,
+      persons: widget.snapshot.persons,
+      excluded: <String>{for (final OwnerDraft o in _owners) o.personId},
     );
-    if (picked != null) setState(() => _owners.add(picked));
+    if (picked != null) {
+      setState(
+        () => _owners.add(OwnerDraft(personId: picked.id, share: _wholeText)),
+      );
+    }
   }
 
   ShareValueObject? get _total {

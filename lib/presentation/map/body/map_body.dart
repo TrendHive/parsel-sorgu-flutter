@@ -14,6 +14,9 @@ import 'package:parcel_atlas/domain/map/enum/map_notice_enum.dart';
 import 'package:parcel_atlas/domain/map/read_model/map_hit_read_model.dart';
 import 'package:parcel_atlas/domain/map/rule/geo_rules.dart';
 import 'package:parcel_atlas/domain/map/rule/map_rules.dart';
+import 'package:parcel_atlas/domain/parcel/entity/official_parcel_entity.dart';
+import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
+import 'package:parcel_atlas/domain/person/rule/family_rules.dart';
 import 'package:parcel_atlas/domain/person/value_object/ownership_value_object.dart';
 import 'package:parcel_atlas/presentation/core_ui/values/base_dimens.dart';
 import 'package:parcel_atlas/presentation/domain_ui/copy/exception_copy.dart';
@@ -26,13 +29,19 @@ import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_local_key
 import 'package:parcel_atlas/presentation/domain_ui/values/window_size_class_enum.dart';
 import 'package:parcel_atlas/presentation/domain_ui/widgets/feedback/parcel_info_toast.dart';
 import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
+import 'package:parcel_atlas/presentation/map/dialog/owner_tree_dialog.dart';
+import 'package:parcel_atlas/presentation/map/dialog/parcel_search_dialog.dart';
 import 'package:parcel_atlas/presentation/map/dialog/save_drawing_dialog.dart';
+import 'package:parcel_atlas/presentation/map/dialog/split_equal_dialog.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_attribution.dart';
+import 'package:parcel_atlas/presentation/map/widgets/map_colour_legend.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_drawing_layer.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_drawing_toolbar.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_drawn_panel.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_official_panel.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_parcel_layers.dart';
+import 'package:parcel_atlas/presentation/map/widgets/map_split_bar.dart';
+import 'package:parcel_atlas/presentation/map/widgets/map_split_layer.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_tile_layer.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_top_bar.dart';
 import 'package:parcel_atlas/presentation/router/parcel_info_router.dart';
@@ -159,6 +168,76 @@ class _MapBodyState extends State<MapBody> {
     if (details != null) await _cubit.saveDetails(drawing, details);
   }
 
+  Future<void> _search(MapReady state) async {
+    final ({int neighborhoodId, String block, String parcel})? query =
+        await ParcelSearchDialog.open(
+          context,
+          neighbourhoods: state.snapshot.neighbourhoods,
+        );
+    if (query != null) {
+      await _cubit.queryByNumber(
+        neighborhoodId: query.neighborhoodId,
+        block: query.block,
+        parcel: query.parcel,
+      );
+    }
+  }
+
+  Future<void> _assign(MapReady state, OfficialParcelEntity parcel) async {
+    final List<DrawnParcelEntity> corrections = state.snapshot
+        .drawingsCorrecting(parcel.id);
+    if (corrections.isNotEmpty) {
+      await _editDetails(state, corrections.first);
+      return;
+    }
+    final String name = ParcelInfoLocalKeys.of(context)
+        .drawingNameDefault(parcel.label);
+    final PersonEntity? person = await OwnerTreeDialog.open(
+      context,
+      persons: state.snapshot.persons,
+    );
+    if (person != null) {
+      await _cubit.assignOwner(parcel, person, name: name);
+    }
+  }
+
+  Future<void> _splitEqual(MapReady state, DrawnParcelEntity drawing) async {
+    final ({int pieces, List<PersonEntity>? heirs})? choice =
+        await SplitEqualDialog.open(
+          context,
+          drawing: drawing,
+          snapshot: state.snapshot,
+        );
+    if (choice != null) {
+      await _cubit.splitEqual(
+        drawing,
+        pieces: choice.pieces,
+        heirs: choice.heirs,
+      );
+    }
+  }
+
+  List<String> _colourLabels(MapReady state) {
+    final AppLocalizations l10n = ParcelInfoLocalKeys.of(context);
+    final List<PersonEntity> persons = state.snapshot.persons;
+    return <String>[
+      for (
+        int level = CoreConstants.zero;
+        level < state.snapshot.generations;
+        level++
+      )
+        l10n.colourLevel(
+          level + CoreConstants.one,
+          persons
+              .where(
+                (PersonEntity p) => FamilyRules.depthOf(persons, p.id) == level,
+              )
+              .map((PersonEntity p) => p.name)
+              .join(CoreConstants.comma + CoreConstants.space),
+        ),
+    ];
+  }
+
   Future<void> _delete(DrawnParcelEntity drawing) async {
     if (await ConfirmDialog.ask(context, name: drawing.name)) {
       await _cubit.deleteDrawing(drawing);
@@ -205,8 +284,10 @@ class _MapBodyState extends State<MapBody> {
                     snapshot: ready.snapshot,
                     layers: ready.layers,
                     selection: ready.selection,
+                    colourLevel: ready.colourLevel,
                   ),
                 if (ready?.drawing != null) _drawingLayer(ready!.drawing!),
+                if (ready?.split != null) MapSplitLayer(split: ready!.split!),
                 MapAttribution(baseMap: ready?.baseMap ?? _defaultBase),
               ],
             ),
@@ -224,14 +305,33 @@ class _MapBodyState extends State<MapBody> {
                     constraints: const BoxConstraints(
                       maxWidth: ParcelInfoDimens.toolbarMaxWidth,
                     ),
-                    child: ready.drawing == null
+                    child: ready.split != null
+                        ? MapSplitBar(
+                            split: ready.split!,
+                            onCancel: _cubit.cancelSplit,
+                            onConfirm: _cubit.confirmSplit,
+                          )
+                        : ready.drawing == null
                         ? _topBar(ready)
                         : _toolbar(ready, ready.drawing!),
                   ),
                 ),
               ),
             if (ready != null &&
+                ready.colourLevel != null &&
                 ready.drawing == null &&
+                ready.split == null)
+              SafeArea(
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: MapColourLegend(
+                    branches: ready.snapshot.branchesAt(ready.colourLevel!),
+                  ),
+                ),
+              ),
+            if (ready != null &&
+                ready.drawing == null &&
+                ready.split == null &&
                 ready.selection != null)
               SafeArea(
                 child: Align(
@@ -324,6 +424,10 @@ class _MapBodyState extends State<MapBody> {
     baseMap: state.baseMap,
     onToggleLayer: _cubit.toggleLayer,
     onBaseMap: _cubit.setBaseMap,
+    colourLevel: state.colourLevel,
+    colourLabels: _colourLabels(state),
+    onColour: _cubit.setColourLevel,
+    onSearch: () => _search(state),
     onNewDrawing: () => _cubit.startDrawing(),
     onMyLocation: _cubit.locate,
     onPeople: () => context.push(ParcelInfoRouter.people.path()),
@@ -350,6 +454,7 @@ class _MapBodyState extends State<MapBody> {
           corrections: state.snapshot.drawingsCorrecting(parcel.id),
           querying: state.querying,
           onDrawReal: () => _cubit.startDrawing(copyFrom: parcel),
+          onAssign: () => _assign(state, parcel),
           onRefresh: () => _cubit.refresh(parcel),
           onOpenDrawing: (DrawnParcelEntity drawing) =>
               _cubit.focusOn(drawing.id),
@@ -361,6 +466,8 @@ class _MapBodyState extends State<MapBody> {
           canDelete: state.member?.canDelete ?? false,
           onEditShape: () => _cubit.startDrawing(edit: drawing),
           onEditDetails: () => _editDetails(state, drawing),
+          onSplit: () => _cubit.startSplit(drawing),
+          onSplitEqual: () => _splitEqual(state, drawing),
           onDelete: () => _delete(drawing),
           onOpenOfficial: (parcel) => _cubit.focusOn(parcel.id),
           onOpenOwner: (OwnershipValueObject line) =>

@@ -263,5 +263,67 @@
     }
   },
   "errorFamilyLoop": "Bir kişi kendi soyundan birinin çocuğu olamaz.",
-  "errorRegistryRefusesWeb": "Resmi kayıt, web sitesinden yapılan sorguları kabul etmiyor. Yeni parsel sorgusunu masaüstü veya mobil uygulamadan yapın; kayıtlı parseller burada da görünür."
+  "errorRegistryRefusesWeb": "Resmi kayıt, web sitesinden yapılan sorguları kabul etmiyor. Yeni parsel sorgusunu masaüstü veya mobil uygulamadan yapın; kayıtlı parseller burada da görünür.",
+  "searchParcel": "Ada / parsel ile sorgula",
+  "searchTitle": "Parsel sorgula",
+  "searchNeighbourhood": "Mahalle",
+  "searchNeighbourhoodCode": "Mahalle kodu",
+  "searchOther": "Başka mahalle (kodunu gir)",
+  "searchHint": "Listede daha önce sorgulanan parsellerin mahalleleri var. Yeni bir mahalle için önce haritada o mahalleden bir parsele dokunun ya da mahalle kodunu girin.",
+  "blockLabel": "Ada",
+  "parcelNumberLabel": "Parsel",
+  "searchButton": "Sorgula",
+  "colourBy": "Aileye göre renklendir",
+  "colourOff": "Renklendirme kapalı",
+  "colourLevel": "{level}. kuşak: {names}",
+  "@colourLevel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "colourShared": "Ortak",
+  "colourUnassigned": "Sahibi yok",
+  "assignOwner": "Sahip ata",
+  "assignOwnerTitle": "Kime ait?",
+  "assignOwnerHint": "Kişiye dokununca seçilir. Oku ile çocuklarına inebilirsiniz; payı çocuklarına geçmiş birini seçerseniz çocukları eşit paydaş görünür.",
+  "showChildren": "Çocuklarına in",
+  "treeBack": "Bir üst kuşak",
+  "splitButton": "İkiye böl",
+  "splitEqualButton": "Eşit böl",
+  "splitHint": "Kesme çizgisi için iki noktaya dokunun; çizgi bu iki noktadan geçer. Noktalar köşelere ve kenarlara kendiliğinden oturur.",
+  "splitMissesHint": "Bu çizgi parseli ikiye ayırmıyor. İki noktayı yeniden seçin.",
+  "splitReady": "İki parça: {first} ve {second}",
+  "@splitReady": {
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmSplit": "Böl ve kaydet",
+  "splitEqualTitle": "Eşit böl",
+  "splitEqualToChildren": "{name} çocuklarına: {count} eşit parça",
+  "@splitEqualToChildren": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "splitEqualCount": "Parça sayısı",
+  "splitEqualByCount": "Sayıya göre eşit parça (sahipler aynı kalır)",
+  "splitEqualNote": "Parsel, uzun ekseni boyunca eşit alanlı parçalara bölünür. Sonra her parçanın köşelerini düzeltebilirsiniz.",
+  "errorDrawingOverlaps": "Bu çizim başka bir çizimin üstüne biniyor. Köşeleri komşu sınıra yaklaştırın; kendiliğinden o sınıra oturur.",
+  "errorSplitMisses": "Parsel bölünemedi. Kesme çizgisini ya da parça sayısını kontrol edin."
 }

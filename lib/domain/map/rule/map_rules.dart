@@ -17,7 +17,16 @@ import 'package:latlong2/latlong.dart';
 /// two free imagery sources really have for the family's area; asking for
 /// more returns a "map data not yet available" tile, so deeper levels
 /// enlarge the last real one instead.
+///
+/// [overlapToleranceSquareMeters] is how much two drawings may share before
+/// the second is refused — enough to forgive a corner placed a hand's width
+/// over a neighbour's line, not a strip of someone else's land.
+/// [maxPieces] is the most strips one equal split makes.
 abstract final class MapRules {
+  static const double overlapToleranceSquareMeters = 2;
+
+  static const int maxPieces = 12;
+
   static const int minimumCorners = 3;
 
   static const LatLng home = LatLng(40.55905, 41.00095);

@@ -19,6 +19,14 @@ Version 2.1.0 is live on https://parcel-info.web.app (the only environment).
   does; Refresh by parcel number.
 - Drawing: copy the registry outline, drag corners, "+" edge chips with live
   lengths, snapping, crosshair mode, undo/redo, keyboard shortcuts.
+
+On `dev`, not yet released (2026-11-15): search by block/parcel number;
+colouring by a level of the family tree with a legend; "Assign owner" on a
+registry parcel with a walk-down-the-tree picker; snapping onto sides and a
+refusal of overlapping drawings; split in two by a cut line and split into
+equal-area pieces (per child of an owner, or by number). None of these has
+been tried by hand on a device yet — the logic is unit-tested, the screens
+are not.
 - A family tree of owners (parent link, "share passed to children");
   deed-style shares that pass down the tree; holdings pages with totals.
 - Change history; every change signed with member and server time.
@@ -27,7 +35,7 @@ Version 2.1.0 is live on https://parcel-info.web.app (the only environment).
 ## Verified
 
 - Gate green: `flutter analyze` 0 issues, `tool/check_structure.dart`
-  clean, 43 tests, web release build; CI green on every pull request.
+  clean, 59 tests, web release build; CI green on every pull request.
 - On production, signed in: the family tree was entered through the app
   (seven people, three generations) — sign-in, rules, writes and the live
   tree all work. A boundary drawn by the owner is stored and shown.

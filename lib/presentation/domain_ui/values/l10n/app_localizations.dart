@@ -883,6 +883,198 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Resmi kayıt, web sitesinden yapılan sorguları kabul etmiyor. Yeni parsel sorgusunu masaüstü veya mobil uygulamadan yapın; kayıtlı parseller burada da görünür.'**
   String get errorRegistryRefusesWeb;
+
+  /// No description provided for @searchParcel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ada / parsel ile sorgula'**
+  String get searchParcel;
+
+  /// No description provided for @searchTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parsel sorgula'**
+  String get searchTitle;
+
+  /// No description provided for @searchNeighbourhood.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mahalle'**
+  String get searchNeighbourhood;
+
+  /// No description provided for @searchNeighbourhoodCode.
+  ///
+  /// In tr, this message translates to:
+  /// **'Mahalle kodu'**
+  String get searchNeighbourhoodCode;
+
+  /// No description provided for @searchOther.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başka mahalle (kodunu gir)'**
+  String get searchOther;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Listede daha önce sorgulanan parsellerin mahalleleri var. Yeni bir mahalle için önce haritada o mahalleden bir parsele dokunun ya da mahalle kodunu girin.'**
+  String get searchHint;
+
+  /// No description provided for @blockLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ada'**
+  String get blockLabel;
+
+  /// No description provided for @parcelNumberLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parsel'**
+  String get parcelNumberLabel;
+
+  /// No description provided for @searchButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sorgula'**
+  String get searchButton;
+
+  /// No description provided for @colourBy.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aileye göre renklendir'**
+  String get colourBy;
+
+  /// No description provided for @colourOff.
+  ///
+  /// In tr, this message translates to:
+  /// **'Renklendirme kapalı'**
+  String get colourOff;
+
+  /// No description provided for @colourLevel.
+  ///
+  /// In tr, this message translates to:
+  /// **'{level}. kuşak: {names}'**
+  String colourLevel(int level, String names);
+
+  /// No description provided for @colourShared.
+  ///
+  /// In tr, this message translates to:
+  /// **'Ortak'**
+  String get colourShared;
+
+  /// No description provided for @colourUnassigned.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sahibi yok'**
+  String get colourUnassigned;
+
+  /// No description provided for @assignOwner.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sahip ata'**
+  String get assignOwner;
+
+  /// No description provided for @assignOwnerTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kime ait?'**
+  String get assignOwnerTitle;
+
+  /// No description provided for @assignOwnerHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kişiye dokununca seçilir. Oku ile çocuklarına inebilirsiniz; payı çocuklarına geçmiş birini seçerseniz çocukları eşit paydaş görünür.'**
+  String get assignOwnerHint;
+
+  /// No description provided for @showChildren.
+  ///
+  /// In tr, this message translates to:
+  /// **'Çocuklarına in'**
+  String get showChildren;
+
+  /// No description provided for @treeBack.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bir üst kuşak'**
+  String get treeBack;
+
+  /// No description provided for @splitButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'İkiye böl'**
+  String get splitButton;
+
+  /// No description provided for @splitEqualButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşit böl'**
+  String get splitEqualButton;
+
+  /// No description provided for @splitHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Kesme çizgisi için iki noktaya dokunun; çizgi bu iki noktadan geçer. Noktalar köşelere ve kenarlara kendiliğinden oturur.'**
+  String get splitHint;
+
+  /// No description provided for @splitMissesHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu çizgi parseli ikiye ayırmıyor. İki noktayı yeniden seçin.'**
+  String get splitMissesHint;
+
+  /// No description provided for @splitReady.
+  ///
+  /// In tr, this message translates to:
+  /// **'İki parça: {first} ve {second}'**
+  String splitReady(String first, String second);
+
+  /// No description provided for @confirmSplit.
+  ///
+  /// In tr, this message translates to:
+  /// **'Böl ve kaydet'**
+  String get confirmSplit;
+
+  /// No description provided for @splitEqualTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşit böl'**
+  String get splitEqualTitle;
+
+  /// No description provided for @splitEqualToChildren.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name} çocuklarına: {count} eşit parça'**
+  String splitEqualToChildren(String name, int count);
+
+  /// No description provided for @splitEqualCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parça sayısı'**
+  String get splitEqualCount;
+
+  /// No description provided for @splitEqualByCount.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sayıya göre eşit parça (sahipler aynı kalır)'**
+  String get splitEqualByCount;
+
+  /// No description provided for @splitEqualNote.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parsel, uzun ekseni boyunca eşit alanlı parçalara bölünür. Sonra her parçanın köşelerini düzeltebilirsiniz.'**
+  String get splitEqualNote;
+
+  /// No description provided for @errorDrawingOverlaps.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu çizim başka bir çizimin üstüne biniyor. Köşeleri komşu sınıra yaklaştırın; kendiliğinden o sınıra oturur.'**
+  String get errorDrawingOverlaps;
+
+  /// No description provided for @errorSplitMisses.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parsel bölünemedi. Kesme çizgisini ya da parça sayısını kontrol edin.'**
+  String get errorSplitMisses;
 }
 
 class _AppLocalizationsDelegate
