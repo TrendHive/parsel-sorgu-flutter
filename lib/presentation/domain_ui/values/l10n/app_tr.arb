@@ -325,5 +325,6 @@
   "splitEqualByCount": "Sayıya göre eşit parça (sahipler aynı kalır)",
   "splitEqualNote": "Parsel, uzun ekseni boyunca eşit alanlı parçalara bölünür. Sonra her parçanın köşelerini düzeltebilirsiniz.",
   "errorDrawingOverlaps": "Bu çizim başka bir çizimin üstüne biniyor. Köşeleri komşu sınıra yaklaştırın; kendiliğinden o sınıra oturur.",
-  "errorSplitMisses": "Parsel bölünemedi. Kesme çizgisini ya da parça sayısını kontrol edin."
+  "errorSplitMisses": "Parsel bölünemedi. Kesme çizgisini ya da parça sayısını kontrol edin.",
+  "noticeUseApp": "Yeni parsel sorgusu web sitesinden yapılamıyor. Sorguyu telefondaki ya da bilgisayardaki Parsel Atlası uygulamasından yapın; sorgulanan parsel burada da hemen görünür."
 }

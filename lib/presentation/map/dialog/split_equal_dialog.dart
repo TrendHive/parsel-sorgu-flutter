@@ -13,9 +13,11 @@ import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_tex
 
 /// Asks how a drawing is to be cut into equal pieces.
 ///
-/// Two ways, one tap each. For every owner of the drawing who has children
-/// there is a line "to the children of the father: 4 equal pieces" — each child
-/// gets one piece as its sole owner. Or a number of pieces is typed, and the
+/// Two ways, one tap each. When the drawing has a single owner who has
+/// children there is a line "to the children of the father: 4 equal pieces"
+/// — each child gets one piece as its sole owner. It is not offered for a
+/// drawing with several owners, where it would hand one owner's children the
+/// others' shares. Or a number of pieces is typed, and the
 /// pieces keep the drawing's owners.
 ///
 /// [open] answers the number of pieces and, for the first way, the heirs in
@@ -79,8 +81,8 @@ class _SplitEqualDialogState extends State<SplitEqualDialog> {
             children: <Widget>[
               ParcelInfoText(l10n.splitEqualNote, style: text.bodySmall),
               SizedBox(height: BaseDimens.height.xxSmall),
-              for (final OwnershipValueObject line in widget.drawing.owners)
-                ..._toChildren(line),
+              if (widget.drawing.owners.length == CoreConstants.one)
+                ..._toChildren(widget.drawing.owners.single),
               const Divider(),
               ParcelInfoText(l10n.splitEqualByCount, style: text.titleSmall),
               SizedBox(height: BaseDimens.height.xxSmall),

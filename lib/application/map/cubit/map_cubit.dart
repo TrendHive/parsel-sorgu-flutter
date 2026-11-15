@@ -28,6 +28,7 @@ import 'package:parcel_atlas/domain/map/read_model/map_snapshot_read_model.dart'
 import 'package:parcel_atlas/domain/map/rule/geo_rules.dart';
 import 'package:parcel_atlas/domain/map/rule/map_rules.dart';
 import 'package:parcel_atlas/domain/parcel/entity/official_parcel_entity.dart';
+import 'package:parcel_atlas/domain/parcel/rule/parcel_rules.dart';
 import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
 import 'package:parcel_atlas/domain/person/value_object/ownership_value_object.dart';
 import 'package:parcel_atlas/domain/person/value_object/share_value_object.dart';
@@ -46,6 +47,11 @@ part 'map_state.dart';
 /// registry ([queryAt]) and the answer is stored, so each parcel costs one
 /// lookup ever. [refresh] is the Refresh button, and [queryByNumber] finds a
 /// parcel by neighbourhood, block and parcel number.
+///
+/// The registry refuses browsers, so where it cannot be reached
+/// (`registryReachable` false — the website) nothing is sent: a lookup that
+/// would need it answers with a notice pointing to the desktop or mobile
+/// app, and what is already stored keeps working.
 ///
 /// Ownership: [assignOwner] records a person on a registry parcel in one
 /// step — the registry record stays untouched, so it stores a drawing with
@@ -77,8 +83,9 @@ final class MapCubit extends Cubit<MapState> {
     this._splitDrawing,
     this._deleteDrawing,
     this._locate,
-    this._auth,
-  ) : super(const MapLoading());
+    this._auth, {
+    this._registryReachable = true,
+  }) : super(const MapLoading());
 
   final WatchMapUseCase _watchMap;
 
@@ -97,6 +104,8 @@ final class MapCubit extends Cubit<MapState> {
   final LocateDeviceUseCase _locate;
 
   final AuthRepositoryInterface _auth;
+
+  final bool _registryReachable;
 
   StreamSubscription<Either<BaseException, MapSnapshotReadModel>>?
   _subscription;
@@ -217,6 +226,10 @@ final class MapCubit extends Cubit<MapState> {
     final MapState current = state;
     if (current is! MapReady || current.querying) return;
     final bool stored = current.snapshot.officialAt(point) != null;
+    if (!stored && !_registryReachable) {
+      emit(current.copyWith(notice: MapNoticeEnum.useApp));
+      return;
+    }
     emit(current.copyWith(querying: true));
     final Either<BaseException, String> result = await _queryAt(
       point,
@@ -231,6 +244,10 @@ final class MapCubit extends Cubit<MapState> {
   Future<void> refresh(OfficialParcelEntity parcel) async {
     final MapState current = state;
     if (current is! MapReady || current.querying) return;
+    if (!_registryReachable) {
+      emit(current.copyWith(notice: MapNoticeEnum.useApp));
+      return;
+    }
     emit(current.copyWith(querying: true));
     _afterRegistry(await _refresh(parcel), MapNoticeEnum.refreshed);
   }
@@ -242,6 +259,15 @@ final class MapCubit extends Cubit<MapState> {
   }) async {
     final MapState current = state;
     if (current is! MapReady || current.querying) return;
+    final String key = ParcelRules.keyOf(
+      neighborhoodId: neighborhoodId,
+      block: block.trim(),
+      parcel: parcel.trim(),
+    );
+    if (!_registryReachable && current.snapshot.officialById(key) == null) {
+      emit(current.copyWith(notice: MapNoticeEnum.useApp));
+      return;
+    }
     emit(current.copyWith(querying: true));
     _afterRegistry(
       await _queryByNumber(
