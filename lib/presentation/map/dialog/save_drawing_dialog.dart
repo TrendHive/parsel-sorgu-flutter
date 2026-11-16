@@ -1,6 +1,7 @@
 import 'package:either_dart/either.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:parcel_atlas/core/base/base_exception.dart';
+import 'package:parcel_atlas/core/constants.dart';
 import 'package:parcel_atlas/domain/drawing/value_object/drawing_details_value_object.dart';
 import 'package:parcel_atlas/domain/map/read_model/map_snapshot_read_model.dart';
 import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
@@ -19,6 +20,9 @@ import 'package:parcel_atlas/presentation/map/dialog/owner_tree_dialog.dart';
 /// Name, owners with their shares, and a note — asked when a drawing is
 /// finished, and again by "Edit details".
 ///
+/// [addedPersonId], when given, is a co-owner being assigned: their line is
+/// added with an empty share for the member to fill in.
+///
 /// [open] answers the details, or null when the member backs out. Shares are
 /// typed as a deed writes them ("1/4"); the running total shows under the
 /// list, and nothing is accepted that the domain would refuse — an empty
@@ -31,6 +35,7 @@ class SaveDrawingDialog extends StatefulWidget {
     required this.owners,
     required this.note,
     required this.officialParcelId,
+    this.addedPersonId,
   });
 
   final MapSnapshotReadModel snapshot;
@@ -43,6 +48,8 @@ class SaveDrawingDialog extends StatefulWidget {
 
   final String? officialParcelId;
 
+  final String? addedPersonId;
+
   static Future<DrawingDetailsValueObject?> open(
     BuildContext context, {
     required MapSnapshotReadModel snapshot,
@@ -50,6 +57,7 @@ class SaveDrawingDialog extends StatefulWidget {
     required List<OwnershipValueObject> owners,
     required String note,
     required String? officialParcelId,
+    String? addedPersonId,
   }) => showDialog<DrawingDetailsValueObject>(
     context: context,
     builder: (_) => SaveDrawingDialog(
@@ -58,6 +66,7 @@ class SaveDrawingDialog extends StatefulWidget {
       owners: owners,
       note: note,
       officialParcelId: officialParcelId,
+      addedPersonId: addedPersonId,
     ),
   );
 
@@ -78,6 +87,8 @@ class _SaveDrawingDialogState extends State<SaveDrawingDialog> {
         personId: line.personId,
         share: '${line.share.numerator}/${line.share.denominator}',
       ),
+    if (widget.addedPersonId case final String added)
+      OwnerDraft(personId: added, share: CoreConstants.empty),
   ];
   String? _error;
 

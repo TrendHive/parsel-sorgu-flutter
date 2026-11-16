@@ -501,7 +501,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get colourBy => 'Aileye göre renklendir';
 
   @override
-  String get colourOff => 'Renklendirme kapalı';
+  String get colourOff => 'Sahibe göre';
 
   @override
   String colourLevel(int level, String names) {
@@ -518,6 +518,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get assignOwner => 'Sahip ata';
 
   @override
+  String get assignOwnerWhichDrawing => 'Hangi gerçek sınıra?';
+
+  @override
   String get assignOwnerTitle => 'Kime ait?';
 
   @override
@@ -525,10 +528,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Kişiye dokununca seçilir. Oku ile çocuklarına inebilirsiniz; payı çocuklarına geçmiş birini seçerseniz çocukları eşit paydaş görünür.';
 
   @override
-  String get showChildren => 'Çocuklarına in';
-
-  @override
-  String get treeBack => 'Bir üst kuşak';
+  String get showChildren => 'Çocuklarını aç / kapat';
 
   @override
   String get splitButton => 'İkiye böl';
@@ -582,4 +582,85 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get noticeUseApp =>
       'Yeni parsel sorgusu web sitesinden yapılamıyor. Sorguyu telefondaki ya da bilgisayardaki Parsel Atlası uygulamasından yapın; sorgulanan parsel burada da hemen görünür.';
+
+  @override
+  String get compareAdd => 'Karşılaştırmaya ekle';
+
+  @override
+  String get compareRemove => 'Karşılaştırmadan çıkar';
+
+  @override
+  String compareOpen(int count) {
+    return 'Karşılaştır ($count)';
+  }
+
+  @override
+  String get compareClear => 'Listeyi temizle';
+
+  @override
+  String get compareTitle => 'Parsel karşılaştırma';
+
+  @override
+  String get compareByOwner => 'Sahibe göre';
+
+  @override
+  String get compareParcels => 'Parseller';
+
+  @override
+  String get compareReal => 'Gerçek';
+
+  @override
+  String get compareRegistry => 'Tapu';
+
+  @override
+  String get compareDifference => 'Fark';
+
+  @override
+  String get compareTotal => 'Toplam';
+
+  @override
+  String get compareEmpty =>
+      'Karşılaştırılacak parsel yok. Haritada bir parsel seçip \"Karşılaştırmaya ekle\" deyin.';
+
+  @override
+  String get compareNotDrawn => 'Gerçek sınırı çizilmemiş';
+
+  @override
+  String get compareNoRegistry => 'Tapu kaydı yok';
+
+  @override
+  String get redivideButton => 'Komşuyla tapuya göre böl';
+
+  @override
+  String get redivideTitle => 'Tapuya göre yeniden bölme';
+
+  @override
+  String get redividePick => 'Yan taraftaki komşu gerçek sınıra dokunun.';
+
+  @override
+  String get redivideNoDeed => 'İkisinin de tapu kaydı (resmi parseli) olmalı.';
+
+  @override
+  String get redivideSameDeed =>
+      'İkisi aynı tapuya ait; tapu bunların nasıl bölüneceğini söylemiyor.';
+
+  @override
+  String get redivideNotNeighbours =>
+      'Bu iki sınır ortak bir kenarı paylaşmıyor.';
+
+  @override
+  String get redivideReady =>
+      'Aradaki çizgi tapu alanlarına göre kaydırıldı. Yeni şekiller haritada.';
+
+  @override
+  String redividePiece(String name, String after, String deed, String now) {
+    return '$name: $after (tapu $deed, şu an $now)';
+  }
+
+  @override
+  String get redivideConfirm => 'Yeni sınırları kaydet';
+
+  @override
+  String get redivideSplitDeed =>
+      'Bu tapulardan biri zaten birkaç gerçek sınıra bölünmüş; tapu alanının tamamı bu sınırın değil.';
 }

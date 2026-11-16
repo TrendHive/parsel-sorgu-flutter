@@ -1,8 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:parcel_atlas/application/auth/cubit/session_cubit.dart';
+import 'package:parcel_atlas/core/constants.dart';
 import 'package:parcel_atlas/core/navigation/navigation_service.dart';
 import 'package:parcel_atlas/presentation/activity/activity_page.dart';
+import 'package:parcel_atlas/presentation/compare/compare_page.dart';
 import 'package:parcel_atlas/presentation/holdings/holdings_page.dart';
 import 'package:parcel_atlas/presentation/map/map_page.dart';
 import 'package:parcel_atlas/presentation/people/people_page.dart';
@@ -19,7 +21,8 @@ import 'package:parcel_atlas/presentation/splash/splash_page.dart';
 ///
 /// [map] takes an optional `focus` query — a record id to select and frame,
 /// which is how the holdings page's "show on map" works. [holdings] is one
-/// person's parcels.
+/// person's parcels. [compare] takes an `ids` query — the drawings and
+/// registry parcels to compare, comma-separated ([compareOf]).
 class ParcelInfoRouter {
   ParcelInfoRouter(this._session)
     : _refresh = SessionRefreshListenable(_session) {
@@ -59,6 +62,15 @@ class ParcelInfoRouter {
           ],
         ),
         GoRoute(
+          path: compare.pathEnd(),
+          builder: (BuildContext context, GoRouterState state) => ComparePage(
+            ids: (state.uri.queryParameters[idsQuery] ?? CoreConstants.empty)
+                .split(CoreConstants.comma)
+                .where((String id) => id.isNotEmpty)
+                .toList(),
+          ),
+        ),
+        GoRoute(
           path: activity.pathEnd(),
           builder: (BuildContext context, GoRouterState state) =>
               const ActivityPage(),
@@ -75,6 +87,8 @@ class ParcelInfoRouter {
 
   static const String focusQuery = 'focus';
 
+  static const String idsQuery = 'ids';
+
   static final RoutePath splash = RoutePath(pathEnd: 'loading');
   static final RoutePath signIn = RoutePath(pathEnd: 'sign-in');
   static final RoutePath map = RoutePath(pathEnd: 'map');
@@ -85,6 +99,12 @@ class ParcelInfoRouter {
     parameter: 'personId',
   );
   static final RoutePath activity = RoutePath(pathEnd: 'activity');
+  static final RoutePath compare = RoutePath(pathEnd: 'compare');
+
+  static String compareOf(List<String> ids) => Uri(
+    path: compare.path(),
+    queryParameters: <String, String>{idsQuery: ids.join(CoreConstants.comma)},
+  ).toString();
 
   static String holdingsOf(String personId) =>
       holdings.path(parameter: personId);

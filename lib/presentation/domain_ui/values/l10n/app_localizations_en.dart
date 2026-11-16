@@ -501,7 +501,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get colourBy => 'Colour by family';
 
   @override
-  String get colourOff => 'No colouring';
+  String get colourOff => 'By owner';
 
   @override
   String colourLevel(int level, String names) {
@@ -518,6 +518,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assignOwner => 'Assign owner';
 
   @override
+  String get assignOwnerWhichDrawing => 'Which real boundary?';
+
+  @override
   String get assignOwnerTitle => 'Whose is it?';
 
   @override
@@ -525,10 +528,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tap a person to choose them. Use the arrow to go down to their children; if you choose someone whose share passed on, their children show as equal holders.';
 
   @override
-  String get showChildren => 'Go to children';
-
-  @override
-  String get treeBack => 'Up one generation';
+  String get showChildren => 'Show or hide their children';
 
   @override
   String get splitButton => 'Split in two';
@@ -582,4 +582,85 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get noticeUseApp =>
       'New parcel lookups cannot be made from the website. Use the Parsel Atlası app on your phone or computer; the parcel appears here at once.';
+
+  @override
+  String get compareAdd => 'Add to comparison';
+
+  @override
+  String get compareRemove => 'Remove from comparison';
+
+  @override
+  String compareOpen(int count) {
+    return 'Compare ($count)';
+  }
+
+  @override
+  String get compareClear => 'Clear the list';
+
+  @override
+  String get compareTitle => 'Parcel comparison';
+
+  @override
+  String get compareByOwner => 'By owner';
+
+  @override
+  String get compareParcels => 'Parcels';
+
+  @override
+  String get compareReal => 'Real';
+
+  @override
+  String get compareRegistry => 'Deed';
+
+  @override
+  String get compareDifference => 'Difference';
+
+  @override
+  String get compareTotal => 'Total';
+
+  @override
+  String get compareEmpty =>
+      'No parcels to compare. Select a parcel on the map and choose \"Add to comparison\".';
+
+  @override
+  String get compareNotDrawn => 'Real boundary not drawn';
+
+  @override
+  String get compareNoRegistry => 'No registry record';
+
+  @override
+  String get redivideButton => 'Divide with neighbour by deed';
+
+  @override
+  String get redivideTitle => 'Divide again by deed';
+
+  @override
+  String get redividePick => 'Tap the neighbouring real boundary.';
+
+  @override
+  String get redivideNoDeed => 'Both need a registry parcel (a deed).';
+
+  @override
+  String get redivideSameDeed =>
+      'Both belong to the same deed; it does not say how they are split.';
+
+  @override
+  String get redivideNotNeighbours =>
+      'These two boundaries do not share a side.';
+
+  @override
+  String get redivideReady =>
+      'The line between them moved to match the deed areas. The new shapes are on the map.';
+
+  @override
+  String redividePiece(String name, String after, String deed, String now) {
+    return '$name: $after (deed $deed, now $now)';
+  }
+
+  @override
+  String get redivideConfirm => 'Save the new boundaries';
+
+  @override
+  String get redivideSplitDeed =>
+      'One of these deeds is already divided among several real boundaries; its whole area is not this boundary\'s.';
 }

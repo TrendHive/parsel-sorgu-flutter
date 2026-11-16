@@ -17,7 +17,8 @@ import 'package:parcel_atlas/presentation/map/widgets/map_panel_frame.dart';
 /// The first action is the main one — draw the real boundary, starting from
 /// a copy of this outline. "Refresh" asks the registry again (one lookup).
 /// The real boundaries already drawn for this parcel are listed and open on
-/// a tap.
+/// a tap. [inCompare] says whether it is on the comparison list, which
+/// [onCompare] toggles.
 class MapOfficialPanel extends StatelessWidget {
   const MapOfficialPanel({
     super.key,
@@ -28,6 +29,8 @@ class MapOfficialPanel extends StatelessWidget {
     required this.onAssign,
     required this.onRefresh,
     required this.onOpenDrawing,
+    required this.inCompare,
+    required this.onCompare,
     required this.onClose,
   });
 
@@ -44,6 +47,10 @@ class MapOfficialPanel extends StatelessWidget {
   final VoidCallback onRefresh;
 
   final ValueChanged<DrawnParcelEntity> onOpenDrawing;
+
+  final bool inCompare;
+
+  final VoidCallback onCompare;
 
   final VoidCallback onClose;
 
@@ -81,6 +88,14 @@ class MapOfficialPanel extends StatelessWidget {
           onPressed: onAssign,
           icon: const Icon(Icons.person_add_alt),
           label: ParcelInfoText(l10n.assignOwner),
+        ),
+        SizedBox(height: BaseDimens.height.xxSmall),
+        OutlinedButton.icon(
+          onPressed: onCompare,
+          icon: Icon(inCompare ? Icons.playlist_remove : Icons.playlist_add),
+          label: ParcelInfoText(
+            inCompare ? l10n.compareRemove : l10n.compareAdd,
+          ),
         ),
         SizedBox(height: BaseDimens.height.xxSmall),
         OutlinedButton.icon(

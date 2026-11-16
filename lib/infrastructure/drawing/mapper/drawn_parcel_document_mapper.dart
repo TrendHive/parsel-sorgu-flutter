@@ -14,7 +14,9 @@ import 'package:parcel_atlas/infrastructure/store/mapper/geo_polygon_mapper.dart
 /// (`measures`), so the numbers a member saw when saving are on record and
 /// readable by any tool, not only by this app. Owners are stored as lines
 /// (`personId`, `numerator`, `denominator`) plus [ownerIds], the flat list
-/// Firestore can query when a person is deleted.
+/// Firestore can query when a person is deleted. [writeShape] is the
+/// geometry alone — outline, measurements and the update stamp — for a
+/// change that must not touch the details another device may have edited.
 class DrawnParcelDocumentMapper {
   const DrawnParcelDocumentMapper();
 
@@ -48,6 +50,19 @@ class DrawnParcelDocumentMapper {
     owners: writeOwners(details.owners),
     ownerIds: writeOwnerIds(details.owners),
     note: details.note,
+    measures: <String, Object?>{
+      area: shape.areaSquareMeters,
+      perimeter: shape.perimeterMeters,
+      edges: shape.edgeLengthsMeters,
+    },
+    updated: _stamps.write(actor),
+  };
+
+  Map<String, Object?> writeShape(
+    GeoPolygonValueObject shape,
+    MemberEntity actor,
+  ) => <String, Object?>{
+    outline: _outline.write(shape),
     measures: <String, Object?>{
       area: shape.areaSquareMeters,
       perimeter: shape.perimeterMeters,

@@ -6,13 +6,15 @@ import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_dimens.da
 import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_local_keys.dart';
 import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
 
-/// Picks a person by walking down the family tree, one generation at a time.
+/// Picks a person from the family tree, shown as a tree that opens and
+/// closes.
 ///
-/// It opens on the eldest generation. A tap on a person chooses them; the
-/// arrow beside a person with children goes down to those children instead,
-/// so a member stops at whatever level the land belongs to — choosing the
-/// grandfather, or going in and choosing one of his sons. People in
-/// [excluded] are shown but cannot be chosen (they are already owners).
+/// The heads of the family come first ([FamilyRules.heads]), each closed. A
+/// tap on a person chooses them; the arrow beside a person with children
+/// opens or closes them in place, indented under their parent, so a member
+/// stops at whatever level the land belongs to — choosing the grandfather,
+/// or opening him and choosing one of his sons. People in [excluded] are
+/// shown but cannot be chosen (they are already owners).
 ///
 /// [open] answers the person, or null when the member backs out.
 class OwnerTreeDialog extends StatefulWidget {
@@ -40,25 +42,13 @@ class OwnerTreeDialog extends StatefulWidget {
 }
 
 class _OwnerTreeDialogState extends State<OwnerTreeDialog> {
-  final List<PersonEntity> _path = <PersonEntity>[];
-
-  List<PersonEntity> get _shown {
-    if (_path.isNotEmpty) {
-      return FamilyRules.childrenOf(widget.persons, _path.last.id);
-    }
-    final Set<String> ids = <String>{
-      for (final PersonEntity p in widget.persons) p.id,
-    };
-    return widget.persons
-        .where((PersonEntity p) => !ids.contains(p.parentId))
-        .toList();
-  }
+  final Set<String> _opened = <String>{};
 
   @override
   Widget build(BuildContext context) {
     final l10n = ParcelInfoLocalKeys.of(context);
     final TextTheme text = Theme.of(context).textTheme;
-    final List<PersonEntity> shown = _shown;
+    final List<PersonEntity> heads = FamilyRules.heads(widget.persons);
     return AlertDialog(
       title: ParcelInfoText(l10n.assignOwnerTitle),
       content: SizedBox(
@@ -70,18 +60,8 @@ class _OwnerTreeDialogState extends State<OwnerTreeDialog> {
             children: <Widget>[
               ParcelInfoText(l10n.assignOwnerHint, style: text.bodySmall),
               SizedBox(height: BaseDimens.height.xxSmall),
-              if (_path.isNotEmpty)
-                ListTile(
-                  leading: const Icon(Icons.arrow_upward),
-                  title: ParcelInfoText(
-                    _path.map((PersonEntity p) => p.name).join(_separator),
-                    style: text.titleSmall,
-                  ),
-                  subtitle: ParcelInfoText(l10n.treeBack),
-                  onTap: () => setState(_path.removeLast),
-                ),
-              if (shown.isEmpty) ParcelInfoText(l10n.pickOwnerEmpty),
-              for (final PersonEntity person in shown) _tile(person),
+              if (heads.isEmpty) ParcelInfoText(l10n.pickOwnerEmpty),
+              for (final PersonEntity person in heads) ..._branch(person, 0),
             ],
           ),
         ),
@@ -95,14 +75,32 @@ class _OwnerTreeDialogState extends State<OwnerTreeDialog> {
     );
   }
 
-  Widget _tile(PersonEntity person) {
-    final l10n = ParcelInfoLocalKeys.of(context);
-    final int children = FamilyRules.childrenOf(
+  List<Widget> _branch(PersonEntity person, int depth) {
+    final List<PersonEntity> children = FamilyRules.childrenOf(
       widget.persons,
       person.id,
-    ).length;
+    );
+    final bool opened = _opened.contains(person.id);
+    return <Widget>[
+      _tile(person, children.length, depth, opened: opened),
+      if (opened && depth < FamilyRules.maxGenerations)
+        for (final PersonEntity child in children) ..._branch(child, depth + 1),
+    ];
+  }
+
+  Widget _tile(
+    PersonEntity person,
+    int children,
+    int depth, {
+    required bool opened,
+  }) {
+    final l10n = ParcelInfoLocalKeys.of(context);
+    final bool excluded = widget.excluded.contains(person.id);
     return ListTile(
-      enabled: !widget.excluded.contains(person.id) || children > 0,
+      contentPadding: EdgeInsetsDirectional.only(
+        start: ParcelInfoDimens.treeIndent * depth,
+      ),
+      enabled: !excluded || children > 0,
       leading: Icon(
         FamilyRules.passes(widget.persons, person)
             ? Icons.account_tree_outlined
@@ -116,14 +114,13 @@ class _OwnerTreeDialogState extends State<OwnerTreeDialog> {
           ? null
           : IconButton(
               tooltip: l10n.showChildren,
-              icon: const Icon(Icons.chevron_right),
-              onPressed: () => setState(() => _path.add(person)),
+              icon: Icon(opened ? Icons.expand_less : Icons.expand_more),
+              onPressed: () => setState(
+                () =>
+                    opened ? _opened.remove(person.id) : _opened.add(person.id),
+              ),
             ),
-      onTap: widget.excluded.contains(person.id)
-          ? null
-          : () => Navigator.of(context).pop(person),
+      onTap: excluded ? null : () => Navigator.of(context).pop(person),
     );
   }
-
-  static const String _separator = ' › ';
 }

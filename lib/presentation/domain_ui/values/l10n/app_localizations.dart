@@ -947,7 +947,7 @@ abstract class AppLocalizations {
   /// No description provided for @colourOff.
   ///
   /// In tr, this message translates to:
-  /// **'Renklendirme kapalı'**
+  /// **'Sahibe göre'**
   String get colourOff;
 
   /// No description provided for @colourLevel.
@@ -974,6 +974,12 @@ abstract class AppLocalizations {
   /// **'Sahip ata'**
   String get assignOwner;
 
+  /// No description provided for @assignOwnerWhichDrawing.
+  ///
+  /// In tr, this message translates to:
+  /// **'Hangi gerçek sınıra?'**
+  String get assignOwnerWhichDrawing;
+
   /// No description provided for @assignOwnerTitle.
   ///
   /// In tr, this message translates to:
@@ -989,14 +995,8 @@ abstract class AppLocalizations {
   /// No description provided for @showChildren.
   ///
   /// In tr, this message translates to:
-  /// **'Çocuklarına in'**
+  /// **'Çocuklarını aç / kapat'**
   String get showChildren;
-
-  /// No description provided for @treeBack.
-  ///
-  /// In tr, this message translates to:
-  /// **'Bir üst kuşak'**
-  String get treeBack;
 
   /// No description provided for @splitButton.
   ///
@@ -1081,6 +1081,150 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Yeni parsel sorgusu web sitesinden yapılamıyor. Sorguyu telefondaki ya da bilgisayardaki Parsel Atlası uygulamasından yapın; sorgulanan parsel burada da hemen görünür.'**
   String get noticeUseApp;
+
+  /// No description provided for @compareAdd.
+  ///
+  /// In tr, this message translates to:
+  /// **'Karşılaştırmaya ekle'**
+  String get compareAdd;
+
+  /// No description provided for @compareRemove.
+  ///
+  /// In tr, this message translates to:
+  /// **'Karşılaştırmadan çıkar'**
+  String get compareRemove;
+
+  /// No description provided for @compareOpen.
+  ///
+  /// In tr, this message translates to:
+  /// **'Karşılaştır ({count})'**
+  String compareOpen(int count);
+
+  /// No description provided for @compareClear.
+  ///
+  /// In tr, this message translates to:
+  /// **'Listeyi temizle'**
+  String get compareClear;
+
+  /// No description provided for @compareTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parsel karşılaştırma'**
+  String get compareTitle;
+
+  /// No description provided for @compareByOwner.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sahibe göre'**
+  String get compareByOwner;
+
+  /// No description provided for @compareParcels.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parseller'**
+  String get compareParcels;
+
+  /// No description provided for @compareReal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gerçek'**
+  String get compareReal;
+
+  /// No description provided for @compareRegistry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tapu'**
+  String get compareRegistry;
+
+  /// No description provided for @compareDifference.
+  ///
+  /// In tr, this message translates to:
+  /// **'Fark'**
+  String get compareDifference;
+
+  /// No description provided for @compareTotal.
+  ///
+  /// In tr, this message translates to:
+  /// **'Toplam'**
+  String get compareTotal;
+
+  /// No description provided for @compareEmpty.
+  ///
+  /// In tr, this message translates to:
+  /// **'Karşılaştırılacak parsel yok. Haritada bir parsel seçip \"Karşılaştırmaya ekle\" deyin.'**
+  String get compareEmpty;
+
+  /// No description provided for @compareNotDrawn.
+  ///
+  /// In tr, this message translates to:
+  /// **'Gerçek sınırı çizilmemiş'**
+  String get compareNotDrawn;
+
+  /// No description provided for @compareNoRegistry.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tapu kaydı yok'**
+  String get compareNoRegistry;
+
+  /// No description provided for @redivideButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Komşuyla tapuya göre böl'**
+  String get redivideButton;
+
+  /// No description provided for @redivideTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Tapuya göre yeniden bölme'**
+  String get redivideTitle;
+
+  /// No description provided for @redividePick.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yan taraftaki komşu gerçek sınıra dokunun.'**
+  String get redividePick;
+
+  /// No description provided for @redivideNoDeed.
+  ///
+  /// In tr, this message translates to:
+  /// **'İkisinin de tapu kaydı (resmi parseli) olmalı.'**
+  String get redivideNoDeed;
+
+  /// No description provided for @redivideSameDeed.
+  ///
+  /// In tr, this message translates to:
+  /// **'İkisi aynı tapuya ait; tapu bunların nasıl bölüneceğini söylemiyor.'**
+  String get redivideSameDeed;
+
+  /// No description provided for @redivideNotNeighbours.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu iki sınır ortak bir kenarı paylaşmıyor.'**
+  String get redivideNotNeighbours;
+
+  /// No description provided for @redivideReady.
+  ///
+  /// In tr, this message translates to:
+  /// **'Aradaki çizgi tapu alanlarına göre kaydırıldı. Yeni şekiller haritada.'**
+  String get redivideReady;
+
+  /// No description provided for @redividePiece.
+  ///
+  /// In tr, this message translates to:
+  /// **'{name}: {after} (tapu {deed}, şu an {now})'**
+  String redividePiece(String name, String after, String deed, String now);
+
+  /// No description provided for @redivideConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yeni sınırları kaydet'**
+  String get redivideConfirm;
+
+  /// No description provided for @redivideSplitDeed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu tapulardan biri zaten birkaç gerçek sınıra bölünmüş; tapu alanının tamamı bu sınırın değil.'**
+  String get redivideSplitDeed;
 }
 
 class _AppLocalizationsDelegate

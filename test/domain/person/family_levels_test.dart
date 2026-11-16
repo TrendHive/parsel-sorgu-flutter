@@ -60,4 +60,34 @@ void main() {
       'grandfather',
     ]);
   });
+
+  test('the owner picker opens on the heads of the family, loners last', () {
+    final List<PersonEntity> persons = <PersonEntity>[
+      testPerson('alone'),
+      ...testFamily,
+      testPerson('second head'),
+      testPerson('his son', parentId: 'second head'),
+    ];
+    expect(FamilyRules.heads(persons).map((PersonEntity p) => p.id), <String>[
+      'grandfather',
+      'second head',
+      'alone',
+    ]);
+  });
+
+  test('an owner avatar shows the first and last initials', () {
+    PersonEntity named(String name) => PersonEntity(
+      id: 'x',
+      name: name,
+      parentId: null,
+      passesToChildren: false,
+      note: '',
+      created: null,
+      updated: null,
+    );
+    expect(named('Ada Lovelace').initials, 'AL');
+    expect(named('  Grace  Brewster Hopper ').initials, 'GH');
+    expect(named('Ada').initials, 'A');
+    expect(named('').initials, '');
+  });
 }

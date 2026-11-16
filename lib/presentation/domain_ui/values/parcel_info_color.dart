@@ -89,22 +89,23 @@ class ParcelInfoColor {
   static const Color mapLabelBackground = Color(0xe6FFFFFF);
   static const Color mapLabelText = Color(0xff202020);
 
-  /// Branches of the family, when the map is coloured by a level of the
-  /// tree: distinct hues that stay apart on aerial imagery. A drawing held by
-  /// several branches at once takes [sharedBranches].
+  /// Owners, or branches of the family when the map is coloured by a level
+  /// of the tree: distinct hues that stay apart on aerial imagery and from
+  /// the registry's cyan and the draft's yellow. A drawing held by several
+  /// at once takes [sharedBranches]; one nobody owns yet takes [unowned].
   static const List<Color> branchPalette = <Color>[
     Color(0xffE53935),
     Color(0xff1E88E5),
     Color(0xff43A047),
-    Color(0xffFDD835),
     Color(0xff8E24AA),
-    Color(0xff00ACC1),
-    Color(0xffF4511E),
     Color(0xffD81B60),
+    Color(0xffF4511E),
     Color(0xff7CB342),
     Color(0xff3949AB),
+    Color(0xff00897B),
   ];
-  static const Color sharedBranches = Color(0xffBDBDBD);
+  static const Color sharedBranches = Color(0xff6D4C41);
+  static const Color unowned = Color(0xffE0E0E0);
 
   static Color branch(int index) => branchPalette[index % branchPalette.length];
 
