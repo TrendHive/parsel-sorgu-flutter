@@ -16,6 +16,10 @@ import 'package:parcel_atlas/domain/input/enum/input_field_enum.dart';
 /// being re-entered — and can later be compared with how the land was
 /// really divided.
 ///
+/// [initials] is what an avatar shows: the first letters of the first and
+/// last word of the name ("Ada Lovelace" → "AL"), one letter for a single
+/// word.
+///
 /// [create] answers a new, unsaved person (empty [id], no stamps yet) or the
 /// reason it is not valid; [edit] the same for a change.
 final class PersonEntity extends BaseEntity {
@@ -83,4 +87,18 @@ final class PersonEntity extends BaseEntity {
       );
 
   bool get isNew => id.isEmpty;
+
+  String get initials {
+    final List<String> words = name
+        .trim()
+        .split(CoreConstants.space)
+        .where((String word) => word.isNotEmpty)
+        .toList();
+    if (words.isEmpty) return CoreConstants.empty;
+    final String first = String.fromCharCode(words.first.runes.first);
+    final String last = words.length > 1
+        ? String.fromCharCode(words.last.runes.first)
+        : CoreConstants.empty;
+    return (first + last).toUpperCase();
+  }
 }

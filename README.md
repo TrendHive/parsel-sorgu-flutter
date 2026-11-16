@@ -60,7 +60,7 @@ Areas, perimeters and every side's length are computed on the WGS84 ellipsoid, s
 <td valign="top">
 
 #### 👨‍👩‍👧‍👦 A family tree of owners
-Owners hold deed-style shares (1/4). A share recorded on an ancestor passes down the tree, split equally among the children of each generation. The map is coloured by owner (unowned land in grey), and can instead be coloured by any generation of the tree.
+Owners hold deed-style shares (1/4). A share recorded on an ancestor passes down the tree, split equally among the children of each generation. The map is coloured by owner, with each owner's initials over their land (unowned land is drawn faintly), and can instead be coloured by any generation of the tree.
 
 </td>
 <td valign="top">

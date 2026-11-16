@@ -13,7 +13,10 @@
 /// [crosshair] the precise-placement sight; [fillAlpha] the polygons'
 /// see-through fill, [branchFillAlpha] the stronger fill of a drawing
 /// coloured by family branch; [legendDot] and [legendMaxWidth] size the
-/// colour legend and [cutPoint] a point of a cut line.
+/// colour legend and [cutPoint] a point of a cut line. A parcel nobody owns
+/// is drawn faintly: [unownedFillAlpha], [unownedStrokeAlpha] and the thin
+/// [unownedOutline]. [avatar] is an owner's initials circle over a parcel,
+/// and [maxAvatars] how many show before a "+n".
 class ParcelInfoDimens {
   ParcelInfoDimens._();
 
@@ -37,6 +40,11 @@ class ParcelInfoDimens {
   static const double fillAlpha = 0.22;
   static const double branchFillAlpha = 0.45;
   static const double legendDot = 14;
+  static const double unownedFillAlpha = 0.06;
+  static const double unownedStrokeAlpha = 0.55;
+  static const double unownedOutline = 1;
+  static const double avatar = 24;
+  static const int maxAvatars = 3;
   static const double legendMaxWidth = 260;
   static const double cutPoint = 14;
   static const double dash = 8;
