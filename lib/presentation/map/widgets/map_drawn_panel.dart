@@ -19,6 +19,8 @@ import 'package:parcel_atlas/presentation/map/widgets/map_panel_frame.dart';
 /// the deed, who owns which share, and the actions on it.
 ///
 /// [canDelete] shows the delete action only to the main account.
+/// [inCompare] says whether it is on the comparison list, which [onCompare]
+/// toggles.
 class MapDrawnPanel extends StatelessWidget {
   const MapDrawnPanel({
     super.key,
@@ -27,11 +29,15 @@ class MapDrawnPanel extends StatelessWidget {
     required this.canDelete,
     required this.onEditShape,
     required this.onEditDetails,
+    required this.onAssign,
     required this.onSplit,
     required this.onSplitEqual,
+    required this.onRedivide,
     required this.onDelete,
     required this.onOpenOfficial,
     required this.onOpenOwner,
+    required this.inCompare,
+    required this.onCompare,
     required this.onClose,
   });
 
@@ -45,15 +51,23 @@ class MapDrawnPanel extends StatelessWidget {
 
   final VoidCallback onEditDetails;
 
+  final VoidCallback onAssign;
+
   final VoidCallback onSplit;
 
   final VoidCallback onSplitEqual;
+
+  final VoidCallback onRedivide;
 
   final VoidCallback onDelete;
 
   final ValueChanged<OfficialParcelEntity> onOpenOfficial;
 
   final ValueChanged<OwnershipValueObject> onOpenOwner;
+
+  final bool inCompare;
+
+  final VoidCallback onCompare;
 
   final VoidCallback onClose;
 
@@ -140,6 +154,20 @@ class MapDrawnPanel extends StatelessWidget {
               icon: const Icon(Icons.edit_note),
               label: ParcelInfoText(l10n.editDetails),
             ),
+            FilledButton.tonalIcon(
+              onPressed: onAssign,
+              icon: const Icon(Icons.person_add_alt),
+              label: ParcelInfoText(l10n.assignOwner),
+            ),
+            OutlinedButton.icon(
+              onPressed: onCompare,
+              icon: Icon(
+                inCompare ? Icons.playlist_remove : Icons.playlist_add,
+              ),
+              label: ParcelInfoText(
+                inCompare ? l10n.compareRemove : l10n.compareAdd,
+              ),
+            ),
             OutlinedButton.icon(
               onPressed: onEditShape,
               icon: const Icon(Icons.polyline_outlined),
@@ -154,6 +182,11 @@ class MapDrawnPanel extends StatelessWidget {
               onPressed: onSplitEqual,
               icon: const Icon(Icons.grid_view_outlined),
               label: ParcelInfoText(l10n.splitEqualButton),
+            ),
+            OutlinedButton.icon(
+              onPressed: onRedivide,
+              icon: const Icon(Icons.compare_arrows),
+              label: ParcelInfoText(l10n.redivideButton),
             ),
             if (canDelete)
               TextButton.icon(

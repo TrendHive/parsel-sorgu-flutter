@@ -4,7 +4,9 @@ import 'package:parcel_atlas/domain/person/value_object/share_value_object.dart'
 /// The family tree's arithmetic: who descends from whom, and what part of
 /// an ancestor's share reaches an heir.
 ///
-/// [childrenOf] is a person's children. [isDescendant] walks up from a
+/// [childrenOf] is a person's children. [heads] is the top of the tree, as
+/// a picker shows it: the people with no parent in the list, the heads of a
+/// family (those with children) first and people on their own after them. [isDescendant] walks up from a
 /// person to see whether an ancestor is above them; [canBeParent] refuses a
 /// link that would make someone their own ancestor.
 ///
@@ -30,6 +32,20 @@ abstract final class FamilyRules {
     List<PersonEntity> persons,
     String personId,
   ) => persons.where((PersonEntity p) => p.parentId == personId).toList();
+
+  static List<PersonEntity> heads(List<PersonEntity> persons) {
+    final Set<String> ids = <String>{
+      for (final PersonEntity p in persons) p.id,
+    };
+    final List<PersonEntity> top = persons
+        .where((PersonEntity p) => !ids.contains(p.parentId))
+        .toList();
+    bool hasChildren(PersonEntity p) => childrenOf(persons, p.id).isNotEmpty;
+    return <PersonEntity>[
+      ...top.where(hasChildren),
+      ...top.where((PersonEntity p) => !hasChildren(p)),
+    ];
+  }
 
   static bool passes(List<PersonEntity> persons, PersonEntity person) =>
       person.passesToChildren && childrenOf(persons, person.id).isNotEmpty;

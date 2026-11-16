@@ -36,6 +36,13 @@ import 'package:parcel_atlas/core/constants.dart';
 /// [splitByLine] cuts an outline along the straight line through two points
 /// and answers the two pieces, or nothing when the line does not divide it.
 /// [splitEqual] cuts it into strips of equal area across its long axis.
+///
+/// [redivide] moves the line between two neighbouring outlines: it joins
+/// them along the sides they share (corners lying on the other's side
+/// count), then cuts the whole again with a straight line parallel to the
+/// old dividing line, placed so the first piece has `firstShare` of the
+/// area. The outer boundary is kept exactly. It answers nothing when the two
+/// do not share a side.
 abstract final class GeoRules {
   static const double semiMajorAxis = 6378137;
 
@@ -303,6 +310,209 @@ abstract final class GeoRules {
     return strips;
   }
 
+  static ({List<LatLng> first, List<LatLng> second})? redivide(
+    List<LatLng> first,
+    List<LatLng> second,
+    double firstShare,
+  ) {
+    final List<LatLng> a = _open(first);
+    final List<LatLng> b = _open(second);
+    if (a.length < _minimumCorners ||
+        b.length < _minimumCorners ||
+        firstShare <= CoreConstants.zeroDouble ||
+        firstShare >= CoreConstants.oneDouble) {
+      return null;
+    }
+    final LatLng origin = centre(<LatLng>[...a, ...b]);
+    List<math.Point<double>> planeA = _counterClockwise(
+      toLocalPlane(a, origin),
+    );
+    List<math.Point<double>> planeB = _counterClockwise(
+      toLocalPlane(b, origin),
+    );
+    planeA = _withCornersOf(planeA, planeB);
+    planeB = _withCornersOf(planeB, planeA);
+    final ({List<math.Point<double>> ring, List<math.Point<double>> shared})?
+    joined = _join(planeA, planeB);
+    if (joined == null) return null;
+    math.Point<double> from = joined.shared.first;
+    math.Point<double> to = joined.shared.last;
+    for (final math.Point<double> p in joined.shared) {
+      for (final math.Point<double> q in joined.shared) {
+        if (p.distanceTo(q) > from.distanceTo(to)) {
+          from = p;
+          to = q;
+        }
+      }
+    }
+    final double length = from.distanceTo(to);
+    if (length <= _joinTolerance) return null;
+    final math.Point<double> along = math.Point<double>(
+      (to.x - from.x) / length,
+      (to.y - from.y) / length,
+    );
+    final math.Point<double> normal = math.Point<double>(-along.y, along.x);
+    double offset(math.Point<double> p) =>
+        (p.x - from.x) * normal.x + (p.y - from.y) * normal.y;
+    final double sideOfFirst =
+        planeA.map(offset).reduce((double x, double y) => x + y) /
+        planeA.length;
+    List<math.Point<double>> firstSide(double t) {
+      final math.Point<double> start = math.Point<double>(
+        from.x + normal.x * t,
+        from.y + normal.y * t,
+      );
+      final math.Point<double> end = math.Point<double>(
+        start.x + along.x,
+        start.y + along.y,
+      );
+      return sideOfFirst >= CoreConstants.zeroDouble
+          ? _clip(joined.ring, start, end)
+          : _clip(joined.ring, end, start);
+    }
+
+    List<math.Point<double>> secondSide(double t) {
+      final math.Point<double> start = math.Point<double>(
+        from.x + normal.x * t,
+        from.y + normal.y * t,
+      );
+      final math.Point<double> end = math.Point<double>(
+        start.x + along.x,
+        start.y + along.y,
+      );
+      return sideOfFirst >= CoreConstants.zeroDouble
+          ? _clip(joined.ring, end, start)
+          : _clip(joined.ring, start, end);
+    }
+
+    final double target = _planeArea(joined.ring) * firstShare;
+    final Iterable<double> offsets = joined.ring.map(offset);
+    double low = offsets.reduce(math.min);
+    double high = offsets.reduce(math.max);
+    final bool growsWithT = sideOfFirst < CoreConstants.zeroDouble;
+    for (int i = CoreConstants.zero; i < _bisections; i++) {
+      final double middle = (low + high) / CoreConstants.two;
+      final bool tooSmall = _planeArea(firstSide(middle)) < target;
+      if (tooSmall == growsWithT) {
+        low = middle;
+      } else {
+        high = middle;
+      }
+    }
+    final double t = (low + high) / CoreConstants.two;
+    final List<math.Point<double>> pieceA = firstSide(t);
+    final List<math.Point<double>> pieceB = secondSide(t);
+    if (pieceA.length < _minimumCorners || pieceB.length < _minimumCorners) {
+      return null;
+    }
+    return (
+      first: fromLocalPlane(pieceA, origin),
+      second: fromLocalPlane(pieceB, origin),
+    );
+  }
+
+  static List<math.Point<double>> _counterClockwise(
+    List<math.Point<double>> plane,
+  ) {
+    double twice = CoreConstants.zeroDouble;
+    for (int i = CoreConstants.zero; i < plane.length; i++) {
+      final math.Point<double> a = plane[i];
+      final math.Point<double> b = plane[(i + 1) % plane.length];
+      twice += a.x * b.y - b.x * a.y;
+    }
+    return twice >= CoreConstants.zeroDouble ? plane : plane.reversed.toList();
+  }
+
+  static List<math.Point<double>> _withCornersOf(
+    List<math.Point<double>> ring,
+    List<math.Point<double>> other,
+  ) {
+    final List<math.Point<double>> result = <math.Point<double>>[];
+    for (int i = CoreConstants.zero; i < ring.length; i++) {
+      final math.Point<double> a = ring[i];
+      final math.Point<double> b = ring[(i + 1) % ring.length];
+      result.add(a);
+      final double lengthSquared =
+          (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y);
+      final List<({double t, math.Point<double> point})> inside =
+          <({double t, math.Point<double> point})>[
+            for (final math.Point<double> p in other)
+              if (p.distanceTo(a) > _joinTolerance &&
+                  p.distanceTo(b) > _joinTolerance &&
+                  _closestOnSegment(a, b, p).distanceTo(p) <= _joinTolerance)
+                (
+                  t:
+                      ((p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y)) /
+                      lengthSquared,
+                  point: p,
+                ),
+          ]..sort(
+            (
+              ({double t, math.Point<double> point}) x,
+              ({double t, math.Point<double> point}) y,
+            ) => x.t.compareTo(y.t),
+          );
+      result.addAll(
+        inside.map(
+          (({double t, math.Point<double> point}) entry) => entry.point,
+        ),
+      );
+    }
+    return result;
+  }
+
+  static ({List<math.Point<double>> ring, List<math.Point<double>> shared})?
+  _join(List<math.Point<double>> a, List<math.Point<double>> b) {
+    bool same(math.Point<double> p, math.Point<double> q) =>
+        p.distanceTo(q) <= _joinTolerance;
+    List<(math.Point<double>, math.Point<double>)> edgesOf(
+      List<math.Point<double>> ring,
+    ) => <(math.Point<double>, math.Point<double>)>[
+      for (int i = CoreConstants.zero; i < ring.length; i++)
+        (ring[i], ring[(i + 1) % ring.length]),
+    ];
+    final List<(math.Point<double>, math.Point<double>)> edgesA = edgesOf(a);
+    final List<(math.Point<double>, math.Point<double>)> edgesB = edgesOf(b);
+    bool reversedIn(
+      (math.Point<double>, math.Point<double>) edge,
+      List<(math.Point<double>, math.Point<double>)> edges,
+    ) => edges.any(
+      ((math.Point<double>, math.Point<double>) other) =>
+          same(edge.$1, other.$2) && same(edge.$2, other.$1),
+    );
+    final List<math.Point<double>> shared = <math.Point<double>>[
+      for (final (math.Point<double>, math.Point<double>) edge in edgesA)
+        if (reversedIn(edge, edgesB)) ...<math.Point<double>>[edge.$1, edge.$2],
+    ];
+    if (shared.isEmpty) return null;
+    final List<(math.Point<double>, math.Point<double>)> outer =
+        <(math.Point<double>, math.Point<double>)>[
+          for (final (math.Point<double>, math.Point<double>) edge in edgesA)
+            if (!reversedIn(edge, edgesB)) edge,
+          for (final (math.Point<double>, math.Point<double>) edge in edgesB)
+            if (!reversedIn(edge, edgesA)) edge,
+        ];
+    if (outer.isEmpty) return null;
+    final List<math.Point<double>> ring = <math.Point<double>>[];
+    final List<(math.Point<double>, math.Point<double>)> left =
+        <(math.Point<double>, math.Point<double>)>[...outer];
+    (math.Point<double>, math.Point<double>) current = left.removeAt(
+      CoreConstants.zero,
+    );
+    ring.add(current.$1);
+    while (left.isNotEmpty) {
+      final int next = left.indexWhere(
+        ((math.Point<double>, math.Point<double>) edge) =>
+            same(edge.$1, current.$2),
+      );
+      if (next < CoreConstants.zero) return null;
+      current = left.removeAt(next);
+      ring.add(current.$1);
+    }
+    if (!same(current.$2, ring.first)) return null;
+    return (ring: _distinct(ring), shared: shared);
+  }
+
   static double _cutAt(List<math.Point<double>> plane, double area) {
     double low = _minX(plane);
     double high = _maxX(plane);
@@ -455,6 +665,8 @@ abstract final class GeoRules {
       plane.map((math.Point<double> p) => p.y).reduce(math.max);
 
   static const int _minimumCorners = 3;
+
+  static const double _joinTolerance = 0.05;
 
   static const int _overlapGrid = 48;
 

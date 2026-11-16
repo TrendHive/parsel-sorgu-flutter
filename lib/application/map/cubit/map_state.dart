@@ -30,9 +30,13 @@ final class MapFailed extends MapState {
 /// the page to move the camera — onto a selected record, say — and
 /// [focusId] changes each time, so the same place can be asked for twice.
 ///
-/// [split] is a drawing being cut in two, or null. [colourLevel] is the
+/// [split] is a drawing being cut in two, or null. [redivide] is two
+/// neighbours being divided again by their deeds, or null. [colourLevel] is the
 /// level of the family tree the drawings are coloured by — zero the eldest
-/// generation — or null for the plain colours.
+/// generation — or null for colouring by owner.
+///
+/// [compareIds] are the drawings and registry parcels put aside for the
+/// comparison page, in the order they were added.
 ///
 /// [notice] or [exception] is the last message to show, and [noticeId]
 /// changes with each one, so the page shows every message exactly once.
@@ -46,7 +50,9 @@ final class MapReady extends MapState {
     this.querying = false,
     this.drawing,
     this.split,
+    this.redivide,
     this.colourLevel,
+    this.compareIds = const <String>[],
     this.focus,
     this.focusId = CoreConstants.zero,
     this.notice,
@@ -70,7 +76,11 @@ final class MapReady extends MapState {
 
   final MapSplitReadModel? split;
 
+  final MapRedivideReadModel? redivide;
+
   final int? colourLevel;
+
+  final List<String> compareIds;
 
   final List<LatLng>? focus;
 
@@ -92,7 +102,9 @@ final class MapReady extends MapState {
     bool? querying,
     MapDrawingReadModel? Function()? drawing,
     MapSplitReadModel? Function()? split,
+    MapRedivideReadModel? Function()? redivide,
     int? Function()? colourLevel,
+    List<String>? compareIds,
     List<LatLng>? focus,
     MapNoticeEnum? notice,
     BaseException? exception,
@@ -105,7 +117,9 @@ final class MapReady extends MapState {
     querying: querying ?? this.querying,
     drawing: drawing == null ? this.drawing : drawing(),
     split: split == null ? this.split : split(),
+    redivide: redivide == null ? this.redivide : redivide(),
     colourLevel: colourLevel == null ? this.colourLevel : colourLevel(),
+    compareIds: compareIds ?? this.compareIds,
     focus: focus ?? this.focus,
     focusId: focus == null ? focusId : focusId + 1,
     notice: notice,

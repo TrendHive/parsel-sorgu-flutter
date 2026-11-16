@@ -11,7 +11,9 @@ import 'package:parcel_atlas/application/auth/usecase/sign_in_usecase.dart';
 import 'package:parcel_atlas/application/auth/usecase/sign_out_usecase.dart';
 import 'package:parcel_atlas/application/auth/usecase/watch_member_usecase.dart';
 import 'package:parcel_atlas/application/di/injection.dart';
+import 'package:parcel_atlas/application/drawing/cubit/compare_cubit.dart';
 import 'package:parcel_atlas/application/drawing/usecase/delete_drawing_usecase.dart';
+import 'package:parcel_atlas/application/drawing/usecase/redivide_drawings_usecase.dart';
 import 'package:parcel_atlas/application/drawing/usecase/save_drawing_usecase.dart';
 import 'package:parcel_atlas/application/drawing/usecase/split_drawing_usecase.dart';
 import 'package:parcel_atlas/application/map/cubit/map_cubit.dart';
@@ -93,6 +95,7 @@ void _register(FirebaseFirestore firestore, FirebaseAuth auth) {
       () => QueryParcelByNumberUseCase(getIt(), getIt(), getIt()),
     )
     ..registerFactory(() => SplitDrawingUseCase(getIt(), getIt()))
+    ..registerFactory(() => RedivideDrawingsUseCase(getIt(), getIt()))
     ..registerFactory(() => SaveDrawingUseCase(getIt(), getIt()))
     ..registerFactory(() => DeleteDrawingUseCase(getIt(), getIt()))
     ..registerFactory(() => SavePersonUseCase(getIt(), getIt()))
@@ -111,10 +114,12 @@ void _register(FirebaseFirestore firestore, FirebaseAuth auth) {
         getIt(),
         getIt(),
         getIt(),
+        getIt(),
         registryReachable: !kIsWeb,
       ),
     )
     ..registerFactory(() => PersonsCubit(getIt(), getIt(), getIt(), getIt()))
     ..registerFactory(() => HoldingsCubit(getIt()))
+    ..registerFactory(() => CompareCubit(getIt()))
     ..registerFactory(() => ActivityCubit(getIt()));
 }

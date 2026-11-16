@@ -77,3 +77,28 @@ shares.** *Guard:* the dialog offers "to the children" only for a drawing
 with a single owner; several owners can still split by number, which keeps
 every owner on every piece.
 
+## Ownership
+
+**"Assign owner" on a registry parcel made a second drawing beside the real
+boundary already drawn on it.** Only drawings linked to the parcel by id were
+found, so a boundary drawn from scratch was missed. *Guard:*
+`drawingsCorrecting` also finds unlinked drawings that cover the parcel's
+ground, and assigning links them (tests in `map_snapshot_read_model_test`
+and `map_cubit_test`).
+
+**The map jumped after an owner was assigned.** The saved drawing was
+selected and framed like a new one. *Guard:* an assignment selects without
+moving the camera (`map_cubit_test`).
+
+**Owned land looked the same as unowned land.** Colour came only from the
+generation menu. *Guard:* colouring by owner is the default, also on the
+registry layer.
+
+## Map camera
+
+**A tap on a parcel already on screen zoomed the map onto it.** Every
+selection that came back from the store or the registry framed the parcel.
+*Guard:* `MapRules.cameraMove` — a parcel wholly in view leaves the camera
+alone, one partly in view slides in at the same zoom, only one off screen is
+framed (`camera_move_test`).
+
