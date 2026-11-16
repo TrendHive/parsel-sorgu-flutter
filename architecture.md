@@ -129,6 +129,16 @@ Drawing snaps a corner to a stored corner within 14 screen pixels, so a drawn
 boundary that shares a corner with the registry, or with a neighbour's drawing,
 shares it exactly.
 
+Re-dividing two neighbours by their deeds (`GeoRules.redivide`) relies on that
+exactness: the two outlines are joined by removing the sides they share (a
+corner lying on the other's side within 5 cm counts), and the joined ground is
+cut again by a straight line parallel to the old dividing line, found by
+bisection on area. The outer boundary — what touches other neighbours — is
+kept exactly, and both drawings are reshaped in one batch
+(`DrawnParcelRepositoryInterface.reshape`), so the ground is never stored
+twice. A registry parcel's real boundaries are the drawings linked to it and
+the unlinked ones that cover its ground (`drawingsCorrecting`).
+
 ## Errors are values
 
 domain and application never throw. They return `Either<BaseException, T>`.

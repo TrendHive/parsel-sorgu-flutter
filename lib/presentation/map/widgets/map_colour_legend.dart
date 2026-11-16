@@ -6,10 +6,10 @@ import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_dimens.da
 import 'package:parcel_atlas/presentation/domain_ui/values/parcel_info_local_keys.dart';
 import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
 
-/// Says which colour is which branch of the family, while the map is
-/// coloured by a level of the tree.
+/// Says which colour is which owner — or which branch of the family, while
+/// the map is coloured by a level of the tree.
 ///
-/// [branches] are the people at that level who hold something, in the order
+/// [branches] are the people who hold something, in the order
 /// their colours were given out; after them come the colour of a drawing
 /// several branches share and the colour of one nobody owns yet.
 class MapColourLegend extends StatelessWidget {
@@ -35,7 +35,7 @@ class MapColourLegend extends StatelessWidget {
               for (final (int index, PersonEntity person) in branches.indexed)
                 _row(context, ParcelInfoColor.branch(index), person.name),
               _row(context, ParcelInfoColor.sharedBranches, l10n.colourShared),
-              _row(context, ParcelInfoColor.drawnStroke, l10n.colourUnassigned),
+              _row(context, ParcelInfoColor.unowned, l10n.colourUnassigned),
             ],
           ),
         ),
