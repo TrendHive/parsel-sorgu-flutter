@@ -2,6 +2,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:parcel_atlas/core/base/base_read_model.dart';
 import 'package:parcel_atlas/domain/drawing/entity/drawn_parcel_entity.dart';
 import 'package:parcel_atlas/domain/drawing/enum/redivide_step_enum.dart';
+import 'package:parcel_atlas/domain/map/read_model/map_snapshot_read_model.dart';
 import 'package:parcel_atlas/domain/map/rule/geo_rules.dart';
 import 'package:parcel_atlas/domain/parcel/entity/official_parcel_entity.dart';
 
@@ -33,9 +34,10 @@ final class MapRedivideReadModel extends BaseReadModel {
   factory MapRedivideReadModel.between({
     required DrawnParcelEntity first,
     required DrawnParcelEntity second,
-    required OfficialParcelEntity? firstOfficial,
-    required OfficialParcelEntity? secondOfficial,
+    required MapSnapshotReadModel snapshot,
   }) {
+    final OfficialParcelEntity? firstOfficial = snapshot.officialOf(first);
+    final OfficialParcelEntity? secondOfficial = snapshot.officialOf(second);
     final double? firstDeed = _deed(firstOfficial);
     final double? secondDeed = _deed(secondOfficial);
     MapRedivideReadModel result(
@@ -54,6 +56,10 @@ final class MapRedivideReadModel extends BaseReadModel {
     }
     if (firstOfficial!.id == secondOfficial!.id) {
       return result(RedivideStepEnum.sameDeed);
+    }
+    if (snapshot.drawingsCorrecting(firstOfficial).length > 1 ||
+        snapshot.drawingsCorrecting(secondOfficial).length > 1) {
+      return result(RedivideStepEnum.splitDeed);
     }
     final ({List<LatLng> first, List<LatLng> second})? pieces =
         GeoRules.redivide(

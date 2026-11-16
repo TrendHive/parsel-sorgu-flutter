@@ -372,5 +372,6 @@
       }
     }
   },
-  "redivideConfirm": "Yeni sınırları kaydet"
+  "redivideConfirm": "Yeni sınırları kaydet",
+  "redivideSplitDeed": "Bu tapulardan biri zaten birkaç gerçek sınıra bölünmüş; tapu alanının tamamı bu sınırın değil."
 }

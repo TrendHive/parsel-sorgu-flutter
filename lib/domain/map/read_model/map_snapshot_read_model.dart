@@ -41,11 +41,14 @@ import 'package:parcel_atlas/domain/person/value_object/share_value_object.dart'
 /// [allCorners] frames the map on what is stored.
 ///
 /// [drawingsCorrecting] is every real boundary of a registry parcel: the
-/// drawings linked to it, and the ones drawn without a link that cover part
-/// of its ground — a boundary drawn from scratch is still that parcel's.
+/// drawings linked to it, and the ones drawn without a link that lie mostly
+/// on its ground (more than [MapRules.coverShare] of their area) — a
+/// boundary drawn from scratch is still that parcel's, but a sliver over a
+/// neighbour's registry line does not make it the neighbour's. Which parcel
+/// each drawing belongs to is worked out once per snapshot.
 ///
 /// [officialOf] is the registry parcel a drawing belongs to: the linked one,
-/// or else the first whose ground it covers.
+/// or else the one holding most of it, by the same rule.
 ///
 /// [compare] lays the given drawings and registry parcels side by side: a
 /// registry parcel stands for its real boundaries, or for itself when
@@ -55,13 +58,13 @@ import 'package:parcel_atlas/domain/person/value_object/share_value_object.dart'
 /// on them, and their part of what is recorded on an ancestor whose shares
 /// passed down the family tree. [childrenOf] is a person's children.
 final class MapSnapshotReadModel extends BaseReadModel {
-  const MapSnapshotReadModel({
+  MapSnapshotReadModel({
     required this.officials,
     required this.drawings,
     required this.persons,
   });
 
-  static const MapSnapshotReadModel empty = MapSnapshotReadModel(
+  static final MapSnapshotReadModel empty = MapSnapshotReadModel(
     officials: <OfficialParcelEntity>[],
     drawings: <DrawnParcelEntity>[],
     persons: <PersonEntity>[],
@@ -240,26 +243,45 @@ final class MapSnapshotReadModel extends BaseReadModel {
   }
 
   List<DrawnParcelEntity> drawingsCorrecting(OfficialParcelEntity parcel) =>
-      drawings
-          .where(
-            (DrawnParcelEntity d) =>
-                d.officialParcelId == parcel.id ||
-                (d.officialParcelId == null &&
-                    GeoRules.overlapSquareMeters(
-                          d.outline.corners,
-                          parcel.record.outline.corners,
-                        ) >
-                        MapRules.overlapToleranceSquareMeters),
-          )
-          .toList();
+      _drawingsOfOfficial[parcel.id] ?? const <DrawnParcelEntity>[];
+
+  late final Map<String, OfficialParcelEntity> _officialOfDrawing =
+      <String, OfficialParcelEntity>{
+        for (final DrawnParcelEntity drawing in drawings)
+          if (_match(drawing) case final OfficialParcelEntity official)
+            drawing.id: official,
+      };
+
+  late final Map<String, List<DrawnParcelEntity>> _drawingsOfOfficial =
+      <String, List<DrawnParcelEntity>>{
+        for (final OfficialParcelEntity official in officials)
+          official.id: <DrawnParcelEntity>[
+            for (final DrawnParcelEntity drawing in drawings)
+              if (_officialOfDrawing[drawing.id]?.id == official.id) drawing,
+          ],
+      };
+
+  OfficialParcelEntity? _match(DrawnParcelEntity drawing) {
+    if (drawing.officialParcelId != null) {
+      return officialById(drawing.officialParcelId);
+    }
+    OfficialParcelEntity? best;
+    double most = drawing.outline.areaSquareMeters * MapRules.coverShare;
+    for (final OfficialParcelEntity official in officials) {
+      final double shared = GeoRules.overlapSquareMeters(
+        drawing.outline.corners,
+        official.record.outline.corners,
+      );
+      if (shared > most) {
+        most = shared;
+        best = official;
+      }
+    }
+    return best;
+  }
 
   OfficialParcelEntity? officialOf(DrawnParcelEntity drawing) =>
-      officialById(drawing.officialParcelId) ??
-      officials
-          .where(
-            (OfficialParcelEntity o) => drawingsCorrecting(o).contains(drawing),
-          )
-          .firstOrNull;
+      _officialOfDrawing[drawing.id];
 
   CompareTableReadModel compare(List<String> ids) {
     final List<CompareLineReadModel> lines = <CompareLineReadModel>[];

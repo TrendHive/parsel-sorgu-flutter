@@ -131,16 +131,7 @@ class DrawnParcelRepository implements DrawnParcelRepositoryInterface {
       final DrawnParcelEntity drawing = change.drawing;
       batch.update(
         _store.doc(StoreCollection.drawnParcels, drawing.id),
-        _mapper.write(
-          change.outline,
-          DrawingDetailsValueObject((
-            name: drawing.name,
-            officialParcelId: drawing.officialParcelId,
-            owners: drawing.owners,
-            note: drawing.note,
-          )),
-          actor,
-        ),
+        _mapper.writeShape(change.outline, actor),
       );
       _store.log(
         batch,

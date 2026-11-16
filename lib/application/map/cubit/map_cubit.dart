@@ -232,8 +232,7 @@ final class MapCubit extends Cubit<MapState> {
             redivide: () => MapRedivideReadModel.between(
               first: redivide.first,
               second: hit.drawing,
-              firstOfficial: current.snapshot.officialOf(redivide.first),
-              secondOfficial: current.snapshot.officialOf(hit.drawing),
+              snapshot: current.snapshot,
             ),
           ),
         );
@@ -498,6 +497,7 @@ final class MapCubit extends Cubit<MapState> {
         emit(current.copyWith(querying: false, exception: value));
       case Right(:final String value):
         _pendingSelection = value;
+        _framePending = true;
         emit(
           _resolvePending(current.copyWith(querying: false, notice: notice)),
         );
@@ -519,6 +519,7 @@ final class MapCubit extends Cubit<MapState> {
 
   void focusOn(String id) {
     _pendingSelection = id;
+    _framePending = true;
     final MapState current = state;
     if (current is MapReady) emit(_resolvePending(current));
   }

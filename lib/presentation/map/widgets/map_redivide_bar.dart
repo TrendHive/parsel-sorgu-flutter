@@ -49,6 +49,7 @@ class MapRedivideBar extends StatelessWidget {
               RedivideStepEnum.pickNeighbour => l10n.redividePick,
               RedivideStepEnum.noDeed => l10n.redivideNoDeed,
               RedivideStepEnum.sameDeed => l10n.redivideSameDeed,
+              RedivideStepEnum.splitDeed => l10n.redivideSplitDeed,
               RedivideStepEnum.notNeighbours => l10n.redivideNotNeighbours,
               RedivideStepEnum.ready => l10n.redivideReady,
             }, style: text.bodyMedium),

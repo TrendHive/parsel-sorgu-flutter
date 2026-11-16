@@ -659,4 +659,8 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get redivideConfirm => 'Yeni sınırları kaydet';
+
+  @override
+  String get redivideSplitDeed =>
+      'Bu tapulardan biri zaten birkaç gerçek sınıra bölünmüş; tapu alanının tamamı bu sınırın değil.';
 }

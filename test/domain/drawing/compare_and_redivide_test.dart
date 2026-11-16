@@ -105,22 +105,42 @@ void main() {
     expect(table.owners.single.person, isNull);
   });
 
+  MapSnapshotReadModel withDeeds(
+    List<OfficialParcelEntity> deeds,
+    List<DrawnParcelEntity> real,
+  ) => MapSnapshotReadModel(
+    officials: deeds,
+    drawings: real,
+    persons: testFamily,
+  );
+
   test('two neighbours are re-divided so each matches its deed share', () {
+    final OfficialParcelEntity deedA = testOfficial(
+      '1',
+      corners: metres(<(double, double)>[(0, 0), (15, 0), (15, 20), (0, 20)]),
+    );
+    final OfficialParcelEntity deedB = testOfficial(
+      '2',
+      corners: metres(<(double, double)>[(15, 0), (30, 0), (30, 20), (15, 20)]),
+    );
+    final DrawnParcelEntity a = testDrawing(
+      'a',
+      const <OwnershipValueObject>[],
+      corners: leftGround,
+      officialParcelId: deedA.id,
+    );
+    final DrawnParcelEntity b = testDrawing(
+      'b',
+      const <OwnershipValueObject>[],
+      corners: rightGround,
+      officialParcelId: deedB.id,
+    );
     final MapRedivideReadModel redivide = MapRedivideReadModel.between(
-      first: left,
-      second: right,
-      firstOfficial: testOfficial(
-        '1',
-        corners: metres(<(double, double)>[(0, 0), (15, 0), (15, 20), (0, 20)]),
-      ),
-      secondOfficial: testOfficial(
-        '2',
-        corners: metres(<(double, double)>[
-          (15, 0),
-          (30, 0),
-          (30, 20),
-          (15, 20),
-        ]),
+      first: a,
+      second: b,
+      snapshot: withDeeds(
+        <OfficialParcelEntity>[deedA, deedB],
+        <DrawnParcelEntity>[a, b],
       ),
     );
 
@@ -130,23 +150,86 @@ void main() {
   });
 
   test('re-dividing needs two different deeds', () {
+    final DrawnParcelEntity unlinked = testDrawing(
+      'free',
+      const <OwnershipValueObject>[],
+      corners: metres(<(double, double)>[
+        (100, 0),
+        (110, 0),
+        (110, 10),
+        (100, 10),
+      ]),
+    );
     expect(
       MapRedivideReadModel.between(
         first: left,
-        second: right,
-        firstOfficial: leftDeed,
-        secondOfficial: null,
+        second: unlinked,
+        snapshot: withDeeds(
+          <OfficialParcelEntity>[leftDeed],
+          <DrawnParcelEntity>[left, unlinked],
+        ),
       ).step,
       RedivideStepEnum.noDeed,
     );
+    final DrawnParcelEntity sameDeed = testDrawing(
+      'same',
+      const <OwnershipValueObject>[],
+      corners: rightGround,
+      officialParcelId: leftDeed.id,
+    );
     expect(
       MapRedivideReadModel.between(
         first: left,
-        second: right,
-        firstOfficial: leftDeed,
-        secondOfficial: leftDeed,
+        second: sameDeed,
+        snapshot: withDeeds(
+          <OfficialParcelEntity>[leftDeed],
+          <DrawnParcelEntity>[left, sameDeed],
+        ),
       ).step,
       RedivideStepEnum.sameDeed,
     );
+  });
+
+  test('re-dividing a strip of a deed already split among heirs is refused, '
+      'so the neighbour does not lose land', () {
+    final DrawnParcelEntity strip1 = testDrawing(
+      'strip1',
+      const <OwnershipValueObject>[],
+      corners: metres(<(double, double)>[(0, 0), (5, 0), (5, 20), (0, 20)]),
+      officialParcelId: leftDeed.id,
+    );
+    final DrawnParcelEntity strip2 = testDrawing(
+      'strip2',
+      const <OwnershipValueObject>[],
+      corners: metres(<(double, double)>[(5, 0), (10, 0), (10, 20), (5, 20)]),
+      officialParcelId: leftDeed.id,
+    );
+    expect(
+      MapRedivideReadModel.between(
+        first: strip2,
+        second: right,
+        snapshot: withDeeds(
+          <OfficialParcelEntity>[leftDeed, rightDeed],
+          <DrawnParcelEntity>[strip1, strip2, right],
+        ),
+      ).step,
+      RedivideStepEnum.splitDeed,
+    );
+  });
+
+  test('a boundary drawn from scratch with a sliver over the neighbour\'s '
+      'registry line is not the neighbour\'s', () {
+    final DrawnParcelEntity drawn = testDrawing(
+      'drawn',
+      const <OwnershipValueObject>[],
+      corners: metres(<(double, double)>[(0, 0), (12, 0), (12, 20), (0, 20)]),
+    );
+    final MapSnapshotReadModel snap = withDeeds(
+      <OfficialParcelEntity>[leftDeed, rightDeed],
+      <DrawnParcelEntity>[drawn],
+    );
+    expect(snap.drawingsCorrecting(rightDeed), isEmpty);
+    expect(snap.drawingsCorrecting(leftDeed).single.id, 'drawn');
+    expect(snap.officialOf(drawn)?.id, leftDeed.id);
   });
 }

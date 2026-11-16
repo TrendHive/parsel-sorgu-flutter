@@ -659,4 +659,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get redivideConfirm => 'Save the new boundaries';
+
+  @override
+  String get redivideSplitDeed =>
+      'One of these deeds is already divided among several real boundaries; its whole area is not this boundary\'s.';
 }

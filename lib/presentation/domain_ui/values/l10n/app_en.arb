@@ -186,5 +186,6 @@
   "redivideNotNeighbours": "These two boundaries do not share a side.",
   "redivideReady": "The line between them moved to match the deed areas. The new shapes are on the map.",
   "redividePiece": "{name}: {after} (deed {deed}, now {now})",
-  "redivideConfirm": "Save the new boundaries"
+  "redivideConfirm": "Save the new boundaries",
+  "redivideSplitDeed": "One of these deeds is already divided among several real boundaries; its whole area is not this boundary's."
 }

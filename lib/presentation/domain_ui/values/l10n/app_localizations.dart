@@ -1219,6 +1219,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Yeni sınırları kaydet'**
   String get redivideConfirm;
+
+  /// No description provided for @redivideSplitDeed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu tapulardan biri zaten birkaç gerçek sınıra bölünmüş; tapu alanının tamamı bu sınırın değil.'**
+  String get redivideSplitDeed;
 }
 
 class _AppLocalizationsDelegate

@@ -24,7 +24,9 @@ import 'package:parcel_atlas/domain/map/enum/camera_move_enum.dart';
 /// [overlapToleranceSquareMeters] is how much two drawings may share before
 /// the second is refused — enough to forgive a corner placed a hand's width
 /// over a neighbour's line, not a strip of someone else's land.
-/// [maxPieces] is the most strips one equal split makes.
+/// [maxPieces] is the most strips one equal split makes. [coverShare] is
+/// how much of an unlinked drawing must lie on a registry parcel for it to
+/// count as that parcel's real boundary.
 ///
 /// [cameraMove] decides how the camera shows a place: not at all when it is
 /// already wholly in the `visible` box, a slide at the same zoom when part
@@ -58,6 +60,8 @@ abstract final class MapRules {
   static const double overlapToleranceSquareMeters = 2;
 
   static const int maxPieces = 12;
+
+  static const double coverShare = 0.5;
 
   static const int minimumCorners = 3;
 
