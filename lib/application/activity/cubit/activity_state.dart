@@ -20,13 +20,15 @@ final class ActivityFailed extends ActivityState {
 /// The latest changes, newest first.
 ///
 /// [exception] is the last refused undo and [undone] whether the last one
-/// worked; [messageId] changes with each, so the page shows every message
+/// worked; [undoing] is true while one runs, so no second one starts;
+/// [messageId] changes with each, so the page shows every message
 /// once.
 final class ActivityReady extends ActivityState {
   const ActivityReady(
     this.entries, {
     this.exception,
     this.undone = false,
+    this.undoing = false,
     this.messageId = CoreConstants.zero,
   });
 
@@ -36,10 +38,15 @@ final class ActivityReady extends ActivityState {
 
   final bool undone;
 
+  final bool undoing;
+
   final int messageId;
 
   ActivityReady withEntries(List<ActivityEntity> next) =>
-      ActivityReady(next, messageId: messageId);
+      ActivityReady(next, undoing: undoing, messageId: messageId);
+
+  ActivityReady whileUndoing() =>
+      ActivityReady(entries, undoing: true, messageId: messageId);
 
   ActivityReady withResult(Either<BaseException, String> result) =>
       ActivityReady(

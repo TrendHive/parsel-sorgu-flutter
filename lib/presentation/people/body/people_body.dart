@@ -49,8 +49,10 @@ class PeopleBody extends StatelessWidget {
           ParcelInfoToast.show(
             context,
             l10n.noticeSaved,
-            actionLabel: l10n.undoButton,
-            onAction: context.read<PersonsCubit>().undoLast,
+            actionLabel: state.canUndo ? l10n.undoButton : null,
+            onAction: state.canUndo
+                ? context.read<PersonsCubit>().undoLast
+                : null,
           );
         }
       },

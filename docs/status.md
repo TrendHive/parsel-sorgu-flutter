@@ -10,7 +10,13 @@ _Last updated: 2026-11-18 (spouse link, split direction, undo, merge, side lengt
 
 ## Released
 
-Version 2.3.0 is live on https://parcel-info.web.app (the only environment).
+Version 2.4.0 is live on https://parcel-info.web.app (the only environment).
+
+**Update every installed app before anyone merges parcels.** 2.4.0 archives
+merged pieces (`mergedInto`); Android and macOS builds older than 2.4.0 do
+not know that field and show the archived pieces as live drawings lying
+over the merged parcel (their overlap check then refuses edits nearby).
+Undo is safe with old builds: it refuses any record changed since.
 
 - Sign-in with fixed accounts; several family accounts exist.
 - Map with two layers (registry parcels, read-only; family-drawn real
@@ -35,7 +41,7 @@ Version 2.3.0 is live on https://parcel-info.web.app (the only environment).
 
 | Platform | State |
 |---|---|
-| Web | Released (2.3.0). No registry lookups, by the registry's choice. |
+| Web | Released (2.4.0). No registry lookups, by the registry's choice. |
 | macOS | Builds and runs signed with the owner's team; sign-in and lookups verified by the owner. Run with `flutter run -d macos` or build in Xcode. Must be signed with a provisioning profile — an ad-hoc build cannot sign in (`docs/regressions.md`). Not packaged for download yet. |
 | Android | Release APK signed with the upload keystore (kept outside the repository, referenced by the gitignored `android/key.properties`). Distributed to the family testers through Firebase App Distribution. |
 | iOS | Not built. The owner has a paid developer account. |

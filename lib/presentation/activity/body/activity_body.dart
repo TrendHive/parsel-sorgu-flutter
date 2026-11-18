@@ -80,16 +80,18 @@ class ActivityBody extends StatelessWidget {
                             : IconButton(
                                 tooltip: l10n.undoButton,
                                 icon: const Icon(Icons.undo),
-                                onPressed: () async {
-                                  final ActivityCubit cubit = context
-                                      .read<ActivityCubit>();
-                                  if (await ConfirmDialog.askUndo(
-                                    context,
-                                    label: entry.label,
-                                  )) {
-                                    await cubit.undo(entry.changeId!);
-                                  }
-                                },
+                                onPressed: state.undoing
+                                    ? null
+                                    : () async {
+                                        final ActivityCubit cubit = context
+                                            .read<ActivityCubit>();
+                                        if (await ConfirmDialog.askUndo(
+                                          context,
+                                          label: entry.label,
+                                        )) {
+                                          await cubit.undo(entry.changeId!);
+                                        }
+                                      },
                               ),
                       );
                     },

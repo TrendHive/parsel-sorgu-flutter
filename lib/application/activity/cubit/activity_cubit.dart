@@ -37,6 +37,9 @@ final class ActivityCubit extends Cubit<ActivityState> {
   }
 
   Future<void> undo(String changeId) async {
+    final ActivityState before = state;
+    if (before is! ActivityReady || before.undoing) return;
+    emit(before.whileUndoing());
     final Either<BaseException, String> result = await _undoChange(
       changeId: changeId,
     );

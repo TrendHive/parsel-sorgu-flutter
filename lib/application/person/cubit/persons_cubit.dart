@@ -29,6 +29,8 @@ final class PersonsCubit extends Cubit<PersonsState> {
 
   final UndoChangeUseCase _undoChange;
 
+  bool _undoing = false;
+
   final WatchMapUseCase _watchMap;
 
   final SavePersonUseCase _savePerson;
@@ -69,6 +71,7 @@ final class PersonsCubit extends Cubit<PersonsState> {
     final PersonsState current = state;
     if (current is! PersonsReady) return;
     _report(
+      created: existing == null,
       await _savePerson(
         name: name,
         parentId: parentId,
@@ -84,12 +87,28 @@ final class PersonsCubit extends Cubit<PersonsState> {
   Future<void> deletePerson(PersonEntity person) async =>
       _report(await _deletePerson(person));
 
-  Future<void> undoLast() async => _report(await _undoChange(), undo: true);
+  Future<void> undoLast() async {
+    if (_undoing) return;
+    _undoing = true;
+    final Either<BaseException, String> result = await _undoChange();
+    _undoing = false;
+    _report(result, undo: true);
+  }
 
-  void _report(Either<BaseException, String> result, {bool undo = false}) {
+  void _report(
+    Either<BaseException, String> result, {
+    bool undo = false,
+    bool created = false,
+  }) {
     final PersonsState current = state;
     if (!isClosed && current is PersonsReady) {
-      emit(current.withResult(result, undo: undo));
+      emit(
+        current.withResult(
+          result,
+          undo: undo,
+          canUndo: !undo && (!created || (current.member?.canDelete ?? false)),
+        ),
+      );
     }
   }
 

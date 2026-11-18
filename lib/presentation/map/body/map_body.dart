@@ -126,7 +126,9 @@ class _MapBodyState extends State<MapBody> {
       final MapNoticeEnum notice = state.notice!;
       final bool undoable =
           notice == MapNoticeEnum.drawingSaved ||
-          notice == MapNoticeEnum.drawingDeleted;
+          notice == MapNoticeEnum.drawingDeleted ||
+          (notice == MapNoticeEnum.drawingCreated &&
+              (state.member?.canDelete ?? false));
       ParcelInfoToast.show(
         context,
         switch (notice) {
@@ -134,6 +136,7 @@ class _MapBodyState extends State<MapBody> {
           MapNoticeEnum.queried => l10n.noticeQueried,
           MapNoticeEnum.refreshed => l10n.noticeRefreshed,
           MapNoticeEnum.drawingSaved => l10n.noticeDrawingSaved,
+          MapNoticeEnum.drawingCreated => l10n.noticeDrawingSaved,
           MapNoticeEnum.drawingDeleted => l10n.noticeDrawingDeleted,
           MapNoticeEnum.useApp => l10n.noticeUseApp,
           MapNoticeEnum.undone => l10n.noticeUndone,

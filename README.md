@@ -46,7 +46,7 @@ Parcels come from the land registry's own service. A tap inside a stored parcel 
 <td width="33%" valign="top">
 
 #### ✏️ Drawing made easy
-Copy the registry outline and move only the wrong corners: drag numbered handles, tap "+" on an edge, place precisely with a crosshair, undo and redo. Corners snap onto neighbours, drawings cannot overlap, and a parcel splits in two or into equal pieces for the heirs, cut in the direction you choose with a numbered preview. Pieces merge back into one, owned by default by the owners' common ancestor. Every side of the selected parcel shows its exact length on the ellipsoid.
+Copy the registry outline and move only the wrong corners: drag numbered handles, tap "+" on an edge, place precisely with a crosshair, undo and redo. Corners snap onto neighbours, drawings cannot overlap, and a parcel splits in two or into equal pieces for the heirs, cut in the direction you choose with a numbered preview. Pieces merge back into one, owned by default by the owners' common ancestor (update every installed app to 2.4.0 or later before merging: older apps show merged pieces as if they were still there). Every side of the selected parcel shows its exact length on the ellipsoid.
 
 </td>
 </tr>

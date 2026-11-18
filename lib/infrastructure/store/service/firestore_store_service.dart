@@ -27,7 +27,8 @@ import 'package:parcel_atlas/infrastructure/store/service/store_collection.dart'
 ///   with a `ref` can be undone: it carries the record's path, what it was
 ///   just before ([before] reads it; null for a record the change creates)
 ///   and the change's id ([newChangeId]), shared by every line of one
-///   batch, so the whole change is undone together.
+///   batch, so the whole change is undone together. [line] is such a line
+///   as data, for a write inside a [transaction].
 /// - [failure] turns Firestore's errors into the app's exceptions: a refused
 ///   read or write means the account is not on the family's list.
 ///
@@ -123,7 +124,32 @@ class FirestoreStoreService {
     DocumentReference<Map<String, dynamic>>? ref,
     Map<String, dynamic>? was,
     bool isUndo = false,
-  }) => batch.set(doc(StoreCollection.activity), <String, Object?>{
+  }) => batch.set(
+    doc(StoreCollection.activity),
+    line(
+      action: action,
+      target: target,
+      targetId: targetId,
+      label: label,
+      actor: actor,
+      change: change,
+      ref: ref,
+      was: was,
+      isUndo: isUndo,
+    ),
+  );
+
+  Map<String, Object?> line({
+    required ActivityActionEnum action,
+    required ActivityTargetEnum target,
+    required String targetId,
+    required String label,
+    required MemberEntity actor,
+    String? change,
+    DocumentReference<Map<String, dynamic>>? ref,
+    Map<String, dynamic>? was,
+    bool isUndo = false,
+  }) => <String, Object?>{
     _action: action.name,
     _target: target.name,
     _targetId: targetId,
@@ -135,7 +161,17 @@ class FirestoreStoreService {
       previous: was,
       if (isUndo) undo: true,
     },
-  });
+  };
+
+  Future<Either<BaseException, T>> transaction<T>(
+    Future<Either<BaseException, T>> Function(Transaction tx) body,
+  ) async {
+    try {
+      return await _firestore.runTransaction(body);
+    } catch (e) {
+      return Left(failure(e));
+    }
+  }
 
   Future<Either<BaseException, String>> commit(
     WriteBatch batch,

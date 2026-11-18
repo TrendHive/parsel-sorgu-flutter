@@ -139,6 +139,8 @@ final class MapCubit extends Cubit<MapState> {
 
   final UndoChangeUseCase _undoChange;
 
+  bool _undoing = false;
+
   final AuthRepositoryInterface _auth;
 
   final bool _registryReachable;
@@ -373,6 +375,7 @@ final class MapCubit extends Cubit<MapState> {
         )),
       ),
       frame: false,
+      created: true,
     );
   }
 
@@ -497,11 +500,15 @@ final class MapCubit extends Cubit<MapState> {
     if (split == null || !split.canConfirm) return;
     _afterDrawingWrite(
       await _splitDrawing(drawing: split.drawing, outlines: split.pieces),
+      created: true,
     );
   }
 
   Future<void> undoLast() async {
+    if (_undoing) return;
+    _undoing = true;
     final Either<BaseException, String> result = await _undoChange();
+    _undoing = false;
     if (isClosed) return;
     final MapState current = state;
     if (current is! MapReady) return;
@@ -529,11 +536,13 @@ final class MapCubit extends Cubit<MapState> {
       ),
       heirs: heirs,
     ),
+    created: true,
   );
 
   void _afterDrawingWrite(
     Either<BaseException, String> result, {
     bool frame = true,
+    bool created = false,
   }) {
     if (isClosed) return;
     final MapState after = state;
@@ -552,7 +561,9 @@ final class MapCubit extends Cubit<MapState> {
               redivide: () => null,
               merge: () => null,
               layers: <MapLayerEnum>{...after.layers, MapLayerEnum.drawn},
-              notice: MapNoticeEnum.drawingSaved,
+              notice: created
+                  ? MapNoticeEnum.drawingCreated
+                  : MapNoticeEnum.drawingSaved,
             ),
           ),
         );
@@ -692,6 +703,7 @@ final class MapCubit extends Cubit<MapState> {
         existing: drawing.editing,
         snapshot: current.snapshot,
       ),
+      created: drawing.editing == null,
     );
   }
 

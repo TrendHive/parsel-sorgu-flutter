@@ -203,9 +203,15 @@ log keeps the store free of a second, separate history. Undo is itself a
 change: one signed batch that restores the records and logs a line per record
 (marked `undo`, remembering what it replaced), so an undo can be undone.
 
-Undo is refused when a later line names any of the same records: someone
-changed them again, or the change was already undone. Restoring an old
-version over a newer one would silently throw that work away. Undoing a
+Undo is refused unless every record is still exactly as the change left it:
+gone for a delete, otherwise stamped `updated` at the change's own server
+time (all writes in one batch share it). The records are read and written
+in one transaction, so an edit made since — by any app version, old ones
+that write no undo data included, or a tool — or an undo already done,
+refuses it, and two undos of the same change cannot both commit. Restoring
+an old version over a newer one would silently throw that work away. The
+Undo button shows only where it can work: a member is not offered it for a
+save that created records, and it is disabled while an undo runs. Undoing a
 change that created records deletes them, and deleting is the main account's
 alone (rule and Firestore rules alike), so such a change — a split's new
 pieces, a new person — is the main account's to undo. A person's delete now

@@ -257,6 +257,11 @@ void main() {
     verify(() => drawings.create(any(), any(), actor: any(named: 'actor')))
         .called(1);
     expect((cubit.state as MapReady).exception, isNull);
+    expect(
+      (cubit.state as MapReady).notice,
+      MapNoticeEnum.drawingCreated,
+      reason: 'a member cannot delete, so this save offers no undo',
+    );
   });
 
   test('assign owner records the person on the existing real boundary, links '
