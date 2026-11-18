@@ -314,6 +314,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get activityEmpty => 'No changes yet.';
 
   @override
+  String get undoButton => 'Undo';
+
+  @override
+  String get noticeUndone => 'Undone.';
+
+  @override
+  String get undoBadge => 'undo';
+
+  @override
+  String get confirmUndoTitle => 'Undo this change?';
+
+  @override
+  String confirmUndoBody(String label) {
+    return '\"$label\" and every record changed in the same step go back to how they were. The undo is logged too, and can itself be undone.';
+  }
+
+  @override
   String get actionQueried => 'queried from the registry';
 
   @override
@@ -430,6 +447,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get parentNone => 'None (top of the tree)';
 
   @override
+  String get spouseLabel => 'Spouse';
+
+  @override
+  String get spouseNone => 'None';
+
+  @override
+  String spouseOf(String name) {
+    return 'spouse of $name';
+  }
+
+  @override
   String get passesToChildrenLabel => 'Share passed to children';
 
   @override
@@ -464,6 +492,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorFamilyLoop =>
       'A person cannot be the child of their own descendant.';
+
+  @override
+  String get errorNothingToUndo =>
+      'There is no change to undo. Registry lookups and changes made before undo existed cannot be undone.';
+
+  @override
+  String get errorChangeSuperseded =>
+      'This change cannot be undone: one of its records was changed again afterwards, or it was already undone. Undo the newer change first.';
+
+  @override
+  String get errorSpouseNotAllowed =>
+      'This person cannot be chosen as the spouse: it is the person themselves, one of their own line, or someone married to another person.';
 
   @override
   String get errorRegistryRefusesWeb =>
@@ -513,6 +553,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get colourUnassigned => 'No owner';
+
+  @override
+  String get legendShow => 'Show what the colours mean';
+
+  @override
+  String get legendHide => 'Hide the colour key';
 
   @override
   String get assignOwner => 'Assign owner';
@@ -568,8 +614,60 @@ class AppLocalizationsEn extends AppLocalizations {
       'Equal pieces by number (owners stay the same)';
 
   @override
+  String splitEqualAngle(int degrees) {
+    return 'Cut direction: $degrees°';
+  }
+
+  @override
+  String get splitEqualAngleHint =>
+      'Compass bearing of the dividing lines: 0° north–south, 90° east–west. The numbers in the preview are the order the pieces are given out.';
+
+  @override
+  String get splitEqualAngleLess => 'Turn 1° left';
+
+  @override
+  String get splitEqualAngleMore => 'Turn 1° right';
+
+  @override
+  String get mergeButton => 'Merge back';
+
+  @override
+  String get mergeTitle => 'Merge pieces';
+
+  @override
+  String get mergePick =>
+      'Tap the neighbouring pieces to merge; tap again to take one off.';
+
+  @override
+  String mergeReady(int count, String area) {
+    return '$count pieces merge into $area';
+  }
+
+  @override
+  String get mergeConfirm => 'Merge';
+
+  @override
+  String get mergeOwnerTitle => 'Who owns the merged parcel?';
+
+  @override
+  String get mergeOwnerHint =>
+      'The owners\' common ancestor is suggested. You can go up the family tree or choose someone else. The merged pieces are archived, not deleted, and the merge can be undone.';
+
+  @override
+  String get mergeOwnerSuggested => 'The owners\' common ancestor';
+
+  @override
+  String get mergeOwnerUp => 'Up to parent';
+
+  @override
+  String get mergeOwnerChoose => 'Choose someone else';
+
+  @override
+  String get mergeOwnerKeep => 'Keep the owners as they are';
+
+  @override
   String get splitEqualNote =>
-      'The parcel is cut into pieces of equal area along its long axis. You can adjust each piece\'s corners afterwards.';
+      'The parcel is cut into pieces of equal area in the direction you choose. You can adjust each piece\'s corners afterwards.';
 
   @override
   String get errorDrawingOverlaps =>
@@ -578,6 +676,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorSplitMisses =>
       'The parcel could not be split. Check the cut line or the number of pieces.';
+
+  @override
+  String get errorMergeMisses =>
+      'The chosen pieces do not all share a side, so they cannot be merged.';
 
   @override
   String get noticeUseApp =>

@@ -46,7 +46,7 @@ Parcels come from the land registry's own service. A tap inside a stored parcel 
 <td width="33%" valign="top">
 
 #### ✏️ Drawing made easy
-Copy the registry outline and move only the wrong corners: drag numbered handles, tap "+" on an edge, place precisely with a crosshair, undo and redo. Corners snap onto neighbours, drawings cannot overlap, and a parcel splits in two or into equal pieces for the heirs.
+Copy the registry outline and move only the wrong corners: drag numbered handles, tap "+" on an edge, place precisely with a crosshair, undo and redo. Corners snap onto neighbours, drawings cannot overlap, and a parcel splits in two or into equal pieces for the heirs, cut in the direction you choose with a numbered preview. Pieces merge back into one, owned by default by the owners' common ancestor (update every installed app to 2.4.0 or later before merging: older apps show merged pieces as if they were still there). Every side of the selected parcel shows its exact length on the ellipsoid.
 
 </td>
 </tr>
@@ -60,7 +60,7 @@ Areas, perimeters and every side's length are computed on the WGS84 ellipsoid, s
 <td valign="top">
 
 #### 👨‍👩‍👧‍👦 A family tree of owners
-Owners hold deed-style shares (1/4). A share recorded on an ancestor passes down the tree, split equally among the children of each generation. The map is coloured by owner, with each owner's initials over their land (unowned land is drawn faintly), and can instead be coloured by any generation of the tree.
+Owners hold deed-style shares (1/4). A share recorded on an ancestor passes down the tree, split equally among the children of each generation; a spouse who married in sits beside their partner and shares their children. The map is coloured by owner, with each owner's initials over their land (unowned land is drawn faintly), and can instead be coloured by any generation of the tree.
 
 </td>
 <td valign="top">
@@ -80,7 +80,7 @@ One shared store, read live with an offline cache: a boundary drawn on one phone
 <td valign="top">
 
 #### 🕓 Every change signed
-Each record says who created and last changed it, at the server's time, and a history lists every change by every member.
+Each record says who created and last changed it, at the server's time, and a history lists every change by every member. A wrong change can be undone — straight from the message after saving, or from any line of the history — unless someone changed the same records since.
 
 </td>
 <td valign="top">

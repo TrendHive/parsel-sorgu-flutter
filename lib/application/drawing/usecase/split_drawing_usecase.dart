@@ -11,6 +11,7 @@ import 'package:parcel_atlas/domain/auth/interface/auth_repository_interface.dar
 import 'package:parcel_atlas/domain/drawing/entity/drawn_parcel_entity.dart';
 import 'package:parcel_atlas/domain/drawing/interface/drawn_parcel_repository_interface.dart';
 import 'package:parcel_atlas/domain/drawing/value_object/drawing_details_value_object.dart';
+import 'package:parcel_atlas/domain/map/rule/map_rules.dart';
 import 'package:parcel_atlas/domain/map/value_object/geo_polygon_value_object.dart';
 import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
 import 'package:parcel_atlas/domain/person/value_object/ownership_value_object.dart';
@@ -57,7 +58,7 @@ final class SplitDrawingUseCase {
                 name: <String>[
                   drawing.name,
                   heirs?[index].name ?? '${index + CoreConstants.one}',
-                ].join(_separator),
+                ].join(MapRules.pieceSeparator),
                 officialParcelId: drawing.officialParcelId,
                 owners: heirs == null
                     ? drawing.owners
@@ -83,6 +84,4 @@ final class SplitDrawingUseCase {
     }
     return _drawings.split(drawing, pieces, actor: actor);
   }
-
-  static const String _separator = ' – ';
 }

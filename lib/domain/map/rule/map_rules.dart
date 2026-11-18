@@ -23,8 +23,14 @@ import 'package:parcel_atlas/domain/map/enum/camera_move_enum.dart';
 ///
 /// [overlapToleranceSquareMeters] is how much two drawings may share before
 /// the second is refused — enough to forgive a corner placed a hand's width
-/// over a neighbour's line, not a strip of someone else's land.
-/// [maxPieces] is the most strips one equal split makes. [coverShare] is
+/// over a neighbour's line, not a strip of someone else's land. Ground
+/// within [overlapSliverMeters] of both drawings' sides is not counted at
+/// all: along a 30 m side, a hand-drawn line half a metre off the
+/// registry's would otherwise add up to many square metres of "overlap"
+/// that is only two people drawing the same boundary.
+/// [maxPieces] is the most strips one equal split makes, and
+/// [pieceSeparator] joins a piece's name to its number or heir ("Tarla – 2")
+/// — a merge takes it off again. [coverShare] is
 /// how much of an unlinked drawing must lie on a registry parcel for it to
 /// count as that parcel's real boundary.
 ///
@@ -59,7 +65,11 @@ abstract final class MapRules {
 
   static const double overlapToleranceSquareMeters = 2;
 
+  static const double overlapSliverMeters = 0.5;
+
   static const int maxPieces = 12;
+
+  static const String pieceSeparator = ' – ';
 
   static const double coverShare = 0.5;
 

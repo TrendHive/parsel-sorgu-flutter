@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:either_dart/either.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parcel_atlas/application/activity/usecase/undo_change_usecase.dart';
 import 'package:parcel_atlas/application/map/usecase/watch_map_usecase.dart';
 import 'package:parcel_atlas/application/person/usecase/delete_person_usecase.dart';
 import 'package:parcel_atlas/application/person/usecase/save_person_usecase.dart';
@@ -15,10 +16,20 @@ import 'package:parcel_atlas/domain/person/entity/person_entity.dart';
 part 'persons_state.dart';
 
 /// The people page: the family tree of everyone parcels are recorded on,
-/// and what reaches each of them — live from the shared store.
+/// and what reaches each of them — live from the shared store. [undoLast]
+/// takes back the member's newest change.
 final class PersonsCubit extends Cubit<PersonsState> {
-  PersonsCubit(this._watchMap, this._savePerson, this._deletePerson, this._auth)
-    : super(const PersonsLoading());
+  PersonsCubit(
+    this._watchMap,
+    this._savePerson,
+    this._deletePerson,
+    this._undoChange,
+    this._auth,
+  ) : super(const PersonsLoading());
+
+  final UndoChangeUseCase _undoChange;
+
+  bool _undoing = false;
 
   final WatchMapUseCase _watchMap;
 
@@ -54,14 +65,17 @@ final class PersonsCubit extends Cubit<PersonsState> {
     required String? parentId,
     required bool passesToChildren,
     required String note,
+    String? spouseId,
     PersonEntity? existing,
   }) async {
     final PersonsState current = state;
     if (current is! PersonsReady) return;
     _report(
+      created: existing == null,
       await _savePerson(
         name: name,
         parentId: parentId,
+        spouseId: spouseId,
         passesToChildren: passesToChildren,
         note: note,
         family: current.snapshot.persons,
@@ -73,9 +87,29 @@ final class PersonsCubit extends Cubit<PersonsState> {
   Future<void> deletePerson(PersonEntity person) async =>
       _report(await _deletePerson(person));
 
-  void _report(Either<BaseException, String> result) {
+  Future<void> undoLast() async {
+    if (_undoing) return;
+    _undoing = true;
+    final Either<BaseException, String> result = await _undoChange();
+    _undoing = false;
+    _report(result, undo: true);
+  }
+
+  void _report(
+    Either<BaseException, String> result, {
+    bool undo = false,
+    bool created = false,
+  }) {
     final PersonsState current = state;
-    if (!isClosed && current is PersonsReady) emit(current.withResult(result));
+    if (!isClosed && current is PersonsReady) {
+      emit(
+        current.withResult(
+          result,
+          undo: undo,
+          canUndo: !undo && (!created || (current.member?.canDelete ?? false)),
+        ),
+      );
+    }
   }
 
   @override

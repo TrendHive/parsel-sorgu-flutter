@@ -14,7 +14,8 @@ import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_tex
 /// opens or closes them in place, indented under their parent, so a member
 /// stops at whatever level the land belongs to — choosing the grandfather,
 /// or opening him and choosing one of his sons. People in [excluded] are
-/// shown but cannot be chosen (they are already owners).
+/// shown but cannot be chosen (they are already owners). A spouse who
+/// married in is listed right below their husband or wife.
 ///
 /// [open] answers the person, or null when the member backs out.
 class OwnerTreeDialog extends StatefulWidget {
@@ -81,8 +82,11 @@ class _OwnerTreeDialogState extends State<OwnerTreeDialog> {
       person.id,
     );
     final bool opened = _opened.contains(person.id);
+    final PersonEntity? spouse = FamilyRules.spouseOf(widget.persons, person);
     return <Widget>[
       _tile(person, children.length, depth, opened: opened),
+      if (spouse != null && FamilyRules.besideSpouse(widget.persons, spouse))
+        _tile(spouse, 0, depth, opened: false),
       if (opened && depth < FamilyRules.maxGenerations)
         for (final PersonEntity child in children) ..._branch(child, depth + 1),
     ];

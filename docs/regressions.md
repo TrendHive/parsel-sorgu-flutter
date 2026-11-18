@@ -94,6 +94,16 @@ moving the camera (`map_cubit_test`).
 generation menu. *Guard:* colouring by owner is the default, also on the
 registry layer.
 
+**"Assign owner" on a registry parcel was refused as an overlap that was not
+there.** The neighbour's real boundary, drawn by hand, crossed the registry's
+shared line by a few tens of centimetres; along a 30 m side that thin strip
+added up to more than the 2 m² allowed. *Guard:* the overlap check ignores
+ground within `MapRules.overlapSliverMeters` (0.5 m) of both drawings' sides,
+so only ground reaching deeper counts (`overlap_sliver_test`). And
+assigning an owner is never checked for overlap at all — it stores the
+registry's own outline, or changes no shape — so recording who owns a
+parcel cannot be refused over geometry (`map_cubit_test`).
+
 ## Map camera
 
 **A tap on a parcel already on screen zoomed the map onto it.** Every

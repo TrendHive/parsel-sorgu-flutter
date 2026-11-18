@@ -16,7 +16,7 @@ import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_tex
 import 'package:parcel_atlas/presentation/router/parcel_info_router.dart';
 
 /// Totals first — parcels, total area, owned area — then the person's place
-/// in the tree (parent and children, each a link), then one card per parcel
+/// in the tree (parent, spouse and children, each a link), then one card per parcel
 /// with where it is, its area, the share that reaches the person, the
 /// ancestor it comes from, and "show on map".
 class HoldingsBody extends StatelessWidget {
@@ -44,6 +44,7 @@ class HoldingsBody extends StatelessWidget {
     final TextTheme text = Theme.of(context).textTheme;
     final HoldingsReadModel holdings = state.holdings;
     final PersonEntity? parent = state.parent;
+    final PersonEntity? spouse = state.spouse;
     return CustomScrollView(
       slivers: <Widget>[
         SliverAppBar.large(title: ParcelInfoText(state.person.name)),
@@ -80,6 +81,14 @@ class HoldingsBody extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: _chip(context, parent),
+                ),
+              ],
+              if (spouse != null) ...<Widget>[
+                SizedBox(height: BaseDimens.height.small),
+                ParcelInfoText(l10n.spouseLabel, style: text.titleMedium),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: _chip(context, spouse),
                 ),
               ],
               if (state.children.isNotEmpty) ...<Widget>[

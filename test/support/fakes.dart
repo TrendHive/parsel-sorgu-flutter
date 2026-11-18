@@ -17,11 +17,13 @@ final AuditStampValueObject testStamp = AuditStampValueObject(
 PersonEntity testPerson(
   String id, {
   String? parentId,
+  String? spouseId,
   bool passesToChildren = false,
 }) => PersonEntity(
   id: id,
   name: id,
   parentId: parentId,
+  spouseId: spouseId,
   passesToChildren: passesToChildren,
   note: '',
   created: testStamp,
