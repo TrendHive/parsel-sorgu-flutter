@@ -27,6 +27,10 @@ class ExceptionCopy {
       CauseCode.registryRefusesWebCode => l10n.errorRegistryRefusesWeb,
       CauseCode.drawingOverlapsCode => l10n.errorDrawingOverlaps,
       CauseCode.splitMissesCode => l10n.errorSplitMisses,
+      CauseCode.spouseNotAllowedCode => l10n.errorSpouseNotAllowed,
+      CauseCode.nothingToUndoCode => l10n.errorNothingToUndo,
+      CauseCode.changeSupersededCode => l10n.errorChangeSuperseded,
+      CauseCode.mergeMissesCode => l10n.errorMergeMisses,
       CauseCode.emptyValueCode => l10n.errorEmptyField,
       _ => null,
     };

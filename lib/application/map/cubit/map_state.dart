@@ -31,7 +31,8 @@ final class MapFailed extends MapState {
 /// [focusId] changes each time, so the same place can be asked for twice.
 ///
 /// [split] is a drawing being cut in two, or null. [redivide] is two
-/// neighbours being divided again by their deeds, or null. [colourLevel] is the
+/// neighbours being divided again by their deeds, or null. [merge] is
+/// neighbouring pieces being merged back into one, or null. [colourLevel] is the
 /// level of the family tree the drawings are coloured by — zero the eldest
 /// generation — or null for colouring by owner.
 ///
@@ -51,6 +52,7 @@ final class MapReady extends MapState {
     this.drawing,
     this.split,
     this.redivide,
+    this.merge,
     this.colourLevel,
     this.compareIds = const <String>[],
     this.focus,
@@ -78,6 +80,8 @@ final class MapReady extends MapState {
 
   final MapRedivideReadModel? redivide;
 
+  final MapMergeReadModel? merge;
+
   final int? colourLevel;
 
   final List<String> compareIds;
@@ -103,6 +107,7 @@ final class MapReady extends MapState {
     MapDrawingReadModel? Function()? drawing,
     MapSplitReadModel? Function()? split,
     MapRedivideReadModel? Function()? redivide,
+    MapMergeReadModel? Function()? merge,
     int? Function()? colourLevel,
     List<String>? compareIds,
     List<LatLng>? focus,
@@ -118,6 +123,7 @@ final class MapReady extends MapState {
     drawing: drawing == null ? this.drawing : drawing(),
     split: split == null ? this.split : split(),
     redivide: redivide == null ? this.redivide : redivide(),
+    merge: merge == null ? this.merge : merge(),
     colourLevel: colourLevel == null ? this.colourLevel : colourLevel(),
     compareIds: compareIds ?? this.compareIds,
     focus: focus ?? this.focus,

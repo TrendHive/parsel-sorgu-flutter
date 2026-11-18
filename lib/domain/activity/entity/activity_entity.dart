@@ -9,6 +9,12 @@ import 'package:parcel_atlas/domain/activity/value_object/audit_stamp_value_obje
 /// line still reads after the record is renamed or deleted. Entries are only
 /// ever added — the log is the answer to "who changed this?", and an editable
 /// log could not give it.
+///
+/// [changeId] groups the lines one save wrote together — a split writes one
+/// per piece — so the whole change is undone at once; it is null for a
+/// registry lookup and for lines from before undo existed. [canUndo] is
+/// whether the line remembers what its record was before. [isUndo] marks a
+/// line written by undoing another change.
 final class ActivityEntity extends BaseEntity {
   const ActivityEntity({
     required this.id,
@@ -17,6 +23,8 @@ final class ActivityEntity extends BaseEntity {
     required this.targetId,
     required this.label,
     required this.stamp,
+    this.changeId,
+    this.isUndo = false,
   });
 
   @override
@@ -31,4 +39,10 @@ final class ActivityEntity extends BaseEntity {
   final String label;
 
   final AuditStampValueObject stamp;
+
+  final String? changeId;
+
+  final bool isUndo;
+
+  bool get canUndo => changeId != null;
 }

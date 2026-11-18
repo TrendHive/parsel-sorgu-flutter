@@ -53,7 +53,8 @@ Members may create and refresh; nobody may delete. The app never edits one.
 | `owners` | list of `{personId, numerator, denominator}` | shares are reduced fractions, total ≤ 1 |
 | `ownerIds` | list of string | the same person ids, flat, for clean-up queries |
 | `note` | string | |
-| `measures` | `{areaSquareMeters, perimeterMeters, edgeLengthsMeters}` | computed from `outline` when saved |
+| `measures` | `{areaSquareMeters, perimeterMeters, edgeLengthsMeters}` | computed from `outline` when saved; lengths are geodesic (Vincenty) from this version on |
+| `mergedInto` | string, absent normally | the drawing this piece was merged into; an archived piece is on no map or total, kept so the merge can be undone |
 | `created`, `updated` | stamp | |
 
 Members create and update; only admin deletes.
@@ -64,12 +65,13 @@ Members create and update; only admin deletes.
 |---|---|---|
 | `name` | string | |
 | `parentId` | string \| null | the person's parent in the tree |
+| `spouseId` | string \| null | the person's husband or wife; stored on one side only, read from both; changes nobody's inheritance |
 | `passesToChildren` | bool | the person's shares are split equally among their children |
 | `note` | string | |
 | `created`, `updated` | stamp | |
 
 Not sign-in accounts. Deleting one (admin) also removes their owner lines
-from every drawing and unlinks their children, in the same batch.
+from every drawing and unlinks their children and spouse, in the same batch.
 
 ### `activity/{auto}` — the change log
 
@@ -77,6 +79,13 @@ from every drawing and unlinks their children, in the same batch.
 `target` (`officialParcel` · `drawnParcel` · `person`), `targetId`,
 `label` (the record's name at the time), `by` (stamp). Append-only: no update,
 no delete.
+
+A line about a drawing or a person also carries what undo needs: `changeId`
+(shared by every line one save wrote — a split's pieces, a person's delete and
+its clean-up), `path` (the record's full store path) and `before` (the record
+as it was just before the change, or null when the change created it). A line
+written by undoing a change has `undo: true`. Registry lookups, and lines from
+before undo existed, have none of these and cannot be undone.
 
 ## Free-tier budget
 

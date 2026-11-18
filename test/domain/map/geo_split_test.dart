@@ -77,7 +77,11 @@ void main() {
     ];
     final double total = GeoRules.areaSquareMeters(field);
 
-    final List<List<LatLng>> strips = GeoRules.splitEqual(field, 4);
+    final List<List<LatLng>> strips = GeoRules.splitEqual(
+      field,
+      4,
+      bearingDegrees: GeoRules.suggestedCutBearing(field),
+    );
 
     expect(strips, hasLength(4));
     for (final List<LatLng> strip in strips) {
@@ -94,5 +98,79 @@ void main() {
         );
       }
     }
+  });
+
+  test('an equal split cuts along the direction the member chose', () {
+    const List<LatLng> square = <LatLng>[
+      LatLng(40, 41),
+      LatLng(40, 41.001),
+      LatLng(40.001, 41.001),
+      LatLng(40.001, 41),
+    ];
+    final List<List<LatLng>> northSouth = GeoRules.splitEqual(
+      square,
+      2,
+      bearingDegrees: 0,
+    );
+    final List<List<LatLng>> eastWest = GeoRules.splitEqual(
+      square,
+      2,
+      bearingDegrees: 90,
+    );
+    double midLongitude(List<LatLng> piece) =>
+        piece.map((LatLng p) => p.longitude).reduce((a, b) => a + b) /
+        piece.length;
+    double midLatitude(List<LatLng> piece) =>
+        piece.map((LatLng p) => p.latitude).reduce((a, b) => a + b) /
+        piece.length;
+    expect(midLongitude(northSouth.first), lessThan(41.0005));
+    expect(midLongitude(northSouth.last), greaterThan(41.0005));
+    expect(midLatitude(eastWest.first), greaterThan(40.0005));
+    expect(midLatitude(eastWest.last), lessThan(40.0005));
+  });
+
+  test('the suggested cut runs across a long field', () {
+    const List<LatLng> longEastWest = <LatLng>[
+      LatLng(40, 41),
+      LatLng(40, 41.004),
+      LatLng(40.0005, 41.004),
+      LatLng(40.0005, 41),
+    ];
+    expect(GeoRules.suggestedCutBearing(longEastWest), closeTo(0, 1));
+  });
+
+  test('pieces split among heirs merge back into the whole field', () {
+    const List<LatLng> field = <LatLng>[
+      LatLng(40, 41),
+      LatLng(40.00002, 41.0004),
+      LatLng(40.00015, 41.00043),
+      LatLng(40.0001, 41.00002),
+    ];
+    final List<List<LatLng>> strips = GeoRules.splitEqual(
+      field,
+      4,
+      bearingDegrees: 30,
+    );
+    final List<LatLng>? whole = GeoRules.merge(<List<LatLng>>[
+      strips[2],
+      strips[0],
+      strips[3],
+      strips[1],
+    ]);
+    expect(whole, isNotNull);
+    expect(
+      GeoRules.areaSquareMeters(whole!),
+      closeTo(GeoRules.areaSquareMeters(field), 0.01),
+    );
+    expect(whole, hasLength(field.length));
+  });
+
+  test('pieces that do not touch cannot be merged', () {
+    const List<LatLng> far = <LatLng>[
+      LatLng(41, 41),
+      LatLng(41, 41.001),
+      LatLng(41.001, 41.001),
+    ];
+    expect(GeoRules.merge(<List<LatLng>>[testSquare, far]), isNull);
   });
 }

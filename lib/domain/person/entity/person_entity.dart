@@ -9,7 +9,10 @@ import 'package:parcel_atlas/domain/input/enum/input_field_enum.dart';
 /// Someone parcels belong to, and their place in the family tree.
 ///
 /// Not a member: a person never signs in. [parentId] is the person's father
-/// or mother in the tree, or null at its root. [passesToChildren] says the
+/// or mother in the tree, or null at its root. [spouseId] is the person's
+/// husband or wife, when it is this person's record that names them — a
+/// marriage is stored on one side only, and `FamilyRules.spouseOf` reads it
+/// from either side. [passesToChildren] says the
 /// person's shares have passed on: whatever they hold is split equally
 /// among their children (and onward, if a child's share has passed on too).
 /// A parcel recorded on a grandfather therefore reaches every heir without
@@ -27,6 +30,7 @@ final class PersonEntity extends BaseEntity {
     required this.id,
     required this.name,
     required this.parentId,
+    required this.spouseId,
     required this.passesToChildren,
     required this.note,
     required this.created,
@@ -40,6 +44,8 @@ final class PersonEntity extends BaseEntity {
 
   final String? parentId;
 
+  final String? spouseId;
+
   final bool passesToChildren;
 
   final String note;
@@ -51,6 +57,7 @@ final class PersonEntity extends BaseEntity {
   static Either<BaseException, PersonEntity> create({
     required String name,
     required String? parentId,
+    required String? spouseId,
     required bool passesToChildren,
     required String note,
   }) => NotBlankValidator(InputFieldEnum.personName.name)
@@ -60,6 +67,7 @@ final class PersonEntity extends BaseEntity {
           id: CoreConstants.empty,
           name: valid.trim(),
           parentId: parentId,
+          spouseId: spouseId,
           passesToChildren: passesToChildren,
           note: note.trim(),
           created: null,
@@ -70,6 +78,7 @@ final class PersonEntity extends BaseEntity {
   Either<BaseException, PersonEntity> edit({
     required String name,
     required String? parentId,
+    required String? spouseId,
     required bool passesToChildren,
     required String note,
   }) => NotBlankValidator(InputFieldEnum.personName.name)
@@ -79,6 +88,7 @@ final class PersonEntity extends BaseEntity {
           id: id,
           name: valid.trim(),
           parentId: parentId,
+          spouseId: spouseId,
           passesToChildren: passesToChildren,
           note: note.trim(),
           created: created,

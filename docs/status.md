@@ -6,11 +6,17 @@ then this page. Keep it current: update it at the end of every working
 session. This repository is public — never write passwords, keys, account
 ids beyond `firestore.rules`, or the family's personal data here.
 
-_Last updated: 2026-11-15 (end of the long first-use session)._
+_Last updated: 2026-11-18 (spouse link, split direction, undo, merge, side lengths, fixes — on branch `feat/person-spouse`, not merged)._
 
 ## Released
 
-Version 2.3.0 is live on https://parcel-info.web.app (the only environment).
+Version 2.4.0 is live on https://parcel-info.web.app (the only environment).
+
+**Update every installed app before anyone merges parcels.** 2.4.0 archives
+merged pieces (`mergedInto`); Android and macOS builds older than 2.4.0 do
+not know that field and show the archived pieces as live drawings lying
+over the merged parcel (their overlap check then refuses edits nearby).
+Undo is safe with old builds: it refuses any record changed since.
 
 - Sign-in with fixed accounts; several family accounts exist.
 - Map with two layers (registry parcels, read-only; family-drawn real
@@ -35,7 +41,7 @@ Version 2.3.0 is live on https://parcel-info.web.app (the only environment).
 
 | Platform | State |
 |---|---|
-| Web | Released (2.3.0). No registry lookups, by the registry's choice. |
+| Web | Released (2.4.0). No registry lookups, by the registry's choice. |
 | macOS | Builds and runs signed with the owner's team; sign-in and lookups verified by the owner. Run with `flutter run -d macos` or build in Xcode. Must be signed with a provisioning profile — an ad-hoc build cannot sign in (`docs/regressions.md`). Not packaged for download yet. |
 | Android | Release APK signed with the upload keystore (kept outside the repository, referenced by the gitignored `android/key.properties`). Distributed to the family testers through Firebase App Distribution. |
 | iOS | Not built. The owner has a paid developer account. |
@@ -89,6 +95,30 @@ The logic below is unit-tested; nobody has clicked through the screens:
    no code (roadmap).
 5. **Sharper imagery and 3D** — decided against: free resources only.
 6. **Lookups on the website** — not possible client-side; decided.
+
+## In progress — branch `feat/person-spouse` (2026-11-18)
+
+Gate green locally; not yet committed, reviewed or merged.
+
+- **Spouse link** (R54): `spouseId` on a person, one side only. The owner
+  asked for a wife to be added beside her husband with the same children:
+  once released, add her in the app (People → add person → Spouse). The
+  data entry is the owner's; inheritance is unchanged by design.
+- **Split direction** (R55): the equal split asks for a bearing and shows a
+  numbered preview.
+- **Undo** (R56): activity lines remember `before` under a `changeId`;
+  undo from the saved message or any history line. Verify by hand before
+  release — the store side (`ActivityRepository.undo`) has no automated
+  test (`fake_cloud_firestore` conflicts with `equatable` 3; no emulator
+  set up): edit a drawing and undo it; split and undo as the main account;
+  split and try to undo as a member (refused); edit, edit again, try to
+  undo the first (refused); delete a person and undo (owner lines, children
+  and spouse come back).
+
+- **Merge back** (R57), **side lengths** (R58), **overlap on assign**
+  (R59, a regression fix), **large text on phones** (R60). Not verified by
+  hand: merging on the map, the owner dialog's "Up to parent", the side
+  labels, and the map on a phone with the largest text size.
 
 ## Housekeeping still open
 
