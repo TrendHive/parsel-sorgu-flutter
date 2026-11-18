@@ -11,6 +11,7 @@ import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_tex
 import 'package:parcel_atlas/presentation/map/widgets/map_audit_line.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_info_row.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_panel_frame.dart';
+import 'package:parcel_atlas/presentation/map/widgets/map_sides_list.dart';
 
 /// A registry parcel: what the registry says, read-only.
 ///
@@ -113,6 +114,7 @@ class MapOfficialPanel extends StatelessWidget {
         MapInfoRow(label: l10n.cityLabel, value: r.cityName),
         MapInfoRow(label: l10n.sheetLabel, value: r.sheet),
         MapInfoRow(label: l10n.landStatusLabel, value: r.landStatus),
+        MapSidesList(outline: r.outline.corners),
         if (corrections.isNotEmpty) ...<Widget>[
           SizedBox(height: BaseDimens.height.small),
           ParcelInfoText(l10n.correctionsTitle, style: text.titleSmall),

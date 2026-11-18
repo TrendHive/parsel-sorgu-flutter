@@ -12,32 +12,94 @@ import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_tex
 /// [branches] are the people who hold something, in the order
 /// their colours were given out; after them come the colour of a drawing
 /// several branches share and the colour of one nobody owns yet.
-class MapColourLegend extends StatelessWidget {
-  const MapColourLegend({super.key, required this.branches});
+///
+/// It folds away to a single button so it never hides the map: [initiallyOpen]
+/// is false on a phone, and an open legend scrolls within
+/// [ParcelInfoDimens.legendMaxHeightFactor] of the screen.
+class MapColourLegend extends StatefulWidget {
+  const MapColourLegend({
+    super.key,
+    required this.branches,
+    this.initiallyOpen = true,
+  });
 
   final List<PersonEntity> branches;
+
+  final bool initiallyOpen;
+
+  @override
+  State<MapColourLegend> createState() => _MapColourLegendState();
+}
+
+class _MapColourLegendState extends State<MapColourLegend> {
+  late bool _open = widget.initiallyOpen;
 
   @override
   Widget build(BuildContext context) {
     final l10n = ParcelInfoLocalKeys.of(context);
+    if (!_open) {
+      return Padding(
+        padding: EdgeInsets.all(BaseDimens.margin.medium),
+        child: FloatingActionButton.small(
+          heroTag: null,
+          tooltip: l10n.legendShow,
+          onPressed: () => setState(() => _open = true),
+          child: const Icon(Icons.palette_outlined),
+        ),
+      );
+    }
     return Card(
       margin: EdgeInsets.all(BaseDimens.margin.medium),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(
+        constraints: BoxConstraints(
           maxWidth: ParcelInfoDimens.legendMaxWidth,
+          maxHeight:
+              MediaQuery.sizeOf(context).height *
+              ParcelInfoDimens.legendMaxHeightFactor,
         ),
-        child: Padding(
-          padding: EdgeInsets.all(BaseDimens.padding.medium),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              for (final (int index, PersonEntity person) in branches.indexed)
-                _row(context, ParcelInfoColor.branch(index), person.name),
-              _row(context, ParcelInfoColor.sharedBranches, l10n.colourShared),
-              _row(context, ParcelInfoColor.unowned, l10n.colourUnassigned),
-            ],
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Align(
+              alignment: Alignment.topRight,
+              child: IconButton(
+                tooltip: l10n.legendHide,
+                visualDensity: VisualDensity.compact,
+                icon: const Icon(Icons.close),
+                onPressed: () => setState(() => _open = false),
+              ),
+            ),
+            Flexible(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  BaseDimens.padding.medium,
+                  BaseDimens.padding.none,
+                  BaseDimens.padding.medium,
+                  BaseDimens.padding.medium,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    for (final (int index, PersonEntity person)
+                        in widget.branches.indexed)
+                      _row(context, ParcelInfoColor.branch(index), person.name),
+                    _row(
+                      context,
+                      ParcelInfoColor.sharedBranches,
+                      l10n.colourShared,
+                    ),
+                    _row(
+                      context,
+                      ParcelInfoColor.unowned,
+                      l10n.colourUnassigned,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

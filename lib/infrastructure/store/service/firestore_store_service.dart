@@ -23,7 +23,12 @@ import 'package:parcel_atlas/infrastructure/store/service/store_collection.dart'
 /// - [watch] streams a collection live from every device and skips a
 ///   document its mapper cannot read instead of failing the list.
 /// - [batch] / [log] / [commit]: a change and its activity line go in one
-///   atomic batch, so neither can exist without the other.
+///   atomic batch, so neither can exist without the other. A line written
+///   with a `ref` can be undone: it carries the record's path, what it was
+///   just before ([before] reads it; null for a record the change creates)
+///   and the change's id ([newChangeId]), shared by every line of one
+///   batch, so the whole change is undone together. [line] is such a line
+///   as data, for a write inside a [transaction].
 /// - [failure] turns Firestore's errors into the app's exceptions: a refused
 ///   read or write means the account is not on the family's list.
 ///
@@ -40,6 +45,10 @@ class FirestoreStoreService {
   static const String _targetId = 'targetId';
   static const String _label = 'label';
   static const String _by = 'by';
+  static const String changeId = 'changeId';
+  static const String path = 'path';
+  static const String previous = 'before';
+  static const String undo = 'undo';
   static const String _permissionDenied = 'permission-denied';
   static const String _notFound = 'not-found';
   static const String _unavailable = 'unavailable';
@@ -89,6 +98,21 @@ class FirestoreStoreService {
 
   WriteBatch batch() => _firestore.batch();
 
+  String newChangeId() => collection(StoreCollection.activity).doc().id;
+
+  DocumentReference<Map<String, dynamic>> docAt(String fullPath) =>
+      _firestore.doc(fullPath);
+
+  Future<Either<BaseException, Map<String, dynamic>?>> before(
+    DocumentReference<Map<String, dynamic>> ref,
+  ) async {
+    try {
+      return Right((await ref.get()).data());
+    } catch (e) {
+      return Left(failure(e));
+    }
+  }
+
   void log(
     WriteBatch batch, {
     required ActivityActionEnum action,
@@ -96,13 +120,58 @@ class FirestoreStoreService {
     required String targetId,
     required String label,
     required MemberEntity actor,
-  }) => batch.set(doc(StoreCollection.activity), <String, Object?>{
+    String? change,
+    DocumentReference<Map<String, dynamic>>? ref,
+    Map<String, dynamic>? was,
+    bool isUndo = false,
+  }) => batch.set(
+    doc(StoreCollection.activity),
+    line(
+      action: action,
+      target: target,
+      targetId: targetId,
+      label: label,
+      actor: actor,
+      change: change,
+      ref: ref,
+      was: was,
+      isUndo: isUndo,
+    ),
+  );
+
+  Map<String, Object?> line({
+    required ActivityActionEnum action,
+    required ActivityTargetEnum target,
+    required String targetId,
+    required String label,
+    required MemberEntity actor,
+    String? change,
+    DocumentReference<Map<String, dynamic>>? ref,
+    Map<String, dynamic>? was,
+    bool isUndo = false,
+  }) => <String, Object?>{
     _action: action.name,
     _target: target.name,
     _targetId: targetId,
     _label: label,
     _by: stamps.write(actor),
-  });
+    if (change != null && ref != null) ...<String, Object?>{
+      changeId: change,
+      path: ref.path,
+      previous: was,
+      if (isUndo) undo: true,
+    },
+  };
+
+  Future<Either<BaseException, T>> transaction<T>(
+    Future<Either<BaseException, T>> Function(Transaction tx) body,
+  ) async {
+    try {
+      return await _firestore.runTransaction(body);
+    } catch (e) {
+      return Left(failure(e));
+    }
+  }
 
   Future<Either<BaseException, String>> commit(
     WriteBatch batch,

@@ -80,4 +80,42 @@ void main() {
     );
     expect(result.left.cause?.errorCode?.code, CauseCode.notSignedInCode);
   });
+
+  test('a wife is saved married to her husband', () async {
+    final Either<BaseException, String> result = await save(
+      name: 'mother',
+      parentId: null,
+      spouseId: 'father',
+      passesToChildren: false,
+      note: '',
+      family: testFamily,
+    );
+    expect(result.isRight, isTrue);
+    final PersonEntity saved =
+        verify(() => persons.save(captureAny(), actor: member)).captured.single
+            as PersonEntity;
+    expect(saved.spouseId, 'father');
+  });
+
+  test(
+    'marrying someone already married to another person is refused',
+    () async {
+      final Either<BaseException, String> result = await save(
+        name: 'second',
+        parentId: null,
+        spouseId: 'father',
+        passesToChildren: false,
+        note: '',
+        family: <PersonEntity>[
+          ...testFamily,
+          testPerson('mother', spouseId: 'father'),
+        ],
+      );
+      expect(
+        result.left.cause?.errorCode?.code,
+        CauseCode.spouseNotAllowedCode,
+      );
+      verifyNever(() => persons.save(any(), actor: any(named: 'actor')));
+    },
+  );
 }

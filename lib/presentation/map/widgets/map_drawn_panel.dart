@@ -1,5 +1,4 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:parcel_atlas/core/constants.dart';
 import 'package:parcel_atlas/domain/drawing/entity/drawn_parcel_entity.dart';
 import 'package:parcel_atlas/domain/drawing/read_model/parcel_comparison_read_model.dart';
 import 'package:parcel_atlas/domain/map/read_model/map_snapshot_read_model.dart';
@@ -14,6 +13,7 @@ import 'package:parcel_atlas/presentation/map/widgets/map_audit_line.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_info_row.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_owner_tile.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_panel_frame.dart';
+import 'package:parcel_atlas/presentation/map/widgets/map_sides_list.dart';
 
 /// A drawn (real) boundary: its exact measurements, how it compares with
 /// the deed, who owns which share, and the actions on it.
@@ -33,6 +33,7 @@ class MapDrawnPanel extends StatelessWidget {
     required this.onSplit,
     required this.onSplitEqual,
     required this.onRedivide,
+    required this.onMerge,
     required this.onDelete,
     required this.onOpenOfficial,
     required this.onOpenOwner,
@@ -59,6 +60,8 @@ class MapDrawnPanel extends StatelessWidget {
 
   final VoidCallback onRedivide;
 
+  final VoidCallback onMerge;
+
   final VoidCallback onDelete;
 
   final ValueChanged<OfficialParcelEntity> onOpenOfficial;
@@ -82,7 +85,6 @@ class MapDrawnPanel extends StatelessWidget {
     final ParcelComparisonReadModel? comparison = official == null
         ? null
         : ParcelComparisonReadModel.of(drawing, official);
-    final List<double> edges = drawing.outline.edgeLengthsMeters;
     return MapPanelFrame(
       badge: l10n.drawnBadge,
       accent: ParcelInfoColor.drawnStroke,
@@ -188,6 +190,11 @@ class MapDrawnPanel extends StatelessWidget {
               icon: const Icon(Icons.compare_arrows),
               label: ParcelInfoText(l10n.redivideButton),
             ),
+            OutlinedButton.icon(
+              onPressed: onMerge,
+              icon: const Icon(Icons.call_merge),
+              label: ParcelInfoText(l10n.mergeButton),
+            ),
             if (canDelete)
               TextButton.icon(
                 onPressed: onDelete,
@@ -196,18 +203,7 @@ class MapDrawnPanel extends StatelessWidget {
               ),
           ],
         ),
-        ExpansionTile(
-          tilePadding: EdgeInsets.zero,
-          title: ParcelInfoText(l10n.edgesLabel),
-          children: <Widget>[
-            for (int i = CoreConstants.zero; i < edges.length; i++)
-              MapInfoRow(
-                label:
-                    '${i + CoreConstants.one}–${(i + CoreConstants.one) % edges.length + CoreConstants.one}',
-                value: format.length(edges[i]),
-              ),
-          ],
-        ),
+        MapSidesList(outline: drawing.outline.corners),
         MapAuditLine(
           l10n.createdBy(
             drawing.created.memberName,

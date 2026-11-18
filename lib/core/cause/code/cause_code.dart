@@ -1,22 +1,26 @@
 import 'package:parcel_atlas/core/base/base_cause.dart';
 import 'package:parcel_atlas/core/cause/admin_only_cause.dart';
+import 'package:parcel_atlas/core/cause/change_superseded_cause.dart';
 import 'package:parcel_atlas/core/cause/drawing_overlaps_cause.dart';
 import 'package:parcel_atlas/core/cause/email_exist_cause.dart';
 import 'package:parcel_atlas/core/cause/empty_value_cause.dart';
 import 'package:parcel_atlas/core/cause/family_loop_cause.dart';
 import 'package:parcel_atlas/core/cause/invalid_credentials_cause.dart';
 import 'package:parcel_atlas/core/cause/max_length_cause.dart';
+import 'package:parcel_atlas/core/cause/merge_misses_cause.dart';
 import 'package:parcel_atlas/core/cause/min_length_cause.dart';
 import 'package:parcel_atlas/core/cause/no_parcel_cause.dart';
 import 'package:parcel_atlas/core/cause/not_member_cause.dart';
 import 'package:parcel_atlas/core/cause/not_signed_in_cause.dart';
 import 'package:parcel_atlas/core/cause/not_valid_email_cause.dart';
+import 'package:parcel_atlas/core/cause/nothing_to_undo_cause.dart';
 import 'package:parcel_atlas/core/cause/null_value_cause.dart';
 import 'package:parcel_atlas/core/cause/record_missing_cause.dart';
 import 'package:parcel_atlas/core/cause/registry_quota_cause.dart';
 import 'package:parcel_atlas/core/cause/registry_refuses_web_cause.dart';
 import 'package:parcel_atlas/core/cause/shares_exceed_whole_cause.dart';
 import 'package:parcel_atlas/core/cause/split_misses_cause.dart';
+import 'package:parcel_atlas/core/cause/spouse_not_allowed_cause.dart';
 import 'package:parcel_atlas/core/cause/token_expired_cause.dart';
 import 'package:parcel_atlas/core/cause/too_few_corners_cause.dart';
 import 'package:parcel_atlas/core/cause/unknown_cause.dart';
@@ -47,6 +51,10 @@ class CauseCode {
   static const int registryRefusesWebCode = 1019;
   static const int drawingOverlapsCode = 1020;
   static const int splitMissesCode = 1021;
+  static const int spouseNotAllowedCode = 1022;
+  static const int nothingToUndoCode = 1023;
+  static const int changeSupersededCode = 1024;
+  static const int mergeMissesCode = 1025;
 
   final int code;
 
@@ -94,6 +102,14 @@ class CauseCode {
 
   CauseCode.splitMisses() : code = splitMissesCode;
 
+  CauseCode.spouseNotAllowed() : code = spouseNotAllowedCode;
+
+  CauseCode.nothingToUndo() : code = nothingToUndoCode;
+
+  CauseCode.changeSuperseded() : code = changeSupersededCode;
+
+  CauseCode.mergeMisses() : code = mergeMissesCode;
+
   BaseCause getCauseByCode() {
     switch (code) {
       case unknownCode:
@@ -138,6 +154,14 @@ class CauseCode {
         return DrawingOverlapsCause();
       case splitMissesCode:
         return SplitMissesCause();
+      case spouseNotAllowedCode:
+        return SpouseNotAllowedCause();
+      case nothingToUndoCode:
+        return NothingToUndoCause();
+      case changeSupersededCode:
+        return ChangeSupersededCause();
+      case mergeMissesCode:
+        return MergeMissesCause();
       default:
         return UnknownCause();
     }

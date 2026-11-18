@@ -8,6 +8,7 @@ class PersonDocumentMapper {
 
   static const String name = 'name';
   static const String parentId = 'parentId';
+  static const String spouseId = 'spouseId';
   static const String passesToChildren = 'passesToChildren';
   static const String note = 'note';
   static const String created = 'created';
@@ -18,6 +19,7 @@ class PersonDocumentMapper {
   Map<String, Object?> write(PersonEntity person) => <String, Object?>{
     name: person.name,
     parentId: person.parentId,
+    spouseId: person.spouseId,
     passesToChildren: person.passesToChildren,
     note: person.note,
   };
@@ -26,6 +28,7 @@ class PersonDocumentMapper {
     id: id,
     name: '${data[name] ?? CoreConstants.empty}',
     parentId: data[parentId] as String?,
+    spouseId: data[spouseId] as String?,
     passesToChildren: data[passesToChildren] == true,
     note: '${data[note] ?? CoreConstants.empty}',
     created: _stamps.readOptional(data[created]),

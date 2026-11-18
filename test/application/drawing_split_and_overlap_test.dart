@@ -130,7 +130,11 @@ void main() {
     final Either<BaseException, String> result =
         await SplitDrawingUseCase(auth, drawings)(
           drawing: field,
-          outlines: GeoRules.splitEqual(testSquare, heirs.length),
+          outlines: GeoRules.splitEqual(
+            testSquare,
+            heirs.length,
+            bearingDegrees: 0,
+          ),
           heirs: heirs,
         );
 

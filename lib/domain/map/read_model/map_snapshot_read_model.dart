@@ -136,7 +136,11 @@ final class MapSnapshotReadModel extends BaseReadModel {
   DrawnParcelEntity? overlapping(List<LatLng> outline, {String? exceptId}) {
     for (final DrawnParcelEntity drawing in drawings) {
       if (drawing.id == exceptId) continue;
-      if (GeoRules.overlapSquareMeters(outline, drawing.outline.corners) >
+      if (GeoRules.overlapSquareMeters(
+            outline,
+            drawing.outline.corners,
+            ignoreWithinMeters: MapRules.overlapSliverMeters,
+          ) >
           MapRules.overlapToleranceSquareMeters) {
         return drawing;
       }

@@ -620,6 +620,36 @@ abstract class AppLocalizations {
   /// **'Henüz değişiklik yok.'**
   String get activityEmpty;
 
+  /// No description provided for @undoButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri al'**
+  String get undoButton;
+
+  /// No description provided for @noticeUndone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri alındı.'**
+  String get noticeUndone;
+
+  /// No description provided for @undoBadge.
+  ///
+  /// In tr, this message translates to:
+  /// **'geri alma'**
+  String get undoBadge;
+
+  /// No description provided for @confirmUndoTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri alınsın mı?'**
+  String get confirmUndoTitle;
+
+  /// No description provided for @confirmUndoBody.
+  ///
+  /// In tr, this message translates to:
+  /// **'\"{label}\" ve aynı işlemle değişen her kayıt önceki haline döner. Bu da geçmişe yazılır ve yine geri alınabilir.'**
+  String confirmUndoBody(String label);
+
   /// No description provided for @actionQueried.
   ///
   /// In tr, this message translates to:
@@ -818,6 +848,24 @@ abstract class AppLocalizations {
   /// **'Yok (ağacın başı)'**
   String get parentNone;
 
+  /// No description provided for @spouseLabel.
+  ///
+  /// In tr, this message translates to:
+  /// **'Eşi'**
+  String get spouseLabel;
+
+  /// No description provided for @spouseNone.
+  ///
+  /// In tr, this message translates to:
+  /// **'Yok'**
+  String get spouseNone;
+
+  /// No description provided for @spouseOf.
+  ///
+  /// In tr, this message translates to:
+  /// **'eşi: {name}'**
+  String spouseOf(String name);
+
   /// No description provided for @passesToChildrenLabel.
   ///
   /// In tr, this message translates to:
@@ -877,6 +925,24 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Bir kişi kendi soyundan birinin çocuğu olamaz.'**
   String get errorFamilyLoop;
+
+  /// No description provided for @errorNothingToUndo.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri alınacak bir değişiklik yok. Resmi kayıt sorguları ve geri alma özelliğinden önceki değişiklikler geri alınamaz.'**
+  String get errorNothingToUndo;
+
+  /// No description provided for @errorChangeSuperseded.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu değişiklik geri alınamaz: kayıtlarından biri sonradan yeniden değiştirildi ya da değişiklik zaten geri alındı. Önce daha yeni değişikliği geri alın.'**
+  String get errorChangeSuperseded;
+
+  /// No description provided for @errorSpouseNotAllowed.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bu kişi eş olarak seçilemez: kendisi, kendi soyundan biri ya da başka biriyle evli.'**
+  String get errorSpouseNotAllowed;
 
   /// No description provided for @errorRegistryRefusesWeb.
   ///
@@ -968,6 +1034,18 @@ abstract class AppLocalizations {
   /// **'Sahibi yok'**
   String get colourUnassigned;
 
+  /// No description provided for @legendShow.
+  ///
+  /// In tr, this message translates to:
+  /// **'Renklerin anlamını göster'**
+  String get legendShow;
+
+  /// No description provided for @legendHide.
+  ///
+  /// In tr, this message translates to:
+  /// **'Renk açıklamasını gizle'**
+  String get legendHide;
+
   /// No description provided for @assignOwner.
   ///
   /// In tr, this message translates to:
@@ -1058,10 +1136,100 @@ abstract class AppLocalizations {
   /// **'Sayıya göre eşit parça (sahipler aynı kalır)'**
   String get splitEqualByCount;
 
+  /// No description provided for @splitEqualAngle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bölme yönü: {degrees}°'**
+  String splitEqualAngle(int degrees);
+
+  /// No description provided for @splitEqualAngleHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Bölme çizgilerinin pusula açısı: 0° kuzey–güney, 90° doğu–batı. Önizlemedeki numaralar parçaların veriliş sırasıdır.'**
+  String get splitEqualAngleHint;
+
+  /// No description provided for @splitEqualAngleLess.
+  ///
+  /// In tr, this message translates to:
+  /// **'1° sola çevir'**
+  String get splitEqualAngleLess;
+
+  /// No description provided for @splitEqualAngleMore.
+  ///
+  /// In tr, this message translates to:
+  /// **'1° sağa çevir'**
+  String get splitEqualAngleMore;
+
+  /// No description provided for @mergeButton.
+  ///
+  /// In tr, this message translates to:
+  /// **'Geri birleştir'**
+  String get mergeButton;
+
+  /// No description provided for @mergeTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parçaları birleştir'**
+  String get mergeTitle;
+
+  /// No description provided for @mergePick.
+  ///
+  /// In tr, this message translates to:
+  /// **'Birleştirilecek komşu parçalara dokunun; tekrar dokunmak çıkarır.'**
+  String get mergePick;
+
+  /// No description provided for @mergeReady.
+  ///
+  /// In tr, this message translates to:
+  /// **'{count} parça birleşiyor: {area}'**
+  String mergeReady(int count, String area);
+
+  /// No description provided for @mergeConfirm.
+  ///
+  /// In tr, this message translates to:
+  /// **'Birleştir'**
+  String get mergeConfirm;
+
+  /// No description provided for @mergeOwnerTitle.
+  ///
+  /// In tr, this message translates to:
+  /// **'Birleşen parsel kimin?'**
+  String get mergeOwnerTitle;
+
+  /// No description provided for @mergeOwnerHint.
+  ///
+  /// In tr, this message translates to:
+  /// **'Parça sahiplerinin ortak atası önerilir. Soyağacında yukarı çıkabilir ya da başka birini seçebilirsiniz. Birleşen parçalar silinmez, arşivlenir; işlem geri alınabilir.'**
+  String get mergeOwnerHint;
+
+  /// No description provided for @mergeOwnerSuggested.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sahiplerin ortak atası'**
+  String get mergeOwnerSuggested;
+
+  /// No description provided for @mergeOwnerUp.
+  ///
+  /// In tr, this message translates to:
+  /// **'Üst soya çık'**
+  String get mergeOwnerUp;
+
+  /// No description provided for @mergeOwnerChoose.
+  ///
+  /// In tr, this message translates to:
+  /// **'Başka birini seç'**
+  String get mergeOwnerChoose;
+
+  /// No description provided for @mergeOwnerKeep.
+  ///
+  /// In tr, this message translates to:
+  /// **'Sahipler olduğu gibi kalsın'**
+  String get mergeOwnerKeep;
+
   /// No description provided for @splitEqualNote.
   ///
   /// In tr, this message translates to:
-  /// **'Parsel, uzun ekseni boyunca eşit alanlı parçalara bölünür. Sonra her parçanın köşelerini düzeltebilirsiniz.'**
+  /// **'Parsel, seçtiğiniz yönde eşit alanlı parçalara bölünür. Sonra her parçanın köşelerini düzeltebilirsiniz.'**
   String get splitEqualNote;
 
   /// No description provided for @errorDrawingOverlaps.
@@ -1075,6 +1243,12 @@ abstract class AppLocalizations {
   /// In tr, this message translates to:
   /// **'Parsel bölünemedi. Kesme çizgisini ya da parça sayısını kontrol edin.'**
   String get errorSplitMisses;
+
+  /// No description provided for @errorMergeMisses.
+  ///
+  /// In tr, this message translates to:
+  /// **'Seçilen parçalar birbirine kenardan bitişmiyor, birleştirilemez.'**
+  String get errorMergeMisses;
 
   /// No description provided for @noticeUseApp.
   ///
