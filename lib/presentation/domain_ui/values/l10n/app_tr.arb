@@ -182,6 +182,18 @@
   "holdingsEmpty": "Atanmış parsel yok.",
   "activityTitle": "Değişiklik geçmişi",
   "activityEmpty": "Henüz değişiklik yok.",
+  "undoButton": "Geri al",
+  "noticeUndone": "Geri alındı.",
+  "undoBadge": "geri alma",
+  "confirmUndoTitle": "Geri alınsın mı?",
+  "confirmUndoBody": "\"{label}\" ve aynı işlemle değişen her kayıt önceki haline döner. Bu da geçmişe yazılır ve yine geri alınabilir.",
+  "@confirmUndoBody": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
   "actionQueried": "resmi kayıttan sorguladı",
   "actionRefreshed": "resmi kayıttan güncelledi",
   "actionCreated": "oluşturdu",
@@ -236,6 +248,16 @@
   },
   "parentLabel": "Babası / annesi",
   "parentNone": "Yok (ağacın başı)",
+  "spouseLabel": "Eşi",
+  "spouseNone": "Yok",
+  "spouseOf": "eşi: {name}",
+  "@spouseOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "passesToChildrenLabel": "Payı çocuklarına geçti",
   "passesToChildrenHint": "Açıkken bu kişinin payları çocukları arasında eşit bölünür.",
   "passedToChildren": "{names} · kişi başı {share}",
@@ -263,6 +285,9 @@
     }
   },
   "errorFamilyLoop": "Bir kişi kendi soyundan birinin çocuğu olamaz.",
+  "errorNothingToUndo": "Geri alınacak bir değişiklik yok. Resmi kayıt sorguları ve geri alma özelliğinden önceki değişiklikler geri alınamaz.",
+  "errorChangeSuperseded": "Bu değişiklik geri alınamaz: kayıtlarından biri sonradan yeniden değiştirildi ya da değişiklik zaten geri alındı. Önce daha yeni değişikliği geri alın.",
+  "errorSpouseNotAllowed": "Bu kişi eş olarak seçilemez: kendisi, kendi soyundan biri ya da başka biriyle evli.",
   "errorRegistryRefusesWeb": "Resmi kayıt, web sitesinden yapılan sorguları kabul etmiyor. Yeni parsel sorgusunu masaüstü veya mobil uygulamadan yapın; kayıtlı parseller burada da görünür.",
   "searchParcel": "Ada / parsel ile sorgula",
   "searchTitle": "Parsel sorgula",
@@ -288,6 +313,8 @@
   },
   "colourShared": "Ortak",
   "colourUnassigned": "Sahibi yok",
+  "legendShow": "Renklerin anlamını göster",
+  "legendHide": "Renk açıklamasını gizle",
   "assignOwner": "Sahip ata",
   "assignOwnerWhichDrawing": "Hangi gerçek sınıra?",
   "assignOwnerTitle": "Kime ait?",
@@ -323,9 +350,42 @@
   },
   "splitEqualCount": "Parça sayısı",
   "splitEqualByCount": "Sayıya göre eşit parça (sahipler aynı kalır)",
-  "splitEqualNote": "Parsel, uzun ekseni boyunca eşit alanlı parçalara bölünür. Sonra her parçanın köşelerini düzeltebilirsiniz.",
+  "splitEqualAngle": "Bölme yönü: {degrees}°",
+  "@splitEqualAngle": {
+    "placeholders": {
+      "degrees": {
+        "type": "int"
+      }
+    }
+  },
+  "splitEqualAngleHint": "Bölme çizgilerinin pusula açısı: 0° kuzey–güney, 90° doğu–batı. Önizlemedeki numaralar parçaların veriliş sırasıdır.",
+  "splitEqualAngleLess": "1° sola çevir",
+  "splitEqualAngleMore": "1° sağa çevir",
+  "mergeButton": "Geri birleştir",
+  "mergeTitle": "Parçaları birleştir",
+  "mergePick": "Birleştirilecek komşu parçalara dokunun; tekrar dokunmak çıkarır.",
+  "mergeReady": "{count} parça birleşiyor: {area}",
+  "@mergeReady": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "mergeConfirm": "Birleştir",
+  "mergeOwnerTitle": "Birleşen parsel kimin?",
+  "mergeOwnerHint": "Parça sahiplerinin ortak atası önerilir. Soyağacında yukarı çıkabilir ya da başka birini seçebilirsiniz. Birleşen parçalar silinmez, arşivlenir; işlem geri alınabilir.",
+  "mergeOwnerSuggested": "Sahiplerin ortak atası",
+  "mergeOwnerUp": "Üst soya çık",
+  "mergeOwnerChoose": "Başka birini seç",
+  "mergeOwnerKeep": "Sahipler olduğu gibi kalsın",
+  "splitEqualNote": "Parsel, seçtiğiniz yönde eşit alanlı parçalara bölünür. Sonra her parçanın köşelerini düzeltebilirsiniz.",
   "errorDrawingOverlaps": "Bu çizim başka bir çizimin üstüne biniyor. Köşeleri komşu sınıra yaklaştırın; kendiliğinden o sınıra oturur.",
   "errorSplitMisses": "Parsel bölünemedi. Kesme çizgisini ya da parça sayısını kontrol edin.",
+  "errorMergeMisses": "Seçilen parçalar birbirine kenardan bitişmiyor, birleştirilemez.",
   "noticeUseApp": "Yeni parsel sorgusu web sitesinden yapılamıyor. Sorguyu telefondaki ya da bilgisayardaki Parsel Atlası uygulamasından yapın; sorgulanan parsel burada da hemen görünür.",
   "compareAdd": "Karşılaştırmaya ekle",
   "compareRemove": "Karşılaştırmadan çıkar",

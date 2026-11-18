@@ -4,7 +4,8 @@
 /// registry lookup was spent. [queried] and [refreshed] are registry answers
 /// saved; [drawingSaved] and [drawingDeleted] are drawings. [useApp] sends
 /// a member on the website to the desktop or mobile app for a registry
-/// lookup, which the registry refuses from a browser.
+/// lookup, which the registry refuses from a browser. [undone] is a saved
+/// change taken back.
 enum MapNoticeEnum {
   fromStore,
   queried,
@@ -12,4 +13,5 @@ enum MapNoticeEnum {
   drawingSaved,
   drawingDeleted,
   useApp,
+  undone,
 }

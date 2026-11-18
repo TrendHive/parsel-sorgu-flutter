@@ -18,7 +18,9 @@ import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_tex
 import 'package:parcel_atlas/presentation/people/dialog/person_dialog.dart';
 import 'package:parcel_atlas/presentation/router/parcel_info_router.dart';
 
-/// The family tree: each person under their parent, indented by generation.
+/// The family tree: each person under their parent, indented by generation,
+/// and a spouse who married in right below their husband or wife, marked
+/// with a ring and "spouse of".
 ///
 /// A row shows how many parcels and how many square metres reach the person,
 /// and opens their holdings page; the pencil edits, the "+" adds a child
@@ -41,8 +43,15 @@ class PeopleBody extends StatelessWidget {
             ExceptionCopy.of(l10n, state.exception!),
             isError: true,
           );
+        } else if (state.undone) {
+          ParcelInfoToast.show(context, l10n.noticeUndone);
         } else if (state.saved) {
-          ParcelInfoToast.show(context, l10n.noticeSaved);
+          ParcelInfoToast.show(
+            context,
+            l10n.noticeSaved,
+            actionLabel: l10n.undoButton,
+            onAction: context.read<PersonsCubit>().undoLast,
+          );
         }
       },
       builder: (BuildContext context, PersonsState state) => switch (state) {
@@ -62,7 +71,11 @@ class PeopleBody extends StatelessWidget {
       for (final PersonEntity p in snapshot.persons) p.id,
     };
     final List<PersonEntity> roots = snapshot.persons
-        .where((PersonEntity p) => !ids.contains(p.parentId))
+        .where(
+          (PersonEntity p) =>
+              !ids.contains(p.parentId) &&
+              !FamilyRules.besideSpouse(snapshot.persons, p),
+        )
         .toList();
     return Stack(
       children: <Widget>[
@@ -98,19 +111,26 @@ class PeopleBody extends StatelessWidget {
     PersonsReady state,
     PersonEntity person,
     int depth,
-  ) => <Widget>[
-    _tile(context, state, person, depth),
-    if (depth < FamilyRules.maxGenerations)
-      for (final PersonEntity child in state.snapshot.childrenOf(person.id))
-        ..._branch(context, state, child, depth + CoreConstants.one),
-  ];
+  ) {
+    final List<PersonEntity> persons = state.snapshot.persons;
+    final PersonEntity? spouse = FamilyRules.spouseOf(persons, person);
+    return <Widget>[
+      _tile(context, state, person, depth),
+      if (spouse != null && FamilyRules.besideSpouse(persons, spouse))
+        _tile(context, state, spouse, depth, spouseOf: person),
+      if (depth < FamilyRules.maxGenerations)
+        for (final PersonEntity child in state.snapshot.childrenOf(person.id))
+          ..._branch(context, state, child, depth + CoreConstants.one),
+    ];
+  }
 
   Widget _tile(
     BuildContext context,
     PersonsReady state,
     PersonEntity person,
-    int depth,
-  ) {
+    int depth, {
+    PersonEntity? spouseOf,
+  }) {
     final l10n = ParcelInfoLocalKeys.of(context);
     final ParcelInfoFormat format = ParcelInfoFormat(l10n);
     final PersonsCubit cubit = context.read<PersonsCubit>();
@@ -124,7 +144,11 @@ class PeopleBody extends StatelessWidget {
         right: _fabMargin,
       ),
       leading: Icon(
-        passes ? Icons.account_tree_outlined : Icons.person_outline,
+        spouseOf != null
+            ? Icons.favorite_border
+            : passes
+            ? Icons.account_tree_outlined
+            : Icons.person_outline,
       ),
       title: ParcelInfoText(person.name),
       subtitle: ParcelInfoText(
@@ -132,6 +156,7 @@ class PeopleBody extends StatelessWidget {
           l10n.parcelCount(holdings.parcelCount),
           format.area(holdings.ownedArea),
           if (passes) l10n.passedOnBadge,
+          if (spouseOf != null) l10n.spouseOf(spouseOf.name),
         ].join(_separator),
       ),
       onTap: () => context.push(ParcelInfoRouter.holdingsOf(person.id)),
@@ -171,9 +196,35 @@ class PeopleBody extends StatelessWidget {
   }) async {
     final PersonsCubit cubit = context.read<PersonsCubit>();
     final List<PersonEntity> persons = state.snapshot.persons;
-    final ({String name, String? parentId, bool passesToChildren, String note})?
+    final PersonEntity? marriedBy = existing == null
+        ? null
+        : persons
+              .where((PersonEntity p) => p.spouseId == existing.id)
+              .firstOrNull;
+    final ({
+      String name,
+      String? parentId,
+      String? spouseId,
+      bool passesToChildren,
+      String note,
+    })?
     input = await PersonDialog.open(
       context,
+      spouses: persons
+          .where(
+            (PersonEntity p) =>
+                p.id != existing?.id &&
+                (existing == null
+                    ? FamilyRules.spouseOf(persons, p) == null
+                    : FamilyRules.canBeSpouse(
+                        persons,
+                        person: existing,
+                        spouseId: p.id,
+                      )),
+          )
+          .toList(),
+      marriedBy: marriedBy,
+      spouseId: existing?.spouseId,
       parents: existing == null
           ? persons
           : persons
@@ -194,6 +245,7 @@ class PeopleBody extends StatelessWidget {
     await cubit.savePerson(
       name: input.name,
       parentId: input.parentId,
+      spouseId: input.spouseId,
       passesToChildren: input.passesToChildren,
       note: input.note,
       existing: existing,

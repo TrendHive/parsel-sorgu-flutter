@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:either_dart/either.dart';
 import 'package:parcel_atlas/core/base/base_exception.dart';
+import 'package:parcel_atlas/domain/activity/enum/activity_action_enum.dart';
+import 'package:parcel_atlas/domain/activity/enum/activity_target_enum.dart';
 import 'package:parcel_atlas/domain/auth/entity/member_entity.dart';
 import 'package:parcel_atlas/domain/drawing/entity/drawn_parcel_entity.dart';
 import 'package:parcel_atlas/domain/person/value_object/ownership_value_object.dart';
@@ -13,7 +15,9 @@ import 'package:parcel_atlas/infrastructure/store/service/store_collection.dart'
 /// change.
 ///
 /// [removeFrom] finds the drawings through `ownerIds` and rewrites each
-/// one's owners without the person, stamping the change with the [MemberEntity].
+/// one's owners without the person, stamping the change with the
+/// [MemberEntity] and logging each drawing under the caller's `change`, with
+/// what it was before, so undoing the delete puts the lines back.
 class HolderCascade {
   const HolderCascade(this._store);
 
@@ -26,6 +30,7 @@ class HolderCascade {
     WriteBatch batch, {
     required String personId,
     required MemberEntity actor,
+    required String change,
   }) async {
     final Either<
       BaseException,
@@ -48,6 +53,17 @@ class HolderCascade {
         DrawnParcelDocumentMapper.ownerIds: _drawings.writeOwnerIds(kept),
         DrawnParcelDocumentMapper.updated: _store.stamps.write(actor),
       });
+      _store.log(
+        batch,
+        action: ActivityActionEnum.updated,
+        target: ActivityTargetEnum.drawnParcel,
+        targetId: doc.id,
+        label: drawing.name,
+        actor: actor,
+        change: change,
+        ref: doc.reference,
+        was: doc.data(),
+      );
     }
     return Right(found.right.length);
   }

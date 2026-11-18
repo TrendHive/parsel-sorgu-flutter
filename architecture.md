@@ -112,13 +112,40 @@ inheritance: was the land divided as the tree says it should have been, and
 who holds more or less than their part. Holdings, totals and owned areas are
 derivations on `MapSnapshotReadModel` — computed live, never stored.
 
+A person may also name a spouse (`spouseId`). The marriage is stored on one
+record only — usually the one who married in — and `FamilyRules.spouseOf`
+reads it from either side, so there is never a second copy to drift. A child
+still names a single parent, so a couple's children are recorded under one of
+them and shown under both (`familyChildrenOf`); shares pass only through that
+recorded parent, so a marriage never changes what anyone inherits. A spouse
+with no parent of their own is drawn beside their partner, not at the top of
+the tree (`besideSpouse`).
+
 ## Geometry
 
 Corners are WGS84 latitude/longitude — the registry's own system. Lengths and
-areas come from one place, `GeoRules`: the ellipsoid is replaced by its tangent
-plane at the polygon's centre, scaled by the meridian and prime-vertical radii
-there. At parcel scale that differs from the ellipsoid by far less than a
-millimetre — and does not carry the ~0.3% error of a spherical formula.
+areas come from one place, `GeoRules`. Areas use the ellipsoid's tangent plane
+at the polygon's centre, scaled by the meridian and prime-vertical radii
+there; at parcel scale that differs from the ellipsoid by far less than a
+millimetre, and does not carry the ~0.3% error of a spherical formula. Side
+lengths, perimeters and distances are exact on the ellipsoid itself:
+Vincenty's inverse formula (`geodesicMeters`), the surveyors' method, checked
+against its published reference line to the millimetre. Every side of the
+selected parcel, registry or drawn, shows its length on the map and in the
+panel's side list.
+
+Merging pieces back (`GeoRules.merge`) is the reverse of a split: neighbours
+are joined along the sides they share, and corners left on a straight side
+(where a cut met the boundary) are dropped. The absorbed pieces are archived
+(`mergedInto`), not deleted, so any member can merge and undo a merge; the
+merged parcel goes by default to the owners' common ancestor
+(`FamilyRules.commonAncestor`), with a step up the tree to choose an older
+generation.
+
+The overlap check forgives ground within half a metre of both drawings' sides
+(`MapRules.overlapSliverMeters`): two people drawing the same boundary a hand
+apart is not an overlap, however long the side. Assigning an owner is never
+checked at all, since it stores the registry's outline or changes no shape.
 
 The registry rounds its corners to five decimals (about a metre), so an area
 computed from its outline is off by a few percent; the app shows the
@@ -128,6 +155,13 @@ family drew, whose corners are exact.
 Drawing snaps a corner to a stored corner within 14 screen pixels, so a drawn
 boundary that shares a corner with the registry, or with a neighbour's drawing,
 shares it exactly.
+
+An equal split (`GeoRules.splitEqual`) cuts parallel strips of equal area,
+each boundary found by bisection. The direction of the dividing lines is
+always the member's — a compass bearing in the split dialog, previewed with
+numbered pieces — because the right direction depends on the road, the slope
+and how the family farms it, which no outline reveals. The long axis
+(`suggestedCutBearing`) is only where the dialog starts.
 
 Re-dividing two neighbours by their deeds (`GeoRules.redivide`) relies on that
 exactness: the two outlines are joined by removing the sides they share (a
@@ -157,6 +191,26 @@ someone creates outside the tool reads and writes nothing. Every write stamps
 who and when (server time), and adds an `activity` line in the same atomic
 batch — a change without its log line cannot exist. The main (admin) account is
 the only one that may delete.
+
+## Undo
+
+A wrong split, re-division, owner assignment, edit or delete can be taken back
+— from the "Undo" on the message after a save (the member's own newest
+change) or from any line of the change history. Each activity line remembers
+its record as it was before (`before`, `path`), and every line one save wrote
+shares a `changeId`, so the whole save is undone together; writing that in the
+log keeps the store free of a second, separate history. Undo is itself a
+change: one signed batch that restores the records and logs a line per record
+(marked `undo`, remembering what it replaced), so an undo can be undone.
+
+Undo is refused when a later line names any of the same records: someone
+changed them again, or the change was already undone. Restoring an old
+version over a newer one would silently throw that work away. Undoing a
+change that created records deletes them, and deleting is the main account's
+alone (rule and Firestore rules alike), so such a change — a split's new
+pieces, a new person — is the main account's to undo. A person's delete now
+logs its clean-up too (owner lines, children and spouse unlinked), so undoing
+it puts every link back.
 
 ## Free resources only
 

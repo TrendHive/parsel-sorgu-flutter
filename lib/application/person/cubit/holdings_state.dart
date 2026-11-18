@@ -20,13 +20,15 @@ final class HoldingsFailed extends HoldingsState {
 /// One person's parcels with totals.
 ///
 /// [person] is whose page it is; [holdings] what reaches them; [parent]
-/// their parent in the tree, if any, and [children] their children.
+/// their parent in the tree, if any; [spouse] their husband or wife, if
+/// any; and [children] the couple's children, recorded under either of them.
 /// [passedOn] is whether their shares have gone on to those children.
 final class HoldingsReady extends HoldingsState {
   const HoldingsReady({
     required this.person,
     required this.holdings,
     required this.parent,
+    required this.spouse,
     required this.children,
     required this.passedOn,
   });
@@ -36,6 +38,8 @@ final class HoldingsReady extends HoldingsState {
   final HoldingsReadModel holdings;
 
   final PersonEntity? parent;
+
+  final PersonEntity? spouse;
 
   final List<PersonEntity> children;
 

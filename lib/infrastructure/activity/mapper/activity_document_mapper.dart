@@ -3,9 +3,12 @@ import 'package:parcel_atlas/domain/activity/entity/activity_entity.dart';
 import 'package:parcel_atlas/domain/activity/enum/activity_action_enum.dart';
 import 'package:parcel_atlas/domain/activity/enum/activity_target_enum.dart';
 import 'package:parcel_atlas/infrastructure/store/mapper/audit_stamp_mapper.dart';
+import 'package:parcel_atlas/infrastructure/store/service/firestore_store_service.dart';
 
 /// An activity line from the store. Lines are written by
-/// `FirestoreStoreService.log` and never edited, so there is only [read].
+/// `FirestoreStoreService.log` and never edited, so there is only [read]. A
+/// line counts as part of an undoable change only when it names both the
+/// change and the record's path.
 class ActivityDocumentMapper {
   const ActivityDocumentMapper();
 
@@ -29,6 +32,12 @@ class ActivityDocumentMapper {
       targetId: '${data['targetId'] ?? CoreConstants.empty}',
       label: '${data['label'] ?? CoreConstants.empty}',
       stamp: _stamps.read(data[by]),
+      changeId:
+          data[FirestoreStoreService.path] is String &&
+              data[FirestoreStoreService.changeId] is String
+          ? data[FirestoreStoreService.changeId] as String
+          : null,
+      isUndo: data[FirestoreStoreService.undo] == true,
     );
   }
 }

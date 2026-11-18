@@ -80,6 +80,7 @@ void main() {
       id: 'x',
       name: name,
       parentId: null,
+      spouseId: null,
       passesToChildren: false,
       note: '',
       created: null,

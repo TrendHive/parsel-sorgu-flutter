@@ -17,6 +17,11 @@ import 'package:parcel_atlas/infrastructure/store/mapper/geo_polygon_mapper.dart
 /// Firestore can query when a person is deleted. [writeShape] is the
 /// geometry alone — outline, measurements and the update stamp — for a
 /// change that must not touch the details another device may have edited.
+///
+/// A piece merged into a neighbour keeps its document, marked with
+/// [mergedInto] (the drawing that absorbed it), so nothing is deleted and
+/// the merge can be undone; [read] answers null for it, so it is on no map,
+/// list or total.
 class DrawnParcelDocumentMapper {
   const DrawnParcelDocumentMapper();
 
@@ -35,6 +40,7 @@ class DrawnParcelDocumentMapper {
   static const String personId = 'personId';
   static const String numerator = 'numerator';
   static const String denominator = 'denominator';
+  static const String mergedInto = 'mergedInto';
 
   static const GeoPolygonMapper _outline = GeoPolygonMapper();
   static const AuditStampMapper _stamps = AuditStampMapper();
@@ -86,6 +92,7 @@ class DrawnParcelDocumentMapper {
   ];
 
   DrawnParcelEntity? read(String id, Map<String, dynamic> data) {
+    if (data[mergedInto] != null) return null;
     final Object? raw = data[owners];
     return DrawnParcelEntity(
       id: id,

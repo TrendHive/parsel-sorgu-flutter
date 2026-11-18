@@ -15,7 +15,8 @@ import 'package:parcel_atlas/infrastructure/store/service/store_collection.dart'
 /// The family's drawn boundaries in the store.
 ///
 /// Every write is one batch: the drawing (with its measurements) and its
-/// activity line. An update keeps `created` and moves `updated`.
+/// activity line, which records what the drawing was before so the change
+/// can be undone. An update keeps `created` and moves `updated`.
 class DrawnParcelRepository implements DrawnParcelRepositoryInterface {
   DrawnParcelRepository(this._store);
 
@@ -48,6 +49,8 @@ class DrawnParcelRepository implements DrawnParcelRepositoryInterface {
       targetId: doc.id,
       label: details.name,
       actor: actor,
+      change: _store.newChangeId(),
+      ref: doc,
     );
     return _store.commit(batch, doc.id);
   }
@@ -58,12 +61,16 @@ class DrawnParcelRepository implements DrawnParcelRepositoryInterface {
     GeoPolygonValueObject outline,
     DrawingDetailsValueObject details, {
     required MemberEntity actor,
-  }) {
+  }) async {
+    final DocumentReference<Map<String, dynamic>> doc = _store.doc(
+      StoreCollection.drawnParcels,
+      drawing.id,
+    );
+    final Either<BaseException, Map<String, dynamic>?> was = await _store
+        .before(doc);
+    if (was.isLeft) return Left(was.left);
     final WriteBatch batch = _store.batch()
-      ..update(
-        _store.doc(StoreCollection.drawnParcels, drawing.id),
-        _mapper.write(outline, details, actor),
-      );
+      ..update(doc, _mapper.write(outline, details, actor));
     _store.log(
       batch,
       action: ActivityActionEnum.updated,
@@ -71,6 +78,9 @@ class DrawnParcelRepository implements DrawnParcelRepositoryInterface {
       targetId: drawing.id,
       label: details.name,
       actor: actor,
+      change: _store.newChangeId(),
+      ref: doc,
+      was: was.right,
     );
     return _store.commit(batch, drawing.id);
   }
@@ -81,7 +91,11 @@ class DrawnParcelRepository implements DrawnParcelRepositoryInterface {
     List<({GeoPolygonValueObject outline, DrawingDetailsValueObject details})>
     pieces, {
     required MemberEntity actor,
-  }) {
+  }) async {
+    final Either<BaseException, Map<String, dynamic>?> was = await _store
+        .before(_store.doc(StoreCollection.drawnParcels, drawing.id));
+    if (was.isLeft) return Left(was.left);
+    final String change = _store.newChangeId();
     final WriteBatch batch = _store.batch();
     for (final (
           int index,
@@ -113,6 +127,9 @@ class DrawnParcelRepository implements DrawnParcelRepositoryInterface {
         targetId: doc.id,
         label: piece.details.name,
         actor: actor,
+        change: change,
+        ref: doc,
+        was: first ? was.right : null,
       );
     }
     return _store.commit(batch, drawing.id);
@@ -123,16 +140,21 @@ class DrawnParcelRepository implements DrawnParcelRepositoryInterface {
     List<({DrawnParcelEntity drawing, GeoPolygonValueObject outline})>
     changes, {
     required MemberEntity actor,
-  }) {
+  }) async {
+    final String changeId = _store.newChangeId();
     final WriteBatch batch = _store.batch();
     for (final ({DrawnParcelEntity drawing, GeoPolygonValueObject outline})
         change
         in changes) {
       final DrawnParcelEntity drawing = change.drawing;
-      batch.update(
-        _store.doc(StoreCollection.drawnParcels, drawing.id),
-        _mapper.writeShape(change.outline, actor),
+      final DocumentReference<Map<String, dynamic>> doc = _store.doc(
+        StoreCollection.drawnParcels,
+        drawing.id,
       );
+      final Either<BaseException, Map<String, dynamic>?> was = await _store
+          .before(doc);
+      if (was.isLeft) return Left(was.left);
+      batch.update(doc, _mapper.writeShape(change.outline, actor));
       _store.log(
         batch,
         action: ActivityActionEnum.updated,
@@ -140,18 +162,73 @@ class DrawnParcelRepository implements DrawnParcelRepositoryInterface {
         targetId: drawing.id,
         label: drawing.name,
         actor: actor,
+        change: changeId,
+        ref: doc,
+        was: was.right,
       );
     }
     return _store.commit(batch, changes.first.drawing.id);
   }
 
   @override
+  Future<Either<BaseException, String>> merge(
+    DrawnParcelEntity into,
+    List<DrawnParcelEntity> absorbed,
+    GeoPolygonValueObject outline,
+    DrawingDetailsValueObject details, {
+    required MemberEntity actor,
+  }) async {
+    final String change = _store.newChangeId();
+    final WriteBatch batch = _store.batch();
+    for (final DrawnParcelEntity drawing in <DrawnParcelEntity>[
+      into,
+      ...absorbed,
+    ]) {
+      final bool first = drawing.id == into.id;
+      final DocumentReference<Map<String, dynamic>> doc = _store.doc(
+        StoreCollection.drawnParcels,
+        drawing.id,
+      );
+      final Either<BaseException, Map<String, dynamic>?> was = await _store
+          .before(doc);
+      if (was.isLeft) return Left(was.left);
+      batch.update(
+        doc,
+        first
+            ? _mapper.write(outline, details, actor)
+            : <String, Object?>{
+                DrawnParcelDocumentMapper.mergedInto: into.id,
+                DrawnParcelDocumentMapper.updated: _store.stamps.write(actor),
+              },
+      );
+      _store.log(
+        batch,
+        action: ActivityActionEnum.updated,
+        target: ActivityTargetEnum.drawnParcel,
+        targetId: drawing.id,
+        label: first ? details.name : drawing.name,
+        actor: actor,
+        change: change,
+        ref: doc,
+        was: was.right,
+      );
+    }
+    return _store.commit(batch, into.id);
+  }
+
+  @override
   Future<Either<BaseException, String>> delete(
     DrawnParcelEntity drawing, {
     required MemberEntity actor,
-  }) {
-    final WriteBatch batch = _store.batch()
-      ..delete(_store.doc(StoreCollection.drawnParcels, drawing.id));
+  }) async {
+    final DocumentReference<Map<String, dynamic>> doc = _store.doc(
+      StoreCollection.drawnParcels,
+      drawing.id,
+    );
+    final Either<BaseException, Map<String, dynamic>?> was = await _store
+        .before(doc);
+    if (was.isLeft) return Left(was.left);
+    final WriteBatch batch = _store.batch()..delete(doc);
     _store.log(
       batch,
       action: ActivityActionEnum.deleted,
@@ -159,6 +236,9 @@ class DrawnParcelRepository implements DrawnParcelRepositoryInterface {
       targetId: drawing.id,
       label: drawing.name,
       actor: actor,
+      change: _store.newChangeId(),
+      ref: doc,
+      was: was.right,
     );
     return _store.commit(batch, drawing.id);
   }

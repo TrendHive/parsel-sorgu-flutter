@@ -43,7 +43,11 @@ final class HoldingsCubit extends Cubit<HoldingsState> {
                     parent: person.parentId == null
                         ? null
                         : value.personById(person.parentId!),
-                    children: value.childrenOf(personId),
+                    spouse: FamilyRules.spouseOf(value.persons, person),
+                    children: FamilyRules.familyChildrenOf(
+                      value.persons,
+                      person,
+                    ),
                     passedOn: FamilyRules.passes(value.persons, person),
                   ),
           );

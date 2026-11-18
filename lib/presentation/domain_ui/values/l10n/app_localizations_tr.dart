@@ -314,6 +314,23 @@ class AppLocalizationsTr extends AppLocalizations {
   String get activityEmpty => 'Henüz değişiklik yok.';
 
   @override
+  String get undoButton => 'Geri al';
+
+  @override
+  String get noticeUndone => 'Geri alındı.';
+
+  @override
+  String get undoBadge => 'geri alma';
+
+  @override
+  String get confirmUndoTitle => 'Geri alınsın mı?';
+
+  @override
+  String confirmUndoBody(String label) {
+    return '\"$label\" ve aynı işlemle değişen her kayıt önceki haline döner. Bu da geçmişe yazılır ve yine geri alınabilir.';
+  }
+
+  @override
   String get actionQueried => 'resmi kayıttan sorguladı';
 
   @override
@@ -430,6 +447,17 @@ class AppLocalizationsTr extends AppLocalizations {
   String get parentNone => 'Yok (ağacın başı)';
 
   @override
+  String get spouseLabel => 'Eşi';
+
+  @override
+  String get spouseNone => 'Yok';
+
+  @override
+  String spouseOf(String name) {
+    return 'eşi: $name';
+  }
+
+  @override
   String get passesToChildrenLabel => 'Payı çocuklarına geçti';
 
   @override
@@ -464,6 +492,18 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errorFamilyLoop =>
       'Bir kişi kendi soyundan birinin çocuğu olamaz.';
+
+  @override
+  String get errorNothingToUndo =>
+      'Geri alınacak bir değişiklik yok. Resmi kayıt sorguları ve geri alma özelliğinden önceki değişiklikler geri alınamaz.';
+
+  @override
+  String get errorChangeSuperseded =>
+      'Bu değişiklik geri alınamaz: kayıtlarından biri sonradan yeniden değiştirildi ya da değişiklik zaten geri alındı. Önce daha yeni değişikliği geri alın.';
+
+  @override
+  String get errorSpouseNotAllowed =>
+      'Bu kişi eş olarak seçilemez: kendisi, kendi soyundan biri ya da başka biriyle evli.';
 
   @override
   String get errorRegistryRefusesWeb =>
@@ -513,6 +553,12 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get colourUnassigned => 'Sahibi yok';
+
+  @override
+  String get legendShow => 'Renklerin anlamını göster';
+
+  @override
+  String get legendHide => 'Renk açıklamasını gizle';
 
   @override
   String get assignOwner => 'Sahip ata';
@@ -568,8 +614,60 @@ class AppLocalizationsTr extends AppLocalizations {
       'Sayıya göre eşit parça (sahipler aynı kalır)';
 
   @override
+  String splitEqualAngle(int degrees) {
+    return 'Bölme yönü: $degrees°';
+  }
+
+  @override
+  String get splitEqualAngleHint =>
+      'Bölme çizgilerinin pusula açısı: 0° kuzey–güney, 90° doğu–batı. Önizlemedeki numaralar parçaların veriliş sırasıdır.';
+
+  @override
+  String get splitEqualAngleLess => '1° sola çevir';
+
+  @override
+  String get splitEqualAngleMore => '1° sağa çevir';
+
+  @override
+  String get mergeButton => 'Geri birleştir';
+
+  @override
+  String get mergeTitle => 'Parçaları birleştir';
+
+  @override
+  String get mergePick =>
+      'Birleştirilecek komşu parçalara dokunun; tekrar dokunmak çıkarır.';
+
+  @override
+  String mergeReady(int count, String area) {
+    return '$count parça birleşiyor: $area';
+  }
+
+  @override
+  String get mergeConfirm => 'Birleştir';
+
+  @override
+  String get mergeOwnerTitle => 'Birleşen parsel kimin?';
+
+  @override
+  String get mergeOwnerHint =>
+      'Parça sahiplerinin ortak atası önerilir. Soyağacında yukarı çıkabilir ya da başka birini seçebilirsiniz. Birleşen parçalar silinmez, arşivlenir; işlem geri alınabilir.';
+
+  @override
+  String get mergeOwnerSuggested => 'Sahiplerin ortak atası';
+
+  @override
+  String get mergeOwnerUp => 'Üst soya çık';
+
+  @override
+  String get mergeOwnerChoose => 'Başka birini seç';
+
+  @override
+  String get mergeOwnerKeep => 'Sahipler olduğu gibi kalsın';
+
+  @override
   String get splitEqualNote =>
-      'Parsel, uzun ekseni boyunca eşit alanlı parçalara bölünür. Sonra her parçanın köşelerini düzeltebilirsiniz.';
+      'Parsel, seçtiğiniz yönde eşit alanlı parçalara bölünür. Sonra her parçanın köşelerini düzeltebilirsiniz.';
 
   @override
   String get errorDrawingOverlaps =>
@@ -578,6 +676,10 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get errorSplitMisses =>
       'Parsel bölünemedi. Kesme çizgisini ya da parça sayısını kontrol edin.';
+
+  @override
+  String get errorMergeMisses =>
+      'Seçilen parçalar birbirine kenardan bitişmiyor, birleştirilemez.';
 
   @override
   String get noticeUseApp =>

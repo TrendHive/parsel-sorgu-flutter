@@ -9,6 +9,7 @@ import 'package:parcel_atlas/application/map/cubit/map_cubit.dart';
 import 'package:parcel_atlas/core/constants.dart';
 import 'package:parcel_atlas/domain/drawing/entity/drawn_parcel_entity.dart';
 import 'package:parcel_atlas/domain/drawing/read_model/map_drawing_read_model.dart';
+import 'package:parcel_atlas/domain/drawing/read_model/map_merge_read_model.dart';
 import 'package:parcel_atlas/domain/drawing/value_object/drawing_details_value_object.dart';
 import 'package:parcel_atlas/domain/map/enum/camera_move_enum.dart';
 import 'package:parcel_atlas/domain/map/enum/map_notice_enum.dart';
@@ -31,6 +32,7 @@ import 'package:parcel_atlas/presentation/domain_ui/values/window_size_class_enu
 import 'package:parcel_atlas/presentation/domain_ui/widgets/feedback/parcel_info_toast.dart';
 import 'package:parcel_atlas/presentation/domain_ui/widgets/text/parcel_info_text.dart';
 import 'package:parcel_atlas/presentation/map/dialog/drawing_choice_dialog.dart';
+import 'package:parcel_atlas/presentation/map/dialog/merge_owner_dialog.dart';
 import 'package:parcel_atlas/presentation/map/dialog/owner_tree_dialog.dart';
 import 'package:parcel_atlas/presentation/map/dialog/parcel_search_dialog.dart';
 import 'package:parcel_atlas/presentation/map/dialog/save_drawing_dialog.dart';
@@ -41,10 +43,13 @@ import 'package:parcel_atlas/presentation/map/widgets/map_compare_bar.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_drawing_layer.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_drawing_toolbar.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_drawn_panel.dart';
+import 'package:parcel_atlas/presentation/map/widgets/map_merge_bar.dart';
+import 'package:parcel_atlas/presentation/map/widgets/map_merge_layer.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_official_panel.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_parcel_layers.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_redivide_bar.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_redivide_layer.dart';
+import 'package:parcel_atlas/presentation/map/widgets/map_side_lengths_layer.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_split_bar.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_split_layer.dart';
 import 'package:parcel_atlas/presentation/map/widgets/map_tile_layer.dart';
@@ -61,7 +66,10 @@ import 'package:parcel_atlas/presentation/router/parcel_info_router.dart';
 ///
 /// Layout follows the window size class, never the device: the selected
 /// record's panel rises from the bottom in a compact or medium window and
-/// sits at the right from expanded up.
+/// sits at the right from expanded up. On a phone the colour key starts
+/// folded and steps aside while a panel is open, and the whole screen caps
+/// the phone's text size at `ParcelInfoDimens.mapMaxTextScale`, so large
+/// accessibility text never buries the map under its own controls.
 ///
 /// While drawing, the keyboard is an accelerator beside the buttons:
 /// Ctrl/Cmd+Z undoes, Ctrl/Cmd+Shift+Z or Ctrl+Y redoes, Delete or
@@ -115,14 +123,24 @@ class _MapBodyState extends State<MapBody> {
         isError: true,
       );
     } else if (state.notice != null) {
-      ParcelInfoToast.show(context, switch (state.notice!) {
-        MapNoticeEnum.fromStore => l10n.noticeFromStore,
-        MapNoticeEnum.queried => l10n.noticeQueried,
-        MapNoticeEnum.refreshed => l10n.noticeRefreshed,
-        MapNoticeEnum.drawingSaved => l10n.noticeDrawingSaved,
-        MapNoticeEnum.drawingDeleted => l10n.noticeDrawingDeleted,
-        MapNoticeEnum.useApp => l10n.noticeUseApp,
-      });
+      final MapNoticeEnum notice = state.notice!;
+      final bool undoable =
+          notice == MapNoticeEnum.drawingSaved ||
+          notice == MapNoticeEnum.drawingDeleted;
+      ParcelInfoToast.show(
+        context,
+        switch (notice) {
+          MapNoticeEnum.fromStore => l10n.noticeFromStore,
+          MapNoticeEnum.queried => l10n.noticeQueried,
+          MapNoticeEnum.refreshed => l10n.noticeRefreshed,
+          MapNoticeEnum.drawingSaved => l10n.noticeDrawingSaved,
+          MapNoticeEnum.drawingDeleted => l10n.noticeDrawingDeleted,
+          MapNoticeEnum.useApp => l10n.noticeUseApp,
+          MapNoticeEnum.undone => l10n.noticeUndone,
+        },
+        actionLabel: undoable ? l10n.undoButton : null,
+        onAction: undoable ? _cubit.undoLast : null,
+      );
     }
   }
 
@@ -257,17 +275,45 @@ class _MapBodyState extends State<MapBody> {
     );
   }
 
+  List<Widget> _sideLengths(MapHitReadModel? selection) => switch (selection) {
+    MapHitOfficial(:final parcel) => <Widget>[
+      MapSideLengthsLayer(
+        outline: parcel.record.outline.corners,
+        accent: ParcelInfoColor.officialStroke,
+      ),
+    ],
+    MapHitDrawn(:final DrawnParcelEntity drawing) => <Widget>[
+      MapSideLengthsLayer(
+        outline: drawing.outline.corners,
+        accent: ParcelInfoColor.drawnStroke,
+      ),
+    ],
+    _ => const <Widget>[],
+  };
+
+  Future<void> _confirmMerge(MapReady state) async {
+    final MapMergeReadModel? merge = state.merge;
+    if (merge == null) return;
+    final ({PersonEntity? owner})? choice = await MergeOwnerDialog.open(
+      context,
+      persons: state.snapshot.persons,
+      merge: merge,
+    );
+    if (choice != null) await _cubit.confirmMerge(owner: choice.owner);
+  }
+
   Future<void> _splitEqual(MapReady state, DrawnParcelEntity drawing) async {
-    final ({int pieces, List<PersonEntity>? heirs})? choice =
-        await SplitEqualDialog.open(
-          context,
-          drawing: drawing,
-          snapshot: state.snapshot,
-        );
+    final ({int pieces, List<PersonEntity>? heirs, double bearingDegrees})?
+    choice = await SplitEqualDialog.open(
+      context,
+      drawing: drawing,
+      snapshot: state.snapshot,
+    );
     if (choice != null) {
       await _cubit.splitEqual(
         drawing,
         pieces: choice.pieces,
+        bearingDegrees: choice.bearingDegrees,
         heirs: choice.heirs,
       );
     }
@@ -342,10 +388,17 @@ class _MapBodyState extends State<MapBody> {
                     selection: ready.selection,
                     colourLevel: ready.colourLevel,
                   ),
+                if (ready != null &&
+                    ready.drawing == null &&
+                    ready.split == null &&
+                    ready.redivide == null &&
+                    ready.merge == null)
+                  ..._sideLengths(ready.selection),
                 if (ready?.drawing != null) _drawingLayer(ready!.drawing!),
                 if (ready?.split != null) MapSplitLayer(split: ready!.split!),
                 if (ready?.redivide != null)
                   MapRedivideLayer(redivide: ready!.redivide!),
+                if (ready?.merge != null) MapMergeLayer(merge: ready!.merge!),
                 MapAttribution(baseMap: ready?.baseMap ?? _defaultBase),
               ],
             ),
@@ -363,7 +416,13 @@ class _MapBodyState extends State<MapBody> {
                     constraints: const BoxConstraints(
                       maxWidth: ParcelInfoDimens.toolbarMaxWidth,
                     ),
-                    child: ready.redivide != null
+                    child: ready.merge != null
+                        ? MapMergeBar(
+                            merge: ready.merge!,
+                            onCancel: _cubit.cancelMerge,
+                            onConfirm: () => _confirmMerge(ready),
+                          )
+                        : ready.redivide != null
                         ? MapRedivideBar(
                             redivide: ready.redivide!,
                             onCancel: _cubit.cancelRedivide,
@@ -400,11 +459,14 @@ class _MapBodyState extends State<MapBody> {
                 ready.snapshot.drawings.isNotEmpty &&
                 ready.drawing == null &&
                 ready.split == null &&
-                ready.redivide == null)
+                ready.redivide == null &&
+                ready.merge == null &&
+                (wide || ready.selection == null))
               SafeArea(
                 child: Align(
                   alignment: Alignment.bottomLeft,
                   child: MapColourLegend(
+                    initiallyOpen: wide,
                     branches: ready.snapshot.branchesAt(ready.colourLevel),
                   ),
                 ),
@@ -413,6 +475,7 @@ class _MapBodyState extends State<MapBody> {
                 ready.drawing == null &&
                 ready.split == null &&
                 ready.redivide == null &&
+                ready.merge == null &&
                 ready.selection != null)
               SafeArea(
                 child: Align(
@@ -424,11 +487,15 @@ class _MapBodyState extends State<MapBody> {
               ),
           ],
         );
+        final Widget scaled = MediaQuery.withClampedTextScaling(
+          maxScaleFactor: ParcelInfoDimens.mapMaxTextScale,
+          child: map,
+        );
         return ready?.drawing == null
-            ? map
+            ? scaled
             : CallbackShortcuts(
                 bindings: _drawingShortcuts(),
-                child: Focus(autofocus: true, child: map),
+                child: Focus(autofocus: true, child: scaled),
               );
       },
     );
@@ -554,6 +621,7 @@ class _MapBodyState extends State<MapBody> {
           onCompare: () => _cubit.toggleCompare(drawing.id),
           onSplit: () => _cubit.startSplit(drawing),
           onRedivide: () => _cubit.startRedivide(drawing),
+          onMerge: () => _cubit.startMerge(drawing),
           onSplitEqual: () => _splitEqual(state, drawing),
           onDelete: () => _delete(drawing),
           onOpenOfficial: (parcel) => _cubit.focusOn(parcel.id),

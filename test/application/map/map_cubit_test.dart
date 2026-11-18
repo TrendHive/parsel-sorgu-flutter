@@ -6,7 +6,9 @@ import 'package:either_dart/either.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:parcel_atlas/application/activity/usecase/undo_change_usecase.dart';
 import 'package:parcel_atlas/application/drawing/usecase/delete_drawing_usecase.dart';
+import 'package:parcel_atlas/application/drawing/usecase/merge_drawings_usecase.dart';
 import 'package:parcel_atlas/application/drawing/usecase/redivide_drawings_usecase.dart';
 import 'package:parcel_atlas/application/drawing/usecase/save_drawing_usecase.dart';
 import 'package:parcel_atlas/application/drawing/usecase/split_drawing_usecase.dart';
@@ -19,6 +21,7 @@ import 'package:parcel_atlas/application/parcel/usecase/refresh_parcel_usecase.d
 import 'package:parcel_atlas/core/base/base_exception.dart';
 import 'package:parcel_atlas/core/cause/registry_refuses_web_cause.dart';
 import 'package:parcel_atlas/core/exception/quota_exceeded_exception.dart';
+import 'package:parcel_atlas/domain/activity/interface/activity_repository_interface.dart';
 import 'package:parcel_atlas/domain/auth/entity/member_entity.dart';
 import 'package:parcel_atlas/domain/auth/enum/member_role_enum.dart';
 import 'package:parcel_atlas/domain/auth/interface/auth_repository_interface.dart';
@@ -53,6 +56,8 @@ class _Persons extends Mock implements PersonRepositoryInterface {}
 
 class _Location extends Mock implements DeviceLocationInterface {}
 
+class _Activity extends Mock implements ActivityRepositoryInterface {}
+
 void main() {
   const MemberEntity member = MemberEntity(
     id: 'uid',
@@ -78,6 +83,7 @@ void main() {
   late _Officials officials;
   late _Drawings drawings;
   late _Persons persons;
+  late _Activity activity;
   late StreamController<Either<BaseException, List<OfficialParcelEntity>>>
   officialStream;
   late MapCubit cubit;
@@ -94,6 +100,7 @@ void main() {
     officials = _Officials();
     drawings = _Drawings();
     persons = _Persons();
+    activity = _Activity();
     officialStream = StreamController();
     when(() => auth.currentMember).thenReturn(member);
     when(() => officials.watchAll()).thenAnswer((_) => officialStream.stream);
@@ -114,8 +121,10 @@ void main() {
       SaveDrawingUseCase(auth, drawings),
       SplitDrawingUseCase(auth, drawings),
       RedivideDrawingsUseCase(auth, drawings),
+      MergeDrawingsUseCase(auth, drawings),
       DeleteDrawingUseCase(auth, drawings),
       LocateDeviceUseCase(_Location()),
+      UndoChangeUseCase(auth, activity),
       auth,
     )..start();
     officialStream.add(const Right(<OfficialParcelEntity>[]));
@@ -196,8 +205,10 @@ void main() {
         SaveDrawingUseCase(auth, drawings),
         SplitDrawingUseCase(auth, drawings),
         RedivideDrawingsUseCase(auth, drawings),
+        MergeDrawingsUseCase(auth, drawings),
         DeleteDrawingUseCase(auth, drawings),
         LocateDeviceUseCase(_Location()),
+        UndoChangeUseCase(auth, activity),
         auth,
         registryReachable: false,
       )..start();
@@ -219,6 +230,34 @@ void main() {
       await web.close();
     },
   );
+
+  test('assign owner on a registry parcel is not refused when a hand-drawn '
+      'neighbour lies over its outline', () async {
+    final OfficialParcelEntity parcel = testOfficial('66');
+    expect(
+      (cubit.state as MapReady).snapshot.overlapping(
+        parcel.record.outline.corners,
+      ),
+      isNotNull,
+    );
+    registerFallbackValue(parcel.record.outline);
+    registerFallbackValue(
+      const DrawingDetailsValueObject((
+        name: 'x',
+        officialParcelId: null,
+        owners: <OwnershipValueObject>[],
+        note: '',
+      )),
+    );
+    when(() => drawings.create(any(), any(), actor: any(named: 'actor')))
+        .thenAnswer((_) async => const Right('new'));
+
+    await cubit.assignOwner(parcel, testPerson('father'), name: '110/66');
+
+    verify(() => drawings.create(any(), any(), actor: any(named: 'actor')))
+        .called(1);
+    expect((cubit.state as MapReady).exception, isNull);
+  });
 
   test('assign owner records the person on the existing real boundary, links '
       'it, and leaves the map where it is', () async {

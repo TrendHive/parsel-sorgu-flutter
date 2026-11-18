@@ -19,9 +19,13 @@ import 'package:parcel_atlas/core/constants.dart';
 ///
 /// [semiMajorAxis] and [flattening] are WGS84's own constants.
 /// [toLocalPlane] gives each corner as metres east and north of the centre.
-/// [areaSquareMeters] is the shoelace area of that plane polygon,
-/// [perimeterMeters] and [edgeLengthsMeters] its sides, [distanceMeters] the
-/// length between two points, and [contains] the ray-casting inside test the
+/// [areaSquareMeters] is the shoelace area of that plane polygon.
+///
+/// Lengths are exact rather than planar: [geodesicMeters] is the shortest
+/// distance between two points on the ellipsoid itself, by Vincenty's
+/// inverse formula iterated to a millimetre's thousandth — the method land
+/// surveys use. [edgeLengthsMeters] (each side, corner 1 to 2, 2 to 3, … the
+/// last back to 1), [perimeterMeters] and [distanceMeters] all use it. [contains] the ray-casting inside test the
 /// map uses to answer "which parcel did I tap?" without asking the registry.
 ///
 /// [metersPerPixel] converts a tap tolerance from screen pixels to the ground
@@ -31,11 +35,27 @@ import 'package:parcel_atlas/core/constants.dart';
 /// [nearestOnRing] is the closest point of an outline's sides to a point, so
 /// a corner can sit exactly on a neighbour's boundary. [overlapSquareMeters]
 /// estimates the area two outlines share by sampling a grid over the box
-/// they have in common — sides that merely touch share nothing.
+/// they have in common — sides that merely touch share nothing. With
+/// `ignoreWithinMeters` a sample that lies that close to both outlines'
+/// sides is not counted, so a thin strip along a shared side — a neighbour
+/// drawn by hand a few centimetres over the registry's line — shares
+/// nothing, while ground reaching deeper still counts.
 ///
 /// [splitByLine] cuts an outline along the straight line through two points
 /// and answers the two pieces, or nothing when the line does not divide it.
-/// [splitEqual] cuts it into strips of equal area across its long axis.
+/// [splitEqual] cuts it into strips of equal area whose dividing lines all
+/// run at `bearingDegrees` — a compass bearing, clockwise from north, so 0
+/// cuts north–south and 90 east–west. The strips are numbered from the
+/// left of that direction to its right (west to east for 0, north to south
+/// for 90). The member always chooses the bearing; [suggestedCutBearing] is
+/// only the value a form starts from — straight across the outline's long
+/// axis — in `[0, 180)`.
+///
+/// [merge] joins neighbouring outlines back into one, the reverse of a
+/// split: each must share a side with the ones joined before it (in any
+/// order). The sides they share disappear, and so do corners left lying on
+/// a straight side — where a cut met the outer boundary. It answers null
+/// when the outlines do not all hang together.
 ///
 /// [redivide] moves the line between two neighbouring outlines: it joins
 /// them along the sides they share (corners lying on the other's side
@@ -47,6 +67,8 @@ abstract final class GeoRules {
   static const double semiMajorAxis = 6378137;
 
   static const double flattening = 1 / 298.257223563;
+
+  static const double halfTurnDegrees = 180;
 
   static const double _equatorMetersPerPixelAtZoomZero = 156543.03392804097;
 
@@ -118,24 +140,86 @@ abstract final class GeoRules {
   static List<double> edgeLengthsMeters(List<LatLng> points) {
     final List<LatLng> ring = _closed(points);
     if (ring.length < CoreConstants.two) return <double>[];
-    final List<math.Point<double>> plane = toLocalPlane(ring, centre(ring));
     return <double>[
-      for (int i = CoreConstants.zero; i < plane.length - 1; i++)
-        plane[i].distanceTo(plane[i + 1]),
+      for (int i = CoreConstants.zero; i < ring.length - 1; i++)
+        geodesicMeters(ring[i], ring[i + 1]),
     ];
+  }
+
+  static double geodesicMeters(LatLng from, LatLng to) {
+    const double a = semiMajorAxis;
+    const double f = flattening;
+    const double b = a * (1 - f);
+    final double l = _radians(to.longitude - from.longitude);
+    final double u1 = math.atan((1 - f) * math.tan(_radians(from.latitude)));
+    final double u2 = math.atan((1 - f) * math.tan(_radians(to.latitude)));
+    final double sinU1 = math.sin(u1);
+    final double cosU1 = math.cos(u1);
+    final double sinU2 = math.sin(u2);
+    final double cosU2 = math.cos(u2);
+    double lambda = l;
+    double sinSigma = CoreConstants.zeroDouble;
+    double cosSigma = CoreConstants.oneDouble;
+    double sigma = CoreConstants.zeroDouble;
+    double cosSqAlpha = CoreConstants.oneDouble;
+    double cos2SigmaM = CoreConstants.zeroDouble;
+    for (int i = CoreConstants.zero; i < _vincentyIterations; i++) {
+      final double sinLambda = math.sin(lambda);
+      final double cosLambda = math.cos(lambda);
+      sinSigma = math.sqrt(
+        math.pow(cosU2 * sinLambda, CoreConstants.two) +
+            math.pow(
+              cosU1 * sinU2 - sinU1 * cosU2 * cosLambda,
+              CoreConstants.two,
+            ),
+      );
+      if (sinSigma == CoreConstants.zeroDouble) return CoreConstants.zeroDouble;
+      cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * cosLambda;
+      sigma = math.atan2(sinSigma, cosSigma);
+      final double sinAlpha = cosU1 * cosU2 * sinLambda / sinSigma;
+      cosSqAlpha = 1 - sinAlpha * sinAlpha;
+      cos2SigmaM = cosSqAlpha == CoreConstants.zeroDouble
+          ? CoreConstants.zeroDouble
+          : cosSigma - 2 * sinU1 * sinU2 / cosSqAlpha;
+      final double c = f / 16 * cosSqAlpha * (4 + f * (4 - 3 * cosSqAlpha));
+      final double previous = lambda;
+      lambda =
+          l +
+          (1 - c) *
+              f *
+              sinAlpha *
+              (sigma +
+                  c *
+                      sinSigma *
+                      (cos2SigmaM +
+                          c * cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM)));
+      if ((lambda - previous).abs() < _vincentyConvergence) break;
+    }
+    final double uSq = cosSqAlpha * (a * a - b * b) / (b * b);
+    final double bigA =
+        1 + uSq / 16384 * (4096 + uSq * (-768 + uSq * (320 - 175 * uSq)));
+    final double bigB =
+        uSq / 1024 * (256 + uSq * (-128 + uSq * (74 - 47 * uSq)));
+    final double deltaSigma =
+        bigB *
+        sinSigma *
+        (cos2SigmaM +
+            bigB /
+                4 *
+                (cosSigma * (-1 + 2 * cos2SigmaM * cos2SigmaM) -
+                    bigB /
+                        6 *
+                        cos2SigmaM *
+                        (-3 + 4 * sinSigma * sinSigma) *
+                        (-3 + 4 * cos2SigmaM * cos2SigmaM)));
+    return b * bigA * (sigma - deltaSigma);
   }
 
   static double perimeterMeters(List<LatLng> points) => edgeLengthsMeters(
     points,
   ).fold(CoreConstants.zeroDouble, (double sum, double edge) => sum + edge);
 
-  static double distanceMeters(LatLng a, LatLng b) {
-    final List<math.Point<double>> plane = toLocalPlane(<LatLng>[
-      a,
-      b,
-    ], centre(<LatLng>[a, b]));
-    return plane.first.distanceTo(plane.last);
-  }
+  static double distanceMeters(LatLng a, LatLng b) => geodesicMeters(a, b);
 
   static bool contains(List<LatLng> points, LatLng point) {
     final List<LatLng> ring = _closed(points);
@@ -220,6 +304,7 @@ abstract final class GeoRules {
     List<LatLng> first,
     List<LatLng> second, {
     int grid = _overlapGrid,
+    double ignoreWithinMeters = CoreConstants.zeroDouble,
   }) {
     final List<LatLng> a = _open(first);
     final List<LatLng> b = _open(second);
@@ -243,7 +328,13 @@ abstract final class GeoRules {
           left + (i + _half) * stepX,
           bottom + (j + _half) * stepY,
         );
-        if (_inside(planeA, sample) && _inside(planeB, sample)) shared++;
+        if (_inside(planeA, sample) &&
+            _inside(planeB, sample) &&
+            (ignoreWithinMeters <= CoreConstants.zeroDouble ||
+                _distanceToRing(planeA, sample) > ignoreWithinMeters ||
+                _distanceToRing(planeB, sample) > ignoreWithinMeters)) {
+          shared++;
+        }
       }
     }
     return shared * stepX * stepY;
@@ -280,13 +371,26 @@ abstract final class GeoRules {
     ];
   }
 
-  static List<List<LatLng>> splitEqual(List<LatLng> points, int pieces) {
+  static double suggestedCutBearing(List<LatLng> points) {
+    final List<LatLng> open = _open(points);
+    if (open.length < _minimumCorners) return CoreConstants.zeroDouble;
+    final double bearing = -_degrees(
+      _longAxisAngle(toLocalPlane(open, centre(open))),
+    );
+    return (bearing % halfTurnDegrees + halfTurnDegrees) % halfTurnDegrees;
+  }
+
+  static List<List<LatLng>> splitEqual(
+    List<LatLng> points,
+    int pieces, {
+    required double bearingDegrees,
+  }) {
     final List<LatLng> open = _open(points);
     if (open.length < _minimumCorners || pieces < CoreConstants.two) {
       return <List<LatLng>>[];
     }
     final LatLng origin = centre(open);
-    final double angle = _longAxisAngle(toLocalPlane(open, origin));
+    final double angle = -_radians(bearingDegrees);
     final List<math.Point<double>> turned = _rotate(
       toLocalPlane(open, origin),
       -angle,
@@ -308,6 +412,43 @@ abstract final class GeoRules {
       strips.add(fromLocalPlane(_rotate(strip, angle), origin));
     }
     return strips;
+  }
+
+  static List<LatLng>? merge(List<List<LatLng>> outlines) {
+    final List<List<LatLng>> open = outlines.map(_open).toList();
+    if (open.length < CoreConstants.two ||
+        open.any((List<LatLng> o) => o.length < _minimumCorners)) {
+      return null;
+    }
+    final LatLng origin = centre(<LatLng>[for (final o in open) ...o]);
+    List<math.Point<double>> ring = _counterClockwise(
+      toLocalPlane(open.first, origin),
+    );
+    final List<List<math.Point<double>>> left = <List<math.Point<double>>>[
+      for (final List<LatLng> o in open.skip(CoreConstants.one))
+        _counterClockwise(toLocalPlane(o, origin)),
+    ];
+    while (left.isNotEmpty) {
+      bool joinedOne = false;
+      for (int i = CoreConstants.zero; i < left.length; i++) {
+        final List<math.Point<double>> withB = _withCornersOf(ring, left[i]);
+        final List<math.Point<double>> withA = _withCornersOf(left[i], withB);
+        final ({
+          List<math.Point<double>> ring,
+          List<math.Point<double>> shared,
+        })?
+        joined = _join(withB, withA);
+        if (joined == null) continue;
+        ring = joined.ring;
+        left.removeAt(i);
+        joinedOne = true;
+        break;
+      }
+      if (!joinedOne) return null;
+    }
+    final List<math.Point<double>> clean = _withoutStraightCorners(ring);
+    if (clean.length < _minimumCorners) return null;
+    return fromLocalPlane(clean, origin);
   }
 
   static ({List<LatLng> first, List<LatLng> second})? redivide(
@@ -573,6 +714,35 @@ abstract final class GeoRules {
     return _distinct(kept);
   }
 
+  static List<math.Point<double>> _withoutStraightCorners(
+    List<math.Point<double>> ring,
+  ) {
+    final List<math.Point<double>> kept = <math.Point<double>>[...ring];
+    bool removed = true;
+    while (removed && kept.length > _minimumCorners) {
+      removed = false;
+      for (int i = CoreConstants.zero; i < kept.length; i++) {
+        final math.Point<double> before =
+            kept[(i - 1 + kept.length) % kept.length];
+        final math.Point<double> here = kept[i];
+        final math.Point<double> after = kept[(i + 1) % kept.length];
+        final double length = before.distanceTo(after);
+        if (length <= _samePoint) continue;
+        final double offLine =
+            ((after.x - before.x) * (here.y - before.y) -
+                    (after.y - before.y) * (here.x - before.x))
+                .abs() /
+            length;
+        if (offLine <= _joinTolerance) {
+          kept.removeAt(i);
+          removed = true;
+          break;
+        }
+      }
+    }
+    return kept;
+  }
+
   static List<math.Point<double>> _distinct(List<math.Point<double>> points) {
     final List<math.Point<double>> result = <math.Point<double>>[];
     for (final math.Point<double> point in points) {
@@ -621,6 +791,27 @@ abstract final class GeoRules {
     return twice.abs() / CoreConstants.two;
   }
 
+  static double _distanceToRing(
+    List<math.Point<double>> plane,
+    math.Point<double> p,
+  ) {
+    double best = double.infinity;
+    for (int i = CoreConstants.zero; i < plane.length; i++) {
+      final math.Point<double> a = plane[i];
+      final math.Point<double> b = plane[(i + 1) % plane.length];
+      final double length = a.squaredDistanceTo(b);
+      final double t = length == CoreConstants.zeroDouble
+          ? CoreConstants.zeroDouble
+          : (((p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y)) / length)
+                .clamp(CoreConstants.zeroDouble, CoreConstants.oneDouble);
+      final double distance = p.distanceTo(
+        math.Point<double>(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t),
+      );
+      if (distance < best) best = distance;
+    }
+    return best;
+  }
+
   static bool _inside(List<math.Point<double>> plane, math.Point<double> p) {
     bool inside = false;
     for (
@@ -666,6 +857,10 @@ abstract final class GeoRules {
 
   static const int _minimumCorners = 3;
 
+  static const int _vincentyIterations = 200;
+
+  static const double _vincentyConvergence = 1e-12;
+
   static const double _joinTolerance = 0.05;
 
   static const int _overlapGrid = 48;
@@ -678,9 +873,9 @@ abstract final class GeoRules {
 
   static const double _smallestPiece = 0.001;
 
-  static double _degrees(double radians) => radians * 180 / math.pi;
+  static double _degrees(double radians) => radians * halfTurnDegrees / math.pi;
 
-  static double _radians(double degrees) => degrees * math.pi / 180;
+  static double _radians(double degrees) => degrees * math.pi / halfTurnDegrees;
 
   static List<LatLng> _open(List<LatLng> points) =>
       points.length > CoreConstants.one && points.first == points.last
